@@ -61,7 +61,8 @@ namespace SolarEditor
         public static bool OnInitialize()
         {
             editorState = new EditorState(new EditorConfig());
-            
+
+            camera = new FlyCamera();
             Quaternion q = Quaternion.Normalize(new Quaternion(2, 23, 34, 12));
 
             Console.WriteLine(Matrix3.ToQuaternion(Quaternion.ToMatrix3(q)));
@@ -83,15 +84,23 @@ namespace SolarEditor
             return ImGui.Initialzie();
         }
 
+        static FlyCamera camera;
         public static void OnUpdate()
         {
-
+            if (Application.IsKeyJustDown(0x1B))
+            {
+                Application.Quit();
+            }
+            camera.Operate();
         }
 
         public static void OnRender(RenderPacket renderPacket)
         {
-            renderPacket.renderEntries.Add(new RenderEntry(new Vector3(5, 0, 0), Quaternion.Identity, new Vector3(0.1f, 1, 1)));
-            renderPacket.renderEntries.Add(new RenderEntry(new Vector3(0, 0, 0), Quaternion.Identity, new Vector3(1,1,1)));
+            //renderPacket.renderEntries.Add(new RenderEntry(new Vector3(5, 0, 0), Quaternion.Identity, new Vector3(0.1f, 1, 1)));
+            renderPacket.renderEntries.Add(new RenderEntry(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1)));
+
+            renderPacket.viewMatrix = camera.GetViewMatrix();
+            renderPacket.projectionMatrix = camera.GetProjectionMatrix();
         }
 
         public static void OnShutdown()

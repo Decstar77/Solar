@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8FjneYrwJfnqifgsFoE0wRARGhjWTC+jcRKdZAaPcq70/CA7NA5Sa90qrmeS5bcW+ga8RT4NBNsIESR0vz3xDA==",
+  "dgSpecHash": "Qco110EBkoNV7ta3WZtIPHZDfHKZ0hiW0NyUsAlNt/yzWPvgYhibKPad1d6qe7FV8nI753HY2tvMGDgx8HckRg==",
   "success": true,
-  "projectFilePath": "F:\\codes\\Learning\\SolarSharp\\SolarEditor\\SolarEditor.csproj",
+  "projectFilePath": "F:\\codes\\Solar\\SolarEditor\\SolarEditor.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\porte\\.nuget\\packages\\assimpnet\\4.1.0\\assimpnet.4.1.0.nupkg.sha512",
     "C:\\Users\\porte\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",

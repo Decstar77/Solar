@@ -261,13 +261,14 @@ namespace SolarSharp.Rendering
             RenderCommands.SetConstBufferData(cbuf);
             RenderCommands.RendererDrawStaticMesh(unitCube);
 #else
-            Matrix4 proj = Matrix4.CreatePerspectiveRH((MathF.PI / 180) * 45.0f, Application.WindowAspect, 0.1f, 100.0f);
-            Matrix4 cam = Matrix4.CreateLookAtRH(new Vector3(8, 8, 8), Vector3.Zero, Vector3.UnitY).Inverse;
+            //Matrix4 proj = Matrix4.CreatePerspectiveRH((MathF.PI / 180) * 45.0f, Application.WindowAspect, 0.1f, 100.0f);
+            //Matrix4 view = Matrix4.CreateLookAtRH(new Vector3(8, 8, 8), Vector3.Zero, Vector3.UnitY).Inverse;
+            Matrix4 proj = renderPacket.projectionMatrix;
+            Matrix4 view = renderPacket.viewMatrix;
 
-            
             foreach (RenderEntry entry in renderPacket.renderEntries)
             {
-                Matrix4 mvp = (proj * cam * entry.ComputeTransformMatrix());
+                Matrix4 mvp = (proj * view * entry.ComputeTransformMatrix());
 
                 cbuf.Reset();
                 cbuf.Prepare(mvp);

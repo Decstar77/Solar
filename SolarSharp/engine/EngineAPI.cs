@@ -7,79 +7,15 @@ using System.Runtime.InteropServices;
 
 namespace SolarSharp
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Input
-    {
-		[MarshalAs(UnmanagedType.Bool)] public bool mb1;
-        [MarshalAs(UnmanagedType.Bool)] public bool mb2;
-        [MarshalAs(UnmanagedType.Bool)] public bool mb3;
-        [MarshalAs(UnmanagedType.Bool)] public bool alt;
-        [MarshalAs(UnmanagedType.Bool)] public bool shift;
-        [MarshalAs(UnmanagedType.Bool)] public bool ctrl;
-		[MarshalAs(UnmanagedType.Bool)] public bool w;
-		[MarshalAs(UnmanagedType.Bool)] public bool s;
-		[MarshalAs(UnmanagedType.Bool)] public bool a;
-		[MarshalAs(UnmanagedType.Bool)] public bool d;
-		[MarshalAs(UnmanagedType.Bool)] public bool q;
-		[MarshalAs(UnmanagedType.Bool)] public bool e;
-		[MarshalAs(UnmanagedType.Bool)] public bool r;
-		[MarshalAs(UnmanagedType.Bool)] public bool t;
-		[MarshalAs(UnmanagedType.Bool)] public bool z;
-		[MarshalAs(UnmanagedType.Bool)] public bool x;
-		[MarshalAs(UnmanagedType.Bool)] public bool c;
-		[MarshalAs(UnmanagedType.Bool)] public bool v;
-		[MarshalAs(UnmanagedType.Bool)] public bool b;
-		[MarshalAs(UnmanagedType.Bool)] public bool del;
-		[MarshalAs(UnmanagedType.Bool)] public bool tlda;
-		[MarshalAs(UnmanagedType.Bool)] public bool K1;
-		[MarshalAs(UnmanagedType.Bool)] public bool K2;
-		[MarshalAs(UnmanagedType.Bool)] public bool K3;
-		[MarshalAs(UnmanagedType.Bool)] public bool K4;
-		[MarshalAs(UnmanagedType.Bool)] public bool K5;
-		[MarshalAs(UnmanagedType.Bool)] public bool K6;
-		[MarshalAs(UnmanagedType.Bool)] public bool K7;
-		[MarshalAs(UnmanagedType.Bool)] public bool K8;
-		[MarshalAs(UnmanagedType.Bool)] public bool K9;
-		[MarshalAs(UnmanagedType.Bool)] public bool K0;
-		[MarshalAs(UnmanagedType.Bool)] public bool f1;
-		[MarshalAs(UnmanagedType.Bool)] public bool f2;
-		[MarshalAs(UnmanagedType.Bool)] public bool f3;
-		[MarshalAs(UnmanagedType.Bool)] public bool f4;
-		[MarshalAs(UnmanagedType.Bool)] public bool f5;
-		[MarshalAs(UnmanagedType.Bool)] public bool f6;
-		[MarshalAs(UnmanagedType.Bool)] public bool f7;
-		[MarshalAs(UnmanagedType.Bool)] public bool f8;
-		[MarshalAs(UnmanagedType.Bool)] public bool f9;
-		[MarshalAs(UnmanagedType.Bool)] public bool f10;
-		[MarshalAs(UnmanagedType.Bool)] public bool f11;
-		[MarshalAs(UnmanagedType.Bool)] public bool f12;
-		[MarshalAs(UnmanagedType.Bool)] public bool escape;
-		[MarshalAs(UnmanagedType.Bool)] public bool space;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerUp;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerDown;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerLeft;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerRight;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerStart;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerBack;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerLeftThumb;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerRightThumb;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerLeftShoulder;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerRightShoulder;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerA;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerB;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerX;
-		[MarshalAs(UnmanagedType.Bool)] public bool controllerY;
-	}
-
     public class EngineAPI
     {
         const string DLLName = "SolarWindows";
 
         [DllImport(DLLName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
-        public static extern bool Win32CreateWindow([MarshalAs(UnmanagedType.LPStr)] string title, int width, int height, int xPos, int yPos);
+		internal static extern bool Win32CreateWindow([MarshalAs(UnmanagedType.LPStr)] string title, int width, int height, int xPos, int yPos);
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        public static extern bool Win32PumpMessages(ref Input input);
+        internal static extern bool Win32PumpMessages(int[] keys, ref MouseIput mouseInput);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern void Win32PostQuitMessage();

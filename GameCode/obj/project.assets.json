@@ -49,11 +49,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\codes\\Learning\\SolarSharp\\GameCode\\GameCode.csproj",
+      "projectUniqueName": "F:\\codes\\Solar\\GameCode\\GameCode.csproj",
       "projectName": "GameCode",
-      "projectPath": "F:\\codes\\Learning\\SolarSharp\\GameCode\\GameCode.csproj",
+      "projectPath": "F:\\codes\\Solar\\GameCode\\GameCode.csproj",
       "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
-      "outputPath": "F:\\codes\\Learning\\SolarSharp\\GameCode\\obj\\",
+      "outputPath": "F:\\codes\\Solar\\GameCode\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -70,8 +70,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj": {
-              "projectPath": "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj"
+            "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
+              "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj"
             }
           }
         }

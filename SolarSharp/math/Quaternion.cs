@@ -95,6 +95,11 @@ namespace SolarSharp
             return new Matrix4(ToMatrix3(value));
         }
 
+        public static Basis ToBasis(Quaternion value)
+        {           
+            return ToMatrix3(value).Basis;
+        }
+
         public static Quaternion RotateLocalX(Quaternion value, float angleRads)
         {
             float hangle = angleRads * 0.5f;            

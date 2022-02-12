@@ -24,14 +24,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="collision\Ray.cs" />
     <Compile Include="core\Application.cs" />
     <Compile Include="core\ApplicationConfig.cs" />
     <Compile Include="core\EventSystem.cs" />
+    <Compile Include="core\Input.cs" />
     <Compile Include="core\MeshFactory.cs" />
     <Compile Include="core\RenderPacket.cs" />
     <Compile Include="core\Resources.cs" />
+    <Compile Include="core\Util.cs" />
     <Compile Include="engine\ImGuiAPI.cs" />
     <Compile Include="core\Logger.cs" />
+    <Compile Include="math\Basis.cs" />
     <Compile Include="math\Matrix3.cs" />
     <Compile Include="math\Quaternion.cs" />
     <Compile Include="math\Vector2.cs" />

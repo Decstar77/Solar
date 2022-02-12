@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj": {}
+    "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {}
   },
   "projects": {
-    "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj": {
+    "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj",
+        "projectUniqueName": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
         "projectName": "SolarSharp",
-        "projectPath": "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj",
+        "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
         "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
-        "outputPath": "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\obj\\",
+        "outputPath": "F:\\codes\\Solar\\SolarSharp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "F:\\codes\\Learning\\SolarSharp\\SolarWindows\\SolarWindows.vcxproj": {
-                "projectPath": "F:\\codes\\Learning\\SolarSharp\\SolarWindows\\SolarWindows.vcxproj"
+              "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
+                "projectPath": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj"
               }
             }
           }
@@ -62,11 +62,11 @@
         }
       }
     },
-    "F:\\codes\\Learning\\SolarSharp\\SolarWindows\\SolarWindows.vcxproj": {
+    "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
       "restore": {
-        "projectUniqueName": "F:\\codes\\Learning\\SolarSharp\\SolarWindows\\SolarWindows.vcxproj",
+        "projectUniqueName": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj",
         "projectName": "SolarWindows",
-        "projectPath": "F:\\codes\\Learning\\SolarSharp\\SolarWindows\\SolarWindows.vcxproj",
+        "projectPath": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj",
         "frameworks": {
           "native": {
             "projectReferences": {}

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lb+mv+JuQylkOtpCn0OkszGEOZFYXQJdeMaakDbiU1j10F99otDi2alWWWTGMIaNVwOwRTLAvIWazR9/dzk0dw==",
+  "dgSpecHash": "jOXO2UtpwNQiMVtaXs5kUTn4XQH8pui4RCitTLGrFjzAVS0ymkIVxSl3ek4oOjGer04MK5Q+DOrlUNlEVsFwtQ==",
   "success": true,
-  "projectFilePath": "F:\\codes\\Learning\\SolarSharp\\SolarSharp\\SolarSharp.csproj",
+  "projectFilePath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

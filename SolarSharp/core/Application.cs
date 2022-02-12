@@ -27,6 +27,8 @@ namespace SolarSharp
         private static Input input = new Input();
         private static Input oldInput = new Input();
 
+        private static Vector2 mouseDelta = new Vector2(0, 0);
+
         private static string version;
         private static string descrip;
 
@@ -71,17 +73,28 @@ namespace SolarSharp
                                 {
                                     Logger.Info("Startup successful");
 
-                                    while (EngineAPI.Win32PumpMessages(ref input))
+                                   
+                                    while (EngineAPI.Win32PumpMessages(input.keys, ref input.mouseIput))
                                     {
                                         RenderPacket renderPacket = new RenderPacket();
+
+                                        if (input.mouseIput.mouseLocked)
+                                        {                                           
+                                            mouseDelta.x = (float)(input.mouseIput.mouseXPositionNormalCoords - 0.5);
+                                            mouseDelta.y = (float)(input.mouseIput.mouseYPositionNormalCoords - 0.5);
+                                        }
+                                        else
+                                        {
+                                            mouseDelta.x = (float)(input.mouseIput.mouseXPositionNormalCoords - oldInput.mouseIput.mouseXPositionNormalCoords);
+                                            mouseDelta.y = (float)(input.mouseIput.mouseYPositionNormalCoords - oldInput.mouseIput.mouseYPositionNormalCoords);
+                                        }
 
                                         config.OnUpdateCallback();
                                         config.OnRenderCallback(renderPacket);
 
                                         Renderer.Render(renderPacket);
 
-
-                                        oldInput = input;
+                                        oldInput.Copy(input);
                                     }
                                 }
                                 else
@@ -117,6 +130,57 @@ namespace SolarSharp
             {
                 Logger.Error("Update/render/init/shutdown callback(s) is null");
             }
+        }
+
+        public static void Quit()
+        {
+            EngineAPI.Win32PostQuitMessage();
+        }
+        public static float GetDeltaTime()
+        {
+            return 0.016f;
+        }
+        public static bool IsKeyDown(ushort vkCode)
+        {
+            return input.keys[vkCode] == 1;
+        }
+        public static bool IsKeyJustDown(ushort vkCode)
+        {
+            return input.keys[vkCode] == 1 && oldInput.keys[vkCode] == 0;
+        }
+        public static bool IsKeyJustUp(ushort vkCode)
+        {
+            return input.keys[vkCode] == 0 && oldInput.keys[vkCode] == 1;
+        }
+        public static void EnableMouse()
+        {
+            input.mouseIput.mouseLocked = false;
+        }
+        public static void DisableMouse()
+        {
+            input.mouseIput.mouseLocked = true;
+        }
+        public static bool GetMouseDown(int num)
+        {
+            if (num == 1)
+            {
+                return input.mouseIput.mb1;
+            }
+            else if (num == 2)
+            {
+                return input.mouseIput.mb2;
+            }
+            else if (num == 3)
+            {
+                return input.mouseIput.mb3;
+            }
+
+            return false;
+        }
+
+        public static Vector2 GetMouseDelta()
+        {
+            return mouseDelta;
         }
     }
 }

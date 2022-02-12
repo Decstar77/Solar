@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rQxGYEF+tLiUPHNlKZ71Y61d8cm9JGSjjyHript24gIbygJm0VR0qWAaEAXhmJ6VDHIglOHyS71Q4s87TxWVqw==",
+  "dgSpecHash": "DR62RARPDUfV/2xDvAiZzcPUvvl+wNqaryyzfNKjEQVU/iUcN34bbVWHuOEpfhbmWl/bKEcFr0rvv1vF5OxdNg==",
   "success": true,
-  "projectFilePath": "F:\\codes\\Learning\\SolarSharp\\GameCode\\GameCode.csproj",
+  "projectFilePath": "F:\\codes\\Solar\\GameCode\\GameCode.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

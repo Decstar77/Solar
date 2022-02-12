@@ -381,6 +381,7 @@ struct Vec2
 
 typedef Vec2<real32> Vec2f;
 typedef Vec2<int32> Vec2i;
+typedef Vec2<double> Vec2d;
 
 template <typename T>
 inline T MagSqrd(const Vec2<T>& a)

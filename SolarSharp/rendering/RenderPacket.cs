@@ -39,6 +39,8 @@ namespace SolarSharp.Rendering
 
     public class RenderPacket
     {
+        public Matrix4 viewMatrix;
+        public Matrix4 projectionMatrix;
         public List<RenderEntry> renderEntries = new List<RenderEntry>();
     }
 }

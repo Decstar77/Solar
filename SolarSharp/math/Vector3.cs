@@ -29,10 +29,8 @@ namespace SolarSharp
             return string.Format("x={0}, y={1}, z={2}", x, y, z);
         }
 
-        public float LengthSquared()
-        {
-            return x * x + y * y + z * z;
-        }
+        public float Mag { get { return MathF.Sqrt(x * x + y * y + z * z); } }
+        public float MagSqrd { get { return (x * x + y * y + z * z); } }
 
         public static Vector3 Normalize(Vector3 value)
         {
@@ -61,6 +59,16 @@ namespace SolarSharp
                 position.x * matrix.m11 + position.y * matrix.m21 + position.z * matrix.m31 + matrix.m41,
                 position.x * matrix.m12 + position.y * matrix.m22 + position.z * matrix.m32 + matrix.m42,
                 position.x * matrix.m13 + position.y * matrix.m23 + position.z * matrix.m33 + matrix.m43);
+        }
+
+        public static bool operator ==(Vector3 left, Vector3 right)
+        {
+            return (left.x == right.x && left.y == right.y && left.z == right.z);
+        }
+
+        public static bool operator !=(Vector3 left, Vector3 right)
+        {
+            return (left.x != right.x || left.y != right.y || left.z != right.z);
         }
 
         public static Vector3 operator +(Vector3 left, Vector3 right)

@@ -51,6 +51,11 @@ namespace SolarSharp
         public Vector3 row2 { get { return new Vector3(m21, m22, m23); } set { m21 = value.x; m22 = value.y; m23 = value.z; } }
         public Vector3 row3 { get { return new Vector3(m31, m32, m33); } set { m31 = value.x; m32 = value.y; m33 = value.z; } }
 
+
+        public Vector3 col1 { get { return new Vector3(m11, m21, m31); } set { m11 = value.x; m21 = value.y; m31 = value.z; } }
+        public Vector3 col2 { get { return new Vector3(m12, m22, m32); } set { m12 = value.x; m22 = value.y; m32 = value.z; } }
+        public Vector3 col3 { get { return new Vector3(m13, m23, m33); } set { m13 = value.x; m23 = value.y; m33 = value.z; } }
+
         public static Matrix3 Identity
         {
             get
@@ -131,6 +136,15 @@ namespace SolarSharp
                     m13, m23, m33);
             }
         }
+
+        public Basis Basis
+        {
+            get 
+            {
+                return new Basis(col1, col2, col3);
+            }
+        }
+
 
         public static Quaternion ToQuaternion(Matrix3 matrix)
         {   
