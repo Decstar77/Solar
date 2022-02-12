@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "GameCode/1.0.0": {
+        "dependencies": {
+          "SolarSharp": "1.0.0"
+        },
+        "runtime": {
+          "GameCode.dll": {}
+        }
+      },
+      "SolarSharp/1.0.0": {
+        "dependencies": {
+          "SolarWindows": "1.0.0"
+        },
+        "runtime": {
+          "SolarSharp.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "GameCode/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SolarSharp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

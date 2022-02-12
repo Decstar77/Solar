@@ -1,0 +1,11 @@
+F:\codes\Learning\SolarSharp\x64\Debug\SolarSharp.deps.json
+F:\codes\Learning\SolarSharp\x64\Debug\SolarSharp.dll
+F:\codes\Learning\SolarSharp\x64\Debug\ref\SolarSharp.dll
+F:\codes\Learning\SolarSharp\x64\Debug\SolarSharp.pdb
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarSharp.GeneratedMSBuildEditorConfig.editorconfig
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarSharp.AssemblyInfoInputs.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarSharp.AssemblyInfo.cs
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarSharp.csproj.CoreCompileInputs.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarSharp.dll
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\ref\SolarSharp.dll
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarSharp.pdb

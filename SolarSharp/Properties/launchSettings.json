@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SolarSharp": {
+      "commandName": "Project",
+      "hotReloadEnabled": false,
+      "nativeDebugging": true
+    }
+  }
+}

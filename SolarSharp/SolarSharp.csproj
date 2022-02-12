@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseOutputPath>$(SolutionDir)</BaseOutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\x64\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutputPath>..\x64\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Application\**" />
+    <EmbeddedResource Remove="Application\**" />
+    <None Remove="Application\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="core\Application.cs" />
+    <Compile Include="core\ApplicationConfig.cs" />
+    <Compile Include="core\EventSystem.cs" />
+    <Compile Include="core\MeshFactory.cs" />
+    <Compile Include="core\RenderPacket.cs" />
+    <Compile Include="core\Resources.cs" />
+    <Compile Include="engine\ImGuiAPI.cs" />
+    <Compile Include="core\Logger.cs" />
+    <Compile Include="math\Matrix3.cs" />
+    <Compile Include="math\Quaternion.cs" />
+    <Compile Include="math\Vector2.cs" />
+    <Compile Include="rendering\Renderer.cs" />
+    <Compile Include="engine\EngineAPI.cs" />
+    <Compile Include="math\Matrix4.cs" />
+    <Compile Include="math\Vector3.cs" />
+    <Compile Include="math\Vector4.cs" />
+    <Compile Include="rendering\RenderPacket.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SolarWindows\SolarWindows.vcxproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Programs\FirstShader.hlsl" />
+  </ItemGroup>
+
+</Project>

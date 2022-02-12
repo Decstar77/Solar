@@ -1,0 +1,15 @@
+F:\codes\Learning\SolarSharp\x64\Debug\SolarEditor.exe
+F:\codes\Learning\SolarSharp\x64\Debug\SolarEditor.deps.json
+F:\codes\Learning\SolarSharp\x64\Debug\SolarEditor.runtimeconfig.json
+F:\codes\Learning\SolarSharp\x64\Debug\SolarEditor.dll
+F:\codes\Learning\SolarSharp\x64\Debug\ref\SolarEditor.dll
+F:\codes\Learning\SolarSharp\x64\Debug\SolarEditor.pdb
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.csproj.AssemblyReference.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.GeneratedMSBuildEditorConfig.editorconfig
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.AssemblyInfoInputs.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.AssemblyInfo.cs
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.csproj.CoreCompileInputs.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.dll
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\ref\SolarEditor.dll
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.pdb
+F:\codes\Learning\SolarSharp\SolarSharp\obj\Debug\SolarEditor.genruntimeconfig.cache

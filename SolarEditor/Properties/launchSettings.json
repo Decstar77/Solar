@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SolarEditor": {
+      "commandName": "Project",
+      "hotReloadEnabled": false,
+      "nativeDebugging": true
+    }
+  }
+}

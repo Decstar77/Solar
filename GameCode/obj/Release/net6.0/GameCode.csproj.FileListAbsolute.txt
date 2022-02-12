@@ -1,0 +1,11 @@
+F:\codes\Learning\SolarSharp\GameCode\bin\Release\net6.0\GameCode.deps.json
+F:\codes\Learning\SolarSharp\GameCode\bin\Release\net6.0\GameCode.dll
+F:\codes\Learning\SolarSharp\GameCode\bin\Release\net6.0\ref\GameCode.dll
+F:\codes\Learning\SolarSharp\GameCode\bin\Release\net6.0\GameCode.pdb
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\GameCode.GeneratedMSBuildEditorConfig.editorconfig
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\GameCode.AssemblyInfoInputs.cache
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\GameCode.AssemblyInfo.cs
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\GameCode.csproj.CoreCompileInputs.cache
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\GameCode.dll
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\ref\GameCode.dll
+F:\codes\Learning\SolarSharp\GameCode\obj\Release\net6.0\GameCode.pdb
