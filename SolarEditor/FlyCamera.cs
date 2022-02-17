@@ -7,37 +7,27 @@ using SolarSharp;
 
 namespace SolarEditor
 {
-    internal class FlyCamera
+    internal class FlyCamera : Camera
     {
-		private Vector3 position = new Vector3(8, 8, 8);
-		private Quaternion orientation = Quaternion.Identity;
-		
 		private float pitch;
 		private float yaw;
-
-		private float far;
-		private float near;
-		private float yfov;
 
 		internal FlyCamera()
         {
 			pitch = 0;
 			yaw = -90.0f; 
-			far = 100.0f;
-			near = 0.1f;
-			yfov = Util.DegToRad(45.0f);
-			orientation = Matrix4.ToQuaternion(Matrix4.CreateLookAtRH(position, Vector3.Zero, Vector3.UnitY));
         }
 
 		internal void Operate()
         {
+			float mouseSensitivity = 100.1f;
+			float flySpeed = 10.0f;
 			if (Application.GetMouseDown(2))
             {             
 				Application.DisableMouse();
 
 				Vector2 delta = Application.GetMouseDelta();
                 
-				float mouseSensitivity = 100.1f;
 				yaw += delta.x * mouseSensitivity;
 				pitch -= delta.y * mouseSensitivity;
 
@@ -50,6 +40,24 @@ namespace SolarEditor
 
 				Matrix4 result = Matrix4.CreateLookAtRH(position, position + direction, Vector3.UnitY);
 				orientation = Matrix4.ToQuaternion(result);
+
+
+				Basis basis = Quaternion.ToBasis(orientation);
+				Vector3 move = Vector3.Zero;
+
+				if (Application.IsKeyDown('W')) { move -= basis.forward; } // @NOTE: Right handed so '-' is comming 'out'
+				if (Application.IsKeyDown('S')) { move += basis.forward; }
+				if (Application.IsKeyDown('D')) { move += basis.right; }
+				if (Application.IsKeyDown('A')) { move -= basis.right; }
+				if (Application.IsKeyDown('Q')) { move += Vector3.UnitY; }
+				if (Application.IsKeyDown('E')) { move -= Vector3.UnitY; }
+
+				// @TODO: Use epsilon damnit !!
+				if (move.MagSqrd > 0.01f)
+                {
+					move = Vector3.Normalize(move) * flySpeed * Application.GetDeltaTime();
+					position += move;
+				}				
 			}
 			else
             {
@@ -57,7 +65,5 @@ namespace SolarEditor
             }
         }
 
-		internal Matrix4 GetViewMatrix() { return Matrix4.TranslateRH(Quaternion.ToMatrix4(orientation), position).Inverse; }
-		internal Matrix4 GetProjectionMatrix() { return Matrix4.CreatePerspectiveRH(yfov, Application.WindowAspect, near, far); }
     }
 }

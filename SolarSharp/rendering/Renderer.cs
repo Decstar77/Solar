@@ -91,9 +91,9 @@ namespace SolarSharp.Rendering
 
     internal class StaticProgram
     {
-        public StaticProgram(string srcCode)
+        public StaticProgram(string srcCode, VertexLayout layout)
         {            
-            obj = EngineAPI.RendererCreateStaticProgram(srcCode, 3);
+            obj = EngineAPI.RendererCreateStaticProgram(srcCode, (int)layout);
         }
 
         public int State { get { return obj; } }
@@ -109,6 +109,20 @@ namespace SolarSharp.Rendering
 
         public int State { get { return obj; } }
         private int obj;
+    }
+
+    internal class DynamicMesh
+    {
+        internal DynamicMesh(int floatCount, VertexLayout layout)
+        {
+            vertices = new float[floatCount];
+            obj = EngineAPI.RendererCreateDynamicMesh(floatCount, (int)layout);
+        }
+
+        internal float[] vertices;
+
+        // @HACK @TODO: Make private !!
+        internal int obj;
     }
 
     internal class ConstBuffer
@@ -183,8 +197,6 @@ namespace SolarSharp.Rendering
         {
             EngineAPI.RendererDrawStaticMesh(mesh.State);
         }
-
-
     }
 
     internal class Renderer
@@ -194,19 +206,25 @@ namespace SolarSharp.Rendering
         private static int samplerState;
         private static int blendState;
         private static StaticProgram program;
-        private static ConstBuffer cbuf;
-        
+
+
+        private static ConstBuffer vertexShaderModelData;
+        private static ConstBuffer vertexShaderViewData;
+
         private static StaticMesh unitQuad;
         private static StaticMesh unitCube;
 
         public static StaticMesh testMesh;
+
+        public static DynamicMesh debugMesh;
+        public static StaticProgram debugProgram;
 
         public static bool Create()
         {
             rasterState = new RasterState(RasterState.FillMode.SOLID, RasterState.CullMode.BACK);
             depthState = new DepthState(true, true, DepthState.Comparison.LESS_EQUAL);
 
-            program = new StaticProgram(new StreamReader("F:/codes/Learning/SolarSharp/SolarSharp/Programs/FirstShader.hlsl").ReadToEnd());
+            program = new StaticProgram(new StreamReader("F:/codes/Solar/SolarSharp/Programs/FirstShader.hlsl").ReadToEnd(), VertexLayout.PNT);
 
             MeshResource quadResource = Tools.MeshFactory.CreateQuad(-1, 1, 2, 2, 0);
             MeshResource cubeResource = Tools.MeshFactory.CreateBox(2, 2, 2, 1);
@@ -214,13 +232,16 @@ namespace SolarSharp.Rendering
             unitQuad = new StaticMesh(quadResource.vertices.ToArray(), quadResource.indices.ToArray(), VertexLayout.PNT);
             unitCube = new StaticMesh(cubeResource.vertices.ToArray(), cubeResource.indices.ToArray(), VertexLayout.PNT);
 
-            cbuf = new ConstBuffer(16 * 3);
-            RenderCommands.SetVertexConstBuffer(cbuf, 0);
+            vertexShaderModelData = new ConstBuffer(16 * 3);
+            RenderCommands.SetVertexConstBuffer(vertexShaderModelData, 0);
 
-
+            vertexShaderViewData = new ConstBuffer(16 * 3);
+            RenderCommands.SetVertexConstBuffer(vertexShaderViewData, 1);
 
             //samplerState = EngineAPI.RendererCreateSamplerState(20, 1);
             blendState = EngineAPI.RendererCreateBlendState();
+
+            Debug.Initialize();
     
             return true;
         }
@@ -266,29 +287,26 @@ namespace SolarSharp.Rendering
             Matrix4 proj = renderPacket.projectionMatrix;
             Matrix4 view = renderPacket.viewMatrix;
 
+            vertexShaderViewData.Reset();
+            vertexShaderViewData.Prepare(proj);
+            vertexShaderViewData.Prepare(view);
+            RenderCommands.SetConstBufferData(vertexShaderViewData);
+
             foreach (RenderEntry entry in renderPacket.renderEntries)
             {
                 Matrix4 mvp = (proj * view * entry.ComputeTransformMatrix());
 
-                cbuf.Reset();
-                cbuf.Prepare(mvp);
-                RenderCommands.SetConstBufferData(cbuf);
+                vertexShaderModelData.Reset();
+                vertexShaderModelData.Prepare(mvp);
+                RenderCommands.SetConstBufferData(vertexShaderModelData);
                 RenderCommands.RendererDrawStaticMesh(unitCube);
             }
 
-
-            
-
-            //m = Matrix4.Identity; m.m14 = 0; m.m24 = 4; m.m34 = 0;
-            //mvp = (proj * cam * m);
-
-            //cbuf.Reset();
-            //cbuf.Prepare(mvp);
-            //RenderCommands.SetConstBufferData(cbuf);
-            //RenderCommands.RendererDrawStaticMesh(unitCube);
 #endif
 
-
+#if DEBUG         
+            Debug.Flush();
+#endif
             EventSystem.Fire(EventType.RENDER_END, null);
 
             EngineAPI.RendererEndFrame(1);

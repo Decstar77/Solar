@@ -400,6 +400,16 @@ namespace SolarSharp
 
             return m;
         }
+        
+        public static Vector4 operator *(Matrix4 value1, Vector4 value2)
+        {
+            float x = Vector4.Dot(value1.col1, value2);
+            float y = Vector4.Dot(value1.col2, value2);
+            float z = Vector4.Dot(value1.col3, value2);
+            float w = Vector4.Dot(value1.col4, value2);
+
+            return new Vector4(x, y, z, w);
+        }
     }
 
 }

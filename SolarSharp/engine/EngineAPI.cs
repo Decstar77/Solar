@@ -54,6 +54,9 @@ namespace SolarSharp
 		public static extern int RendererCreateStaticMesh(float[] vertices, int vertexCount, uint[] indices, int indexCount, int layout);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern int RendererCreateDynamicMesh(int vertexCount, int layout);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern int RendererCreateStaticTexture(byte[] data, int width, int height, int format);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
@@ -87,11 +90,15 @@ namespace SolarSharp
 		public static extern void RendererSetConstBufferData(int id, float[] data);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void RendererSetDynamicMeshData(int id, float[] data, int count);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern void RendererClearRenderTarget(int id);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern void RendererDrawStaticMesh(int id);
 
-	
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void RendererDrawDynamicMesh(int id, int count, uint offset);
 	}
 }

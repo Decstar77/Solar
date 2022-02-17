@@ -562,8 +562,8 @@ public:
 	{
 		switch (value)
 		{
-		case Value::P: return 1;
-		case Value::P_PAD: return 2;
+		case Value::P: return 3;
+		case Value::P_PAD: return 3 + 1;
 		case Value::PNT: return 3 + 3 + 2;
 		case Value::PNTC: return 3 + 3 + 2 + 4;
 		case Value::PNTM: return 3 + 3 + 2 + 16;

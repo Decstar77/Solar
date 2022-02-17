@@ -85,13 +85,21 @@ namespace SolarEditor
         }
 
         static FlyCamera camera;
+        static Ray ray = new Ray();
         public static void OnUpdate()
         {
             if (Application.IsKeyJustDown(0x1B))
             {
                 Application.Quit();
             }
+            
             camera.Operate();
+
+            if (Application.GetMouseJustDown(1))
+            {
+                ray = camera.ShootRayFromMousePos();
+            }
+            Debug.DrawRay(ray);
         }
 
         public static void OnRender(RenderPacket renderPacket)

@@ -373,6 +373,24 @@ EDITOR_INTERFACE(void) RendererDrawStaticMesh(int id)
 	DXINFO(renderState.deviceContext.context->DrawIndexed(mesh.indexCount, 0, 0));
 }
 
+EDITOR_INTERFACE(void) RendererDrawDynamicMesh(int id, int count, uint32 offset)
+{
+	uint32 _ = 0;
+	DynamicMesh mesh = renderState.dynamicMeshes.at(id);
+	DXINFO(renderState.deviceContext.context->IASetVertexBuffers(0, 1, &mesh.vertexBuffer, &mesh.strideBytes, &_));
+	DXINFO(renderState.deviceContext.context->Draw(count, offset));
+}
+
+EDITOR_INTERFACE(void) RendererSetDynamicMeshData(int id, float* data, int count)
+{
+	D3D11_MAPPED_SUBRESOURCE resource = {};
+
+	DynamicMesh mesh = renderState.dynamicMeshes.at(id);
+	DXCHECK(renderState.deviceContext.context->Map(mesh.vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource));	
+	memcpy(resource.pData, data, count * sizeof(real32));
+	DXINFO(renderState.deviceContext.context->Unmap(mesh.vertexBuffer, 0));
+}
+
 EDITOR_INTERFACE(void) RendererSetStaticProgram(int id)
 {
 	StaticProgram program = renderState.staticPrograms.at(id);
@@ -410,7 +428,13 @@ EDITOR_INTERFACE(void) RendererSetConstBufferData(int id, float *data)
 	Temp temp = {};
 
 	Mat4f proj = PerspectiveLH(DegToRad(45.0f), 1.777777f, 0.1f, 100.0f);
-	Mat4f view = Inverse(LookAtLH(Vec3f(3), Vec3f(0), Vec3f(0, 1, 0)));
+	
+
+
+	Mat4f view = Inverse(LookAtRH(Vec3f(7), Vec3f(0), Vec3f(0, 1, 0)));
+
+	Vec4f r = Vec4f(384, 132, 13, 2) * view;
+	//std::cout << r.x << " " << r.y << " " << r.z << " " << r.w << std::endl;
 
 	if (swapper)
 	{
@@ -582,6 +606,34 @@ EDITOR_INTERFACE(int) RendererCreateBlendState()
 	}
 	
 	return index;	
+}
+
+EDITOR_INTERFACE(int) RendererCreateDynamicMesh(int vertexCount, int _layout)
+{
+	VertexLayoutType layout = VertexLayoutType(_layout);
+	uint32 vertexStrideBytes = sizeof(real32) * layout.GetStride();
+
+	D3D11_BUFFER_DESC vertex_desc = {};
+	vertex_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertex_desc.Usage = D3D11_USAGE_DYNAMIC;
+	vertex_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	vertex_desc.MiscFlags = 0;
+	vertex_desc.ByteWidth = vertexCount * sizeof(real32);
+	vertex_desc.StructureByteStride = vertexStrideBytes;
+		
+	int index = FindFree(renderState.dynamicMeshes);
+
+	if (index)
+	{
+		DXCHECK(renderState.deviceContext.device->CreateBuffer(&vertex_desc, NULL, &renderState.dynamicMeshes.at(index).vertexBuffer));
+		renderState.dynamicMeshes.at(index).strideBytes = vertexStrideBytes;
+	}
+	else
+	{
+		SOLERROR("RendererCreateDynamicMesh");
+	}
+	
+	return index;
 }
 
 EDITOR_INTERFACE(int) RendererCreateStaticMesh(float* vertices, int vertexCount, uint32* indices, int indexCount, int _layout)

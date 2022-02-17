@@ -47,6 +47,11 @@ namespace SolarSharp
             return string.Format("x={0}, y={1}, z={2}, w={3}", x, y, z, w);
         }
 
+        public static float Dot(Vector4 a, Vector4 b)
+        {
+            return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+        }
+
         public static Vector4 operator +(Vector4 left, Vector4 right)
         {
             return new Vector4(left.x + right.x, left.y + right.y, left.z + right.z, left.w + right.w);

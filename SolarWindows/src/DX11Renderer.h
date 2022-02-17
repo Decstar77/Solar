@@ -127,11 +127,17 @@ struct StaticMesh
 	operator bool() const { return vertexBuffer && indexBuffer; }	
 };
 
+struct DynamicMesh
+{
+	ID3D11Buffer* vertexBuffer;
+	uint32 strideBytes;
+	operator bool() const { return vertexBuffer; }
+};
+
 struct RenderState
 {
     SwapChain swapChain;
     DeviceContext deviceContext;
-
 
 	std::array<ID3D11RasterizerState*, 8> rasterStates;
 	std::array<ID3D11DepthStencilState*, 8> depthStates;
@@ -140,6 +146,8 @@ struct RenderState
 	std::array<ID3D11Buffer*, 8> constBuffers;
 
 	std::array<StaticMesh, 1024> staticMeshes;
+	std::array<DynamicMesh, 1024> dynamicMeshes;
+
 	std::array<StaticProgram, 1024> staticPrograms;
 };
 

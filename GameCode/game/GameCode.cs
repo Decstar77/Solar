@@ -59,7 +59,7 @@ namespace GameCode
     {
         internal List<Entity> entities = new List<Entity>(); 
         internal Player player = new Player();
-        internal Camera camera = new Camera();
+        internal GameCamera camera = new GameCamera();
     }
 
     internal class GameCode

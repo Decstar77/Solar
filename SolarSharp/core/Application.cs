@@ -15,7 +15,7 @@ namespace SolarSharp
         public static int SurfaceHeight { get { return surfaceHeight; } }
         private static int surfaceHeight;
 
-        public static float WindowAspect { get { return windowAspect; } }
+        public static float SurfaceAspect { get { return windowAspect; } }
         private static float windowAspect;
 
         public static string WindowName { get { return windowName; } }
@@ -73,18 +73,27 @@ namespace SolarSharp
                                 {
                                     Logger.Info("Startup successful");
 
-                                   
+
+                                    bool mouseUnlocked = true; // @NOTE: Used to stop snapping when first activating locking the mouse
                                     while (EngineAPI.Win32PumpMessages(input.keys, ref input.mouseIput))
                                     {
                                         RenderPacket renderPacket = new RenderPacket();
 
                                         if (input.mouseIput.mouseLocked)
-                                        {                                           
+                                        {                   
+                                            if (mouseUnlocked)
+                                            {
+                                                mouseUnlocked = false;
+                                                input.mouseIput.mouseXPositionNormalCoords = 0.5f;
+                                                input.mouseIput.mouseYPositionNormalCoords = 0.5f;
+                                            }
+
                                             mouseDelta.x = (float)(input.mouseIput.mouseXPositionNormalCoords - 0.5);
                                             mouseDelta.y = (float)(input.mouseIput.mouseYPositionNormalCoords - 0.5);
                                         }
                                         else
                                         {
+                                            mouseUnlocked = true;
                                             mouseDelta.x = (float)(input.mouseIput.mouseXPositionNormalCoords - oldInput.mouseIput.mouseXPositionNormalCoords);
                                             mouseDelta.y = (float)(input.mouseIput.mouseYPositionNormalCoords - oldInput.mouseIput.mouseYPositionNormalCoords);
                                         }
@@ -160,6 +169,7 @@ namespace SolarSharp
         {
             input.mouseIput.mouseLocked = true;
         }
+
         public static bool GetMouseDown(int num)
         {
             if (num == 1)
@@ -178,9 +188,30 @@ namespace SolarSharp
             return false;
         }
 
+        public static bool GetMouseJustDown(int num)
+        {
+            if (num == 1)
+            {
+                return input.mouseIput.mb1 && !oldInput.mouseIput.mb1;
+            }
+            else if (num == 2)
+            {
+                return input.mouseIput.mb2 && !oldInput.mouseIput.mb2; 
+            }
+            else if (num == 3)
+            {
+                return input.mouseIput.mb3 && !oldInput.mouseIput.mb3; 
+            }
+
+            return false;
+        }
         public static Vector2 GetMouseDelta()
         {
             return mouseDelta;
+        }
+        public static Vector2 GetMousePixelPosition()
+        {
+            return new Vector2((float)input.mouseIput.mouseXPositionPixelCoords, (float)input.mouseIput.mouseYPositionPixelCoords);
         }
     }
 }

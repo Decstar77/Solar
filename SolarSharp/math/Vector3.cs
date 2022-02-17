@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,6 +70,20 @@ namespace SolarSharp
         public static bool operator !=(Vector3 left, Vector3 right)
         {
             return (left.x != right.x || left.y != right.y || left.z != right.z);
+        }
+
+        public override bool Equals([NotNullWhen(true)] object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (obj is Vector3)
+            {
+                return this == (Vector3)obj;
+            }
+
+            return false;
         }
 
         public static Vector3 operator +(Vector3 left, Vector3 right)

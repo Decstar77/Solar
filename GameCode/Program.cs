@@ -22,8 +22,13 @@ namespace GameCode
 
         internal static void OnUpdate()
         {
-            room.player.Operate();
+            //room.player.Operate();
             room.camera.Follow(room.player);
+
+            if (Application.GetMouseJustDown(1))
+            {
+                Ray ray = room.camera.ShootRayFromMousePos();
+            }
         }
 
         internal static void OnRender(RenderPacket renderPacket)
@@ -43,8 +48,8 @@ namespace GameCode
         {
 
             ApplicationConfig config = new ApplicationConfig();
-            config.Title = "Gaem";
-            config.Description = "Gaem";
+            config.Title = "Game";
+            config.Description = "Game";
             config.SurfaceWidth = 1280;
             config.SurfaceHeight = 720;
             config.WindowXPos = 200;
