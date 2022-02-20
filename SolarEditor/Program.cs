@@ -14,14 +14,22 @@ namespace SolarEditor
         private static EditorState editorState;
         
         static Vector3 v = new Vector3();
-
+        static Matrix4 model = Matrix4.Identity;
+        
         public static bool ImGuiDraw()
         {
             ImGui.BeginFrame();
-            
+
+            ImGui.GizmoEnable(true);
+            ImGui.GizmoSetRect(0, 0, Application.SurfaceWidth, Application.SurfaceHeight);
+
+            ImGui.GizmoManipulate(camera, ref model, 2, 1);
+       
+
+
             if (ImGui.DragFloat3("Label", ref v))
             {
-                Console.WriteLine(v);
+                
             }
 
             if (ImGui.BeginMainMenuBar())
@@ -63,22 +71,8 @@ namespace SolarEditor
             editorState = new EditorState(new EditorConfig());
 
             camera = new FlyCamera();
-            Quaternion q = Quaternion.Normalize(new Quaternion(2, 23, 34, 12));
 
-            Console.WriteLine(Matrix3.ToQuaternion(Quaternion.ToMatrix3(q)));
-            Console.WriteLine(Matrix4.ToQuaternion(Quaternion.ToMatrix4(q)));
-
-            Matrix4 m = new Matrix4();
-            m.col1 = new Vector4(1, 2, 3, 4);
-            m.col2 = new Vector4(5, 6, 7, 8);
-            m.col3 = new Vector4(9, 10, 11, 12);
-            m.col4 = new Vector4(13, 14, 15, 16);
-
-            Console.WriteLine(m);
-            Console.WriteLine(m.col1);
-            Console.WriteLine(m.col2);
-            Console.WriteLine(m.col3);
-            Console.WriteLine(m.col4);
+            Console.WriteLine(camera.GetProjectionMatrix());
 
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { return ImGuiDraw(); });
             return ImGui.Initialzie();
@@ -104,8 +98,13 @@ namespace SolarEditor
 
         public static void OnRender(RenderPacket renderPacket)
         {
+            Vector3 position;
+            Quaternion orientation;
+            Vector3 scale;
+            Matrix4.Decompose(model.Transpose, out position, out orientation, out scale);
+
             //renderPacket.renderEntries.Add(new RenderEntry(new Vector3(5, 0, 0), Quaternion.Identity, new Vector3(0.1f, 1, 1)));
-            renderPacket.renderEntries.Add(new RenderEntry(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1)));
+            renderPacket.renderEntries.Add(new RenderEntry(position, orientation, scale));
 
             renderPacket.viewMatrix = camera.GetViewMatrix();
             renderPacket.projectionMatrix = camera.GetProjectionMatrix();

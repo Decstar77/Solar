@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace SolarSharp
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector2
     {
         public float x;

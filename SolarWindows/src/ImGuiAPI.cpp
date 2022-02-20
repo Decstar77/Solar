@@ -4,6 +4,8 @@
 #include "vendor/imgui/imgui_impl_win32.h"
 #include "vendor/imgui/imgui_impl_dx11.h"
 
+#include "vendor/imguizmo/ImGuizmo.h"
+
 #include "Win32Platform.h"
 #include "DX11Renderer.h"
 
@@ -54,6 +56,7 @@ namespace ImGuiAPI
 		ImGui_ImplWin32_NewFrame();
 
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	EDITOR_INTERFACE(void) EndFrame()
@@ -143,5 +146,21 @@ namespace ImGuiAPI
 		*z = v[2];
 
 		return r;
+	}
+
+	EDITOR_INTERFACE(void) GizmoEnable(bool enable)
+	{
+		ImGuizmo::Enable(enable);
+	}
+
+	EDITOR_INTERFACE(void) GizmoSetRect(float x, float y, float width, float height)
+	{
+		ImGuizmo::SetRect(x, y, width, height);
+	}
+
+	EDITOR_INTERFACE(bool) GizmoManipulate(Mat4f proj, Mat4f view, Mat4f *world, int operation, int mode)
+	{
+		Mat4f v = Translate(Mat4f(), Vec3f(0,0,10));	
+		return ImGuizmo::Manipulate(view.ptr, proj.ptr, (ImGuizmo::OPERATION)operation, (ImGuizmo::MODE)mode, world->ptr);
 	}
 }

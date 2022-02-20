@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace SolarSharp
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector4
     {
         public static readonly Vector4 Zero = new Vector4();
@@ -41,6 +43,9 @@ namespace SolarSharp
             this.z = z;
             this.w = w;
         }
+
+        public float Mag { get { return MathF.Sqrt(x * x + y * y + z * z + w * w); } }
+        public float MagSqrd { get { return (x * x + y * y + z * z + w * w); } }
 
         public override string ToString()
         {
@@ -81,5 +86,11 @@ namespace SolarSharp
         {
             return new Vector4(left.x * right, left.y * right, left.z * right, left.w * right);
         }
+
+        public static Vector4 operator /(Vector4 left, float right)
+        {
+            return new Vector4(left.x / right, left.y / right, left.z / right, left.w / right);
+        }
+
     }
 }

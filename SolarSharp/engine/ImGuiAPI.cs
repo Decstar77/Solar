@@ -106,5 +106,21 @@ namespace SolarSharp
 			return DragFloat3(label, ref v.x, ref v.y, ref v.z, v_speed, v_min, v_max);
 		}
 
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void GizmoEnable(bool enable);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void GizmoSetRect(float x, float y, float width, float height);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		private static extern bool GizmoManipulate(Matrix4 proj, Matrix4 viewLH, ref Matrix4 world, int operation, int mode);
+
+		public static bool GizmoManipulate(Camera camera, ref Matrix4 world, int operation, int mode)
+        {
+			Matrix4 view = camera.GetViewMatrix();
+			Matrix4 proj = camera.GetProjectionMatrix();
+
+			return GizmoManipulate(proj.Transpose, view.Transpose, ref world, operation, mode);
+        }
 	}
 }

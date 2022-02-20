@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "SolarMath.h"
 
 namespace ImGuiAPI
 {
@@ -28,4 +29,10 @@ namespace ImGuiAPI
 	EDITOR_INTERFACE(bool) Button(const char* label, float sizeX, float sizeY);
 
 	EDITOR_INTERFACE(bool) DragFloat3(const char* label, float* x, float* y, float* z, float v_speed, float v_min, float v_max);
+
+	EDITOR_INTERFACE(void) GizmoEnable(bool enable);
+	EDITOR_INTERFACE(void) GizmoSetRect(float x, float y, float width, float height);
+	EDITOR_INTERFACE(bool) GizmoManipulate(Mat4f proj, Mat4f view, Mat4f *world, int operation, int mode);
+
+	
 }

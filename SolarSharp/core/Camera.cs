@@ -9,10 +9,20 @@ namespace SolarSharp
     public class Camera
     {
         protected Vector3 position = new Vector3(0, 0, 10);
+		public Vector3 Position { get { return position; } }
+
         protected Quaternion orientation = Quaternion.Identity;
+		public Quaternion Orientation { get { return orientation;} }
+
 		protected float far = 100.0f;
+		public float Far { get { return far; } }
+
 		protected float near = 0.1f;
+		public float Near { get { return near; } }
+
 		protected float yfov = Util.DegToRad(45.0f);
+		public float YFovDegrees { get { return Util.RadToDeg(yfov);} set { yfov = Util.DegToRad(value); } }
+		public float YFovRadians { get { return yfov; } set { yfov = value; } }
 
 		protected Vector4 GetNormalisedDeviceCoordinates(float width, float height, float mouseX, float mouseY)
 		{

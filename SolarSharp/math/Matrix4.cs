@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SolarSharp
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Matrix4
     {
         public float m11;
@@ -217,6 +219,14 @@ namespace SolarSharp
             return matrix; 
         }
 
+        public static Matrix4 TranslateLH(Matrix4 matrix, Vector3 translation)
+        {
+            matrix.m41 += translation.x;
+            matrix.m42 += translation.y;
+            matrix.m43 += translation.z;
+            return matrix;
+        }
+
         public static Matrix4 ScaleCardinal(Matrix4 matrix, Vector3 scale)
         {
             matrix.col1 *= scale.x;
@@ -231,6 +241,23 @@ namespace SolarSharp
             Quaternion result = Matrix3.ToQuaternion(new Matrix3(matrix));
 
             return result;
+        }
+
+        public static void Decompose(Matrix4 transform, out Vector3 position, out Quaternion orientation, out Vector3 scale)
+        {
+            position = new Vector3(transform.col4);
+            
+            float m1 = transform.col1.Mag;
+            float m2 = transform.col2.Mag;
+            float m3 = transform.col3.Mag;
+
+            scale = new Vector3(m1, m2, m3);
+
+            transform.col1 /= m1;
+            transform.col2 /= m2;
+            transform.col3 /= m3;
+
+            orientation = Matrix4.ToQuaternion(transform);
         }
 
         public static Matrix4 CreateFromYawPitchRoll(float yaw, float pitch, float roll)

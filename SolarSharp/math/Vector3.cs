@@ -4,9 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace SolarSharp
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector3
     {
         public static readonly Vector3 Zero = new Vector3();
@@ -23,6 +25,13 @@ namespace SolarSharp
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        public Vector3( Vector4 v4 )
+        {
+            this.x = v4.x;
+            this.y = v4.y;
+            this.z = v4.z;
         }
 
         public override string ToString()

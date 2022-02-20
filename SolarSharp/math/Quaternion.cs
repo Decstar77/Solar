@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace SolarSharp
 {
+    [StructLayout(LayoutKind.Sequential)]    
     public struct Quaternion
     {
-        public float w;
         public float x;
         public float y;
         public float z;
+        public float w;
 
         public Quaternion(float x, float y, float z, float w)
         {
@@ -137,6 +139,11 @@ namespace SolarSharp
                      c * value.y + s * value.x,
                      c * value.z + s * value.w,
                      c * value.w - s * value.z);
+        }
+
+        public static Quaternion ConvertRightHandedToLeftHandedQuaternion(Quaternion rightHandedQuaternion)
+        {
+            return new Quaternion(-rightHandedQuaternion.x, -rightHandedQuaternion.z, -rightHandedQuaternion.y, rightHandedQuaternion.w);     
         }
 
         public static Quaternion operator *(Quaternion left, float right)
