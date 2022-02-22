@@ -26,6 +26,7 @@
     <Compile Include="EditorConfig.cs" />
     <Compile Include="EditorState.cs" />
     <Compile Include="FlyCamera.cs" />
+    <Compile Include="Gizmo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="undo\Action.cs" />
     <Compile Include="undo\MoveAction.cs" />

@@ -12,10 +12,10 @@ namespace SolarSharp.GameLogic
         public Vector3 Position { get { return position; } set { position = value; } }
 
         protected Quaternion orientation = Quaternion.Identity;
-        public Quaternion Orientation { get { return orientation; } }
+        public Quaternion Orientation { get { return orientation; } set { orientation = value; } }
 
         protected Vector3 scale = new Vector3(1, 1, 1);
-        public Vector3 Scale { get { return scale; } }
+        public Vector3 Scale { get { return scale; } set { scale = value; } }
 
         public Matrix4 ComputeModelMatrix()
         {

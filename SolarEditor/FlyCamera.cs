@@ -18,11 +18,11 @@ namespace SolarEditor
 			yaw = -90.0f; 
         }
 
-		internal void Operate()
+		internal bool Operate()
         {
 			float mouseSensitivity = 100.1f;
 			float flySpeed = 10.0f;
-			if (Application.GetMouseDown(2))
+			if (Application.IsMouseDown(2))
             {             
 				Application.DisableMouse();
 
@@ -57,12 +57,16 @@ namespace SolarEditor
                 {
 					move = Vector3.Normalize(move) * flySpeed * Application.GetDeltaTime();
 					position += move;
-				}				
+				}
+
+				return true;
 			}
 			else
             {
 				Application.EnableMouse();
             }
+
+			return false;
         }
 
     }

@@ -170,7 +170,7 @@ namespace SolarSharp
             input.mouseIput.mouseLocked = true;
         }
 
-        public static bool GetMouseDown(int num)
+        public static bool IsMouseDown(int num)
         {
             if (num == 1)
             {

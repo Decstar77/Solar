@@ -17,7 +17,7 @@ namespace SolarEditor
         {
             if (editorState != null)
             {
-                ImGui.BeginFrame();
+               
 
                 if (ImGui.BeginMainMenuBar())
                 {
@@ -49,8 +49,7 @@ namespace SolarEditor
                     ImGui.EndMainMenuBar();
                 }
 
-                editorState.Gizmo();
-
+               
                 editorState.ShowWindows();
 
                 ImGui.EndFrame();
@@ -72,6 +71,7 @@ namespace SolarEditor
         {
             if (editorState != null)
             {
+                ImGui.BeginFrame();
                 editorState.Update();     
             }
         }

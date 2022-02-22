@@ -19,7 +19,8 @@ namespace SolarEditor
         public string AssetPath;
         public FlyCamera camera;
         public Room currentRoom;
-        public Selection selection;   
+        public Selection selection;
+        public Gizmo gizmo;
 
         internal EditorState(EditorConfig config)
         {
@@ -27,6 +28,7 @@ namespace SolarEditor
             camera = new FlyCamera();
             currentRoom = new Room();
             selection = new Selection();
+            gizmo = new Gizmo();
 
             currentRoom.entities.Add(new Entity());
             selection.entities.Add( currentRoom.entities[0] );
@@ -45,17 +47,13 @@ namespace SolarEditor
             {
                 ray = camera.ShootRayFromMousePos();
             }
-            Plane plane = new Plane(Vector3.Zero, Vector3.UnitY);
 
-            RaycastInfo info;
-            if (Raycast.Plane(ray, plane, out info))
+            if (!camera.Operate())
             {
-                Debug.DrawPoint(info.point);
+                gizmo.Operate(camera, selection.entities);
             }
+            
 
-            Debug.DrawRay(ray);
-
-            camera.Operate();
             return false;
         }
 
@@ -65,7 +63,7 @@ namespace SolarEditor
             {
                 foreach (Entity entity in currentRoom.entities)
                 {
-                    renderPacket.renderEntries.Add(new RenderEntry(entity.Position, entity.Orientation, new Vector3(1, 1, 1)));
+                    renderPacket.renderEntries.Add(new RenderEntry(entity.Position, entity.Orientation, entity.Scale));
                 }                
             }
 
@@ -75,21 +73,7 @@ namespace SolarEditor
 
         internal void Gizmo()
         {
-            if (selection.entities.Count > 0)
-            {
-                Entity entity = selection.entities[0];
-                Matrix4 model = entity.ComputeModelMatrix().Transpose;
-                               
-                ImGui.GizmoSetRect(0, 0, Application.SurfaceWidth, Application.SurfaceHeight);
-                ImGui.GizmoManipulate(camera, ref model, 0, 1);
-                
-                Vector3 position;
-                Quaternion orientation;
-                Vector3 scale;
-                Matrix4.Decompose(model.Transpose, out position, out orientation, out scale);
-                
-                entity.Position = position;
-            }
+            gizmo.Operate(camera, selection.entities);
         }
 
         internal bool AddWindow(Window window)
