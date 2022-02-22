@@ -51,9 +51,16 @@ namespace SolarSharp
             debugMesh.vertices[debugMeshVertexCount++] = p2.z;
         }
 
-        public static void DrawRay(Ray ray, float dist = 10.0f)
+        public static void DrawRay(Ray ray, float dist = 100.0f)
         {
             DrawLine(ray.origin, ray.origin + ray.direction * dist);
+        }
+
+        public static void DrawPoint(Vector3 position)
+        {
+            DrawLine(position - Vector3.UnitX, position + Vector3.UnitX);
+            DrawLine(position - Vector3.UnitY, position + Vector3.UnitY);
+            DrawLine(position - Vector3.UnitZ, position + Vector3.UnitZ);
         }
     }
 }

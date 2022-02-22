@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using SolarSharp;
 using SolarSharp.Rendering;
 
+using SolarSharp.GameLogic;
+
 namespace SolarEditor
 {
     internal interface Window
@@ -57,6 +59,38 @@ namespace SolarEditor
         }              
     }
 
+    internal class RoomWindow : Window
+    {
+        private bool show = true;
+
+        public bool ShouldRemove() => !show;
+        public void Show(EditorState editorState)
+        {
+            if (ImGui.Begin("Room", ref show))
+            {
+                if (editorState.currentRoom != null)
+                {
+                    Room room = editorState.currentRoom;
+                    string name = room.Name; 
+                    if (ImGui.InputText("Name", ref name))
+                    {
+                        room.Name = name;
+                    }
+
+                    if (ImGui.Button("Save"))
+                    {
+                        ContentProcessor.SaveRoomToTextFile(room);
+                    }                    
+                }
+                else
+                {
+                    ImGui.Text("Something has gone really wrong.");
+                }
+            }
+
+            ImGui.End();
+        }
+    }
 
 
 

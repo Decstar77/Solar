@@ -39,6 +39,7 @@
     <Compile Include="core\Util.cs" />
     <Compile Include="engine\ImGuiAPI.cs" />
     <Compile Include="core\Logger.cs" />
+    <Compile Include="game\Entity.cs" />
     <Compile Include="math\Basis.cs" />
     <Compile Include="math\Matrix3.cs" />
     <Compile Include="math\Quaternion.cs" />

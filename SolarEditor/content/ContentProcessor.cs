@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+using SolarSharp.GameLogic;
+
 namespace SolarSharp
 {
     public class ContentProcessor
     {
-        public static string AssetPath = "F:/codes/Learning/SolarSharp/Assets/base";
+        public static string AssetPath = "F:/codes/Solar/Assets/base";
 
         public static void ProcessModels()
         {
@@ -37,6 +39,46 @@ namespace SolarSharp
             {
                 Logger.Error("Could not find asset path: " + AssetPath);
             }  
+        }
+
+        public static void SaveRoomToTextFile(Room room)
+        {
+            StreamWriter fileWriter = new StreamWriter(AssetPath + "/room.txt");
+
+
+            fileWriter.WriteLine("Version=0.1");
+                        
+            foreach (var prop in room.GetType().GetProperties())
+            {
+                fileWriter.Write(prop.Name);
+                fileWriter.Write("=");
+                fileWriter.WriteLine(prop.GetValue(room, null));
+            }
+
+
+            fileWriter.WriteLine("=========Entities=========");
+            fileWriter.WriteLine("EntityCount={0}", room.entities.Count);
+            foreach (Entity entity in room.entities)
+            {
+                fileWriter.WriteLine("ENTITY");
+
+                var type = entity.GetType();                
+                fileWriter.WriteLine("ClassName={0}", type.Name);
+
+                var properties = type.GetProperties();
+                foreach (var property in properties)
+                {
+                    var value = property.GetValue(entity, null);
+                    if (value != null)
+                    {
+                        fileWriter.WriteLine("{0}={1}",property.Name, value.ToString());
+                    }
+                }
+                
+                fileWriter.WriteLine("END");
+            }
+
+            fileWriter.Close();
         }
     }
 }

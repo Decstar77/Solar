@@ -205,6 +205,25 @@ namespace SolarSharp
 
             return false;
         }
+
+        public static bool IsMouseJustUp(int num)
+        {
+            if (num == 1)
+            {
+                return !input.mouseIput.mb1 && oldInput.mouseIput.mb1;
+            }
+            else if (num == 2)
+            {
+                return !input.mouseIput.mb2 && oldInput.mouseIput.mb2;
+            }
+            else if (num == 3)
+            {
+                return !input.mouseIput.mb3 && oldInput.mouseIput.mb3;
+            }
+
+            return false;
+        }
+
         public static Vector2 GetMouseDelta()
         {
             return mouseDelta;

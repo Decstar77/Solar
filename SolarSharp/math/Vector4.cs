@@ -49,7 +49,7 @@ namespace SolarSharp
 
         public override string ToString()
         {
-            return string.Format("x={0}, y={1}, z={2}, w={3}", x, y, z, w);
+            return string.Format("x={0} y={1} z={2} w={3}", x, y, z, w);
         }
 
         public static float Dot(Vector4 a, Vector4 b)

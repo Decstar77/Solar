@@ -11,56 +11,50 @@ namespace SolarEditor
 {
     public class Program
     {
-        private static EditorState editorState;
-        
-        static Vector3 v = new Vector3();
-        static Matrix4 model = Matrix4.Identity;
-        
+        private static EditorState? editorState;
+
         public static bool ImGuiDraw()
         {
-            ImGui.BeginFrame();
-
-            ImGui.GizmoEnable(true);
-            ImGui.GizmoSetRect(0, 0, Application.SurfaceWidth, Application.SurfaceHeight);
-
-            ImGui.GizmoManipulate(camera, ref model, 2, 1);
-       
-
-
-            if (ImGui.DragFloat3("Label", ref v))
+            if (editorState != null)
             {
-                
-            }
+                ImGui.BeginFrame();
 
-            if (ImGui.BeginMainMenuBar())
-            {
-                if (ImGui.BeginMenu("File"))
+                if (ImGui.BeginMainMenuBar())
                 {
-                    if (ImGui.MenuItem("Open"))
+                    if (ImGui.BeginMenu("File"))
                     {
+                        if (ImGui.MenuItem("Open"))
+                        {
 
+                        }
+
+                        ImGui.EndMenu();
                     }
 
-                    ImGui.EndMenu();
-                }
-
-                if (ImGui.BeginMenu("View"))
-                {
-                    if (ImGui.MenuItem("Assets"))
+                    if (ImGui.BeginMenu("View"))
                     {
-                        editorState.AddWindow(new AssetWindow());
+                        if (ImGui.MenuItem("Assets"))
+                        {
+                            editorState.AddWindow(new AssetWindow());
+                        }
+
+                        if (ImGui.MenuItem("Room"))
+                        {
+                            editorState.AddWindow(new RoomWindow());
+                        }
+
+                        ImGui.EndMenu();
                     }
 
-                    ImGui.EndMenu();
+                    ImGui.EndMainMenuBar();
                 }
 
-                ImGui.EndMainMenuBar();
+                editorState.Gizmo();
+
+                editorState.ShowWindows();
+
+                ImGui.EndFrame();
             }
-
-            editorState.ShowWindows();
-
-
-            ImGui.EndFrame();
 
             return false;
         }
@@ -70,44 +64,24 @@ namespace SolarEditor
         {
             editorState = new EditorState(new EditorConfig());
 
-            camera = new FlyCamera();
-
-            Console.WriteLine(camera.GetProjectionMatrix());
-
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { return ImGuiDraw(); });
             return ImGui.Initialzie();
         }
 
-        static FlyCamera camera;
-        static Ray ray = new Ray();
         public static void OnUpdate()
         {
-            if (Application.IsKeyJustDown(0x1B))
+            if (editorState != null)
             {
-                Application.Quit();
+                editorState.Update();     
             }
-            
-            camera.Operate();
-
-            if (Application.GetMouseJustDown(1))
-            {
-                ray = camera.ShootRayFromMousePos();
-            }
-            Debug.DrawRay(ray);
         }
 
         public static void OnRender(RenderPacket renderPacket)
         {
-            Vector3 position;
-            Quaternion orientation;
-            Vector3 scale;
-            Matrix4.Decompose(model.Transpose, out position, out orientation, out scale);
-
-            //renderPacket.renderEntries.Add(new RenderEntry(new Vector3(5, 0, 0), Quaternion.Identity, new Vector3(0.1f, 1, 1)));
-            renderPacket.renderEntries.Add(new RenderEntry(position, orientation, scale));
-
-            renderPacket.viewMatrix = camera.GetViewMatrix();
-            renderPacket.projectionMatrix = camera.GetProjectionMatrix();
+            if (editorState != null)
+            {
+                editorState.Render(renderPacket);
+            }
         }
 
         public static void OnShutdown()

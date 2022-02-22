@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SolarSharp;
 using SolarSharp.Rendering;
+using SolarSharp.GameLogic;
 
 namespace GameCode
 {
@@ -14,21 +15,20 @@ namespace GameCode
 
         internal static bool OnInitialize()
         {
-            Quaternion q = Quaternion.Normalize(new Quaternion(34, 23, 34, 12));
             room = new Room();
+            room.camera = new GameCamera();
+            room.player.camera = room.camera;
 
             return true;
         }
 
         internal static void OnUpdate()
         {
-            //room.player.Operate();
-            room.camera.Follow(room.player);
+            room.player.Operate();
+            ((GameCamera)room.camera).Follow(room.player);
 
-            if (Application.GetMouseJustDown(1))
-            {
-                Ray ray = room.camera.ShootRayFromMousePos();
-            }
+            
+            
         }
 
         internal static void OnRender(RenderPacket renderPacket)
@@ -36,7 +36,7 @@ namespace GameCode
             renderPacket.viewMatrix = room.camera.GetViewMatrix();
             renderPacket.projectionMatrix = room.camera.GetProjectionMatrix();
             renderPacket.renderEntries.Add(new RenderEntry(room.player.Position, room.player.Orientation, new Vector3(1, 1, 1)));
-            renderPacket.renderEntries.Add(new RenderEntry(new Vector3(0, -2, 0), room.player.Orientation, new Vector3(10, 1, 10)));
+            renderPacket.renderEntries.Add(new RenderEntry(new Vector3(0, -2, 0),Quaternion.Identity , new Vector3(10, 1, 10)));
         }
 
         internal static void OnShutdown()

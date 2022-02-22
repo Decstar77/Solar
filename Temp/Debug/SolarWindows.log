@@ -1,2 +1,14 @@
-﻿  ImGuiAPI.cpp
+﻿  DX11RenderCommands.cpp
+  DX11Renderer.cpp
+  ImGuiAPI.cpp
+  SolarMath.cpp
+  imgui.cpp
+  ImGuizmo.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_dx11.cpp
+  imgui_impl_win32.cpp
+  imgui_widgets.cpp
+  Win32Platform.cpp
+     Creating library F:\codes\Solar\x64\Debug\SolarWindows.lib and object F:\codes\Solar\x64\Debug\SolarWindows.exp
   SolarWindows.vcxproj -> F:\codes\Solar\x64\Debug\SolarWindows.dll

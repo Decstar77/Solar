@@ -21,6 +21,19 @@ namespace SolarSharp
     {
         public Vector3 origin;
         public Vector3 normal;
+
+        public Plane()
+        {
+            origin = Vector3.Zero;
+            normal = Vector3.Zero;
+        }
+
+        public Plane(Vector3 origin, Vector3 normal)
+        {
+            this.origin = origin;
+            this.normal = normal;
+        }
+
     }
 
 

@@ -27,6 +27,8 @@
     <Compile Include="EditorState.cs" />
     <Compile Include="FlyCamera.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="undo\Action.cs" />
+    <Compile Include="undo\MoveAction.cs" />
     <Compile Include="windows\Window.cs" />
   </ItemGroup>
 

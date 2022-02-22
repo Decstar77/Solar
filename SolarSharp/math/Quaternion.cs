@@ -46,7 +46,7 @@ namespace SolarSharp
 
         public override string ToString()
         {
-            return String.Format("x={0}, y={1}, z={2}, w={3}", x, y, z, w);
+            return String.Format("x={0} y={1} z={2} w={3}", x, y, z, w);
         }
 
         public float Mag { get { return MathF.Sqrt(x*x + y*y + z*z + w*w);} }
