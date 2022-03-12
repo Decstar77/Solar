@@ -15,6 +15,11 @@ namespace SolarSharp
         {
             return string.Format("Ray, origin={0}, direction={1}", origin, direction);
         }
+
+        public Vector3 Travel(float dist)
+        {
+            return origin + (direction * dist);
+        }
     }
 
     public struct Plane
@@ -33,7 +38,51 @@ namespace SolarSharp
             this.origin = origin;
             this.normal = normal;
         }
+    }
 
+    public struct AlignedBox
+    {
+        public Vector3 min;
+        public Vector3 max;
+
+        public AlignedBox()
+        {
+            min = Vector3.Zero;
+            max = Vector3.Zero;
+        }
+
+        public AlignedBox(Vector3 min, Vector3 max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public AlignedBox(Vector3 min, Vector3 max, Quaternion orienation)
+        {
+            this.min = min;
+            this.max = max;
+        }
+    }
+
+    public struct BoundingBox
+    {
+        public Vector3 origin;
+        public Vector3 extents;
+        public Quaternion orientation;
+
+        public BoundingBox()
+        {
+            origin = Vector3.Zero;
+            extents = Vector3.Zero;
+            orientation = Quaternion.Identity;
+        }
+
+        public BoundingBox(Vector3 origin, Vector3 extents, Quaternion orientation)
+        {
+            this.origin = origin;
+            this.extents = extents;
+            this.orientation = orientation;
+        }
     }
 
 

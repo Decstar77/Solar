@@ -33,9 +33,7 @@ namespace SolarEditor
             currentRoom.entities.Add(new Entity());
             selection.entities.Add( currentRoom.entities[0] );
         }
-
-
-        public Ray ray= new Ray(); 
+      
         internal bool Update()
         {
             if (Application.IsKeyJustDown(0x1B))
@@ -43,16 +41,61 @@ namespace SolarEditor
                 Application.Quit();
             }
 
-            if (Application.GetMouseJustDown(1))
+            bool handled = false;
+
+            if (!handled)
             {
-                ray = camera.ShootRayFromMousePos();
+                handled = camera.Operate();
             }
 
-            if (!camera.Operate())
+            if (!handled)
             {
-                gizmo.Operate(camera, selection.entities);
+                handled = gizmo.Operate(camera, selection.entities);
             }
-            
+
+            if (!handled)
+            {
+                if (Application.IsKeyDown(KeyCode.LEFT_CONTROL) && Application.IsKeyJustDown(KeyCode.D))
+                {
+                    Entity entity = new Entity();
+                    entity.Position = selection.entities[0].Position + Vector3.UnitX;
+                    entity.Orientation = selection.entities[0].Orientation;
+                    entity.Scale = selection.entities[0].Scale;
+
+                    currentRoom.entities.Add(entity);
+                    selection.entities[0] = entity;
+
+                    handled = true;
+                }
+            }
+
+            if (!handled && Application.IsMouseJustDown(1))
+            {
+                Ray ray = camera.ShootRayFromMousePos();
+ 
+
+
+                //for (int i = 0; i < currentRoom.entities.Count; i++)
+                //{
+                //    Entity entity = currentRoom.entities[i];
+                //    BoundingBox boundingBox = entity.GetBoundingBox();
+                //
+                //    RaycastInfo info;
+                //    if (Raycast.BoundingBox(ray, boundingBox, out info))
+                //    {
+                //
+                //    }
+                //
+                //    Debug.DrawBoundingBox(boundingBox);
+                //    
+                //}
+
+                handled = true;
+            }
+
+
+
+
 
             return false;
         }
@@ -69,11 +112,6 @@ namespace SolarEditor
 
             renderPacket.viewMatrix = camera.GetViewMatrix();
             renderPacket.projectionMatrix = camera.GetProjectionMatrix();
-        }
-
-        internal void Gizmo()
-        {
-            gizmo.Operate(camera, selection.entities);
         }
 
         internal bool AddWindow(Window window)

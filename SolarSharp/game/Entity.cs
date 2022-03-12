@@ -27,6 +27,11 @@ namespace SolarSharp.GameLogic
 
             return transform;            
         }
+
+        public BoundingBox GetBoundingBox()
+        {
+           return new BoundingBox(position, scale, orientation);            
+        }
     }
 
     public class Player : Entity

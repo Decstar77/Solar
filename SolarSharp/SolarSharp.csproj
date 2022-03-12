@@ -33,6 +33,7 @@
     <Compile Include="core\Debug.cs" />
     <Compile Include="core\EventSystem.cs" />
     <Compile Include="core\Input.cs" />
+    <Compile Include="core\KeyCode.cs" />
     <Compile Include="core\MeshFactory.cs" />
     <Compile Include="core\RenderPacket.cs" />
     <Compile Include="core\Resources.cs" />
@@ -57,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="core\TODO.txt" />
     <None Include="Programs\Debug.hlsl" />
     <None Include="Programs\FirstShader.hlsl" />
   </ItemGroup>

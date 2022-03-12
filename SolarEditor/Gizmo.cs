@@ -33,15 +33,17 @@ namespace SolarEditor
             mode = GizmoMode.LOCAL;
         }
 
-        public void Operate(Camera camera, List<Entity> entities)
+        public bool Operate(Camera camera, List<Entity> entities)
         {
-            if (Application.IsKeyJustDown('T')) { operation = GizmoOperation.TRANSLATION; }
-            if (Application.IsKeyJustDown('R')) { operation = GizmoOperation.ROTATION; }
-            if (Application.IsKeyJustDown('E')) { operation = GizmoOperation.SCALING; mode = GizmoMode.LOCAL; }
+            bool handled = false;
+            if (Application.IsKeyJustDown(KeyCode.T)) { operation = GizmoOperation.TRANSLATION; handled = true; }
+            if (Application.IsKeyJustDown(KeyCode.R)) { operation = GizmoOperation.ROTATION; handled = true; }
+            if (Application.IsKeyJustDown(KeyCode.E)) { operation = GizmoOperation.SCALING; mode = GizmoMode.LOCAL; handled = true; }
 
-            if (Application.IsKeyJustDown(0xC0) && operation != GizmoOperation.SCALING) 
+            if (Application.IsKeyJustDown(KeyCode.TLDA) && operation != GizmoOperation.SCALING) 
             {
-                mode = mode == GizmoMode.LOCAL ? GizmoMode.WORLD : GizmoMode.LOCAL;  
+                mode = mode == GizmoMode.LOCAL ? GizmoMode.WORLD : GizmoMode.LOCAL;
+                handled = true;
             }
 
             if (entities.Count > 0)
@@ -50,7 +52,7 @@ namespace SolarEditor
                 Matrix4 model = entity.ComputeModelMatrix().Transpose;
 
                 ImGui.GizmoSetRect(0, 0, Application.SurfaceWidth, Application.SurfaceHeight);
-                ImGui.GizmoManipulate(camera, ref model, (int)operation, (int)mode);
+                handled = handled || ImGui.GizmoManipulate(camera, ref model, (int)operation, (int)mode);
 
                 Vector3 position;
                 Quaternion orientation;
@@ -61,6 +63,8 @@ namespace SolarEditor
                 entity.Orientation = orientation;
                 entity.Scale = scale;
             }
+
+            return handled;
         }
     }
 

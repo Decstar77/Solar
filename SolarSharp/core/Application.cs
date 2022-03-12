@@ -161,6 +161,18 @@ namespace SolarSharp
         {
             return input.keys[vkCode] == 0 && oldInput.keys[vkCode] == 1;
         }
+        public static bool IsKeyDown(KeyCode code)
+        {
+            return input.keys[(ushort)code] == 1;
+        }
+        public static bool IsKeyJustDown(KeyCode code)
+        {
+            return input.keys[(ushort)code] == 1 && oldInput.keys[(ushort)code] == 0;
+        }
+        public static bool IsKeyJustUp(KeyCode code)
+        {
+            return input.keys[(ushort)code] == 0 && oldInput.keys[(ushort)code] == 1;
+        }
         public static void EnableMouse()
         {
             input.mouseIput.mouseLocked = false;
@@ -169,7 +181,6 @@ namespace SolarSharp
         {
             input.mouseIput.mouseLocked = true;
         }
-
         public static bool IsMouseDown(int num)
         {
             if (num == 1)
@@ -187,8 +198,7 @@ namespace SolarSharp
 
             return false;
         }
-
-        public static bool GetMouseJustDown(int num)
+        public static bool IsMouseJustDown(int num)
         {
             if (num == 1)
             {
@@ -223,7 +233,6 @@ namespace SolarSharp
 
             return false;
         }
-
         public static Vector2 GetMouseDelta()
         {
             return mouseDelta;

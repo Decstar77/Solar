@@ -71,6 +71,20 @@ namespace SolarSharp
                 position.x * matrix.m13 + position.y * matrix.m23 + position.z * matrix.m33 + matrix.m43);
         }
 
+        public static Vector3 Min(Vector3 a, Vector3 b)
+        {
+            return new Vector3(MathF.Min(a.x, b.x), MathF.Min(a.y, b.y), MathF.Min(a.z, b.z));
+        }
+
+        public static Vector3 Max(Vector3 a, Vector3 b)
+        {
+            return new Vector3(MathF.Max(a.x, b.x), MathF.Max(a.y, b.y), MathF.Max(a.z, b.z));
+        }
+        public static Vector3 Abs(Vector3 a)
+        {
+            return new Vector3(MathF.Abs(a.x), MathF.Abs(a.y), MathF.Abs(a.z));
+        }
+
         public static bool operator ==(Vector3 left, Vector3 right)
         {
             return (left.x == right.x && left.y == right.y && left.z == right.z);
@@ -113,6 +127,11 @@ namespace SolarSharp
         public static Vector3 operator *(Vector3 left, Vector3 right)
         {
             return new Vector3(left.x * right.x, left.y * right.y, left.z * right.z);
+        }
+
+        public static Vector3 operator /(Vector3 left, Vector3 right)
+        {
+            return new Vector3(left.x / right.x, left.y / right.y, left.z / right.z);
         }
 
         public static Vector3 operator *(Vector3 left, float right)

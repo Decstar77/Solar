@@ -8,6 +8,15 @@ namespace SolarSharp
 {
     public static class Util
     {
+
+        // @TODO: Does c# come with this ?
+        public static void Swap(ref float a, ref float b)
+        {
+            float temp = a;
+            a = b;
+            b = temp;
+        }
+
         public static float DegToRad(float deg)
         {
             return (MathF.PI / 180) * deg;

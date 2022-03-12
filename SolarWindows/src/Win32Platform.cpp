@@ -299,9 +299,18 @@ EDITOR_INTERFACE(bool) Win32PumpMessages(int* appInput, MouseInput *mouseInput)
 
 		ProcessMouseInput();
 
+		input.keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL) & (1 << 15);
+		if (input.keys[VK_LCONTROL])
+		{
+			int a = 2;
+		}
+		input.keys[VK_RCONTROL] = GetAsyncKeyState(VK_RCONTROL) & (1 << 15);
+		input.keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT) & (1 << 15);
+		input.keys[VK_RSHIFT] = GetAsyncKeyState(VK_RSHIFT) & (1 << 15);
+
 		for (int i = 0; i < UINT16_MAX; i++)
 		{
-			appInput[i] = input.keys[i];
+			appInput[i] = (bool)input.keys[i];
 		}
 
 		mouseInput->mb1 = input.mouseInput.mb1;
