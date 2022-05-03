@@ -21,9 +21,6 @@
     <ClCompile Include="src\DX11Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DX11RenderCommands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SolarMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,15 +48,21 @@
     <ClCompile Include="src\ImGuiAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\vendor\imgui_text\TextEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imnodes\imnodes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImGuiTextAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Win32Platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DX11Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RendererTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\SolarMath.h">
@@ -98,8 +101,14 @@
     <ClInclude Include="src\Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
+    <ClInclude Include="src\vendor\imgui_text\TextEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imnodes\imnodes_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imnodes\imnodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,28 +8,20 @@ namespace SolarSharp
 {
     public static class Util
     {
-
-        // @TODO: Does c# come with this ?
-        public static void Swap(ref float a, ref float b)
+        public static string AsciiBytesToString(byte[] buffer, int offset)
         {
-            float temp = a;
-            a = b;
-            b = temp;
-        }
-
-        public static float DegToRad(float deg)
-        {
-            return (MathF.PI / 180) * deg;
-        }
-
-        public static float RadToDeg(float rad)
-        {
-            return (180 / MathF.PI) * rad;
-        }
-
-        public static float Lerp(float a, float b, float t)
-        {
-            return a + (b - a) * t;
+            int end = offset;
+            while (end < buffer.Length && buffer[end] != 0)
+            {
+                end++;
+            }
+            unsafe
+            {
+                fixed (byte* pAscii = buffer)
+                {
+                    return new string((sbyte*)pAscii, offset, end - offset);
+                }
+            }
         }
     }
 }

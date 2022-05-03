@@ -1,6 +1,5 @@
 F:\codes\Learning\SolarSharp\x64\Debug\SolarSharp.deps.json
 F:\codes\Learning\SolarSharp\x64\Debug\SolarSharp.dll
-F:\codes\Learning\SolarSharp\x64\Debug\ref\SolarSharp.dll
 F:\codes\Learning\SolarSharp\x64\Debug\SolarSharp.pdb
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\SolarSharp.GeneratedMSBuildEditorConfig.editorconfig
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\SolarSharp.AssemblyInfoInputs.cache
@@ -10,15 +9,4 @@ F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\SolarSharp.dll
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\ref\SolarSharp.dll
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\SolarSharp.pdb
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\SolarSharp.csproj.AssemblyReference.cache
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.GeneratedMSBuildEditorConfig.editorconfig
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.AssemblyInfoInputs.cache
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.AssemblyInfo.cs
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.csproj.CoreCompileInputs.cache
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.dll
-F:\codes\Solar\SolarSharp\obj\x64\Debug\ref\SolarSharp.dll
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.pdb
-F:\codes\Solar\x64\Debug\SolarSharp.deps.json
-F:\codes\Solar\x64\Debug\SolarSharp.dll
-F:\codes\Solar\x64\Debug\ref\SolarSharp.dll
-F:\codes\Solar\x64\Debug\SolarSharp.pdb
-F:\codes\Solar\SolarSharp\obj\x64\Debug\SolarSharp.csproj.AssemblyReference.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Debug\refint\SolarSharp.dll

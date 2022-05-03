@@ -7,6 +7,6 @@ F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Release\ref\SolarSharp.dll
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Release\SolarSharp.pdb
 F:\codes\Learning\SolarSharp\x64\Release\SolarSharp.deps.json
 F:\codes\Learning\SolarSharp\x64\Release\SolarSharp.dll
-F:\codes\Learning\SolarSharp\x64\Release\ref\SolarSharp.dll
 F:\codes\Learning\SolarSharp\x64\Release\SolarSharp.pdb
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Release\SolarSharp.csproj.AssemblyReference.cache
+F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Release\refint\SolarSharp.dll

@@ -4,15 +4,13 @@
 #include "vendor/imgui/imgui_impl_win32.h"
 #include "vendor/imgui/imgui_impl_dx11.h"
 
-#include "vendor/imguizmo/ImGuizmo.h"
-
 #include "Win32Platform.h"
 #include "DX11Renderer.h"
 
 
 namespace ImGuiAPI
 {
-	EDITOR_INTERFACE(bool) Initialzie()
+	EDITOR_INTERFACE(bool) ImGuiInitialzie()
 	{
 		if (ImGui::CreateContext())
 		{
@@ -21,7 +19,9 @@ namespace ImGuiAPI
 
 			if (ImGui_ImplWin32_Init(winState.window))
 			{
-				if (ImGui_ImplDX11_Init(renderState.deviceContext.device, renderState.deviceContext.context))
+				RenderState* renderState = GetRenderState();
+
+				if (ImGui_ImplDX11_Init(renderState->device, renderState->context))
 				{
 					return true;
 				}
@@ -43,100 +43,109 @@ namespace ImGuiAPI
 		return false;
 	}
 
-	EDITOR_INTERFACE(void) Shutdown()
+	EDITOR_INTERFACE(void) ImGuiShutdown()
 	{
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
 	}
 
-	EDITOR_INTERFACE(void) BeginFrame()
+	EDITOR_INTERFACE(void) ImGuiBeginFrame()
 	{
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 
 		ImGui::NewFrame();
-		ImGuizmo::BeginFrame();
 	}
 
-	EDITOR_INTERFACE(void) EndFrame()
+	EDITOR_INTERFACE(void) ImGuiEndFrame()
 	{
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	EDITOR_INTERFACE(void) ShowDemoWindow()
+	EDITOR_INTERFACE(void) ImGuiShowDemoWindow()
 	{
 		ImGui::ShowDemoWindow();
 	}
 
-	EDITOR_INTERFACE(bool) BeginMainMenuBar()
+	EDITOR_INTERFACE(bool) ImGuiBeginMainMenuBar()
 	{
 		return ImGui::BeginMainMenuBar();
 	}
 
-	EDITOR_INTERFACE(void) EndMainMenuBar()
+	EDITOR_INTERFACE(void) ImGuiEndMainMenuBar()
 	{
 		ImGui::EndMainMenuBar();
 	}
 
-	EDITOR_INTERFACE(bool) BeginMenu(const char* label, bool enabled)
+	EDITOR_INTERFACE(bool) ImGuiBeginMenuBar()
+	{
+		return ImGui::BeginMenuBar();
+	}
+
+	EDITOR_INTERFACE(void) ImGuiEndMenuBar()
+	{
+		ImGui::EndMenuBar();
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiBeginMenu(const char* label, bool enabled)
 	{
 		return ImGui::BeginMenu(label, enabled);
 	}
 
-	EDITOR_INTERFACE(bool) MenuItem(const char* label, const char* shortcut, bool selected, bool enabled)
+	EDITOR_INTERFACE(bool) ImGuiMenuItem(const char* label, const char* shortcut, bool selected, bool enabled)
 	{
 		return ImGui::MenuItem(label, shortcut, selected, enabled);
 	}
 
-	EDITOR_INTERFACE(void) EndMenu_()
+	EDITOR_INTERFACE(void) ImGuiEndMenu_()
 	{
 		ImGui::EndMenu();
 	}
 
-	EDITOR_INTERFACE(void) Separator()
+	EDITOR_INTERFACE(void) ImGuiSeparator()
 	{
 		ImGui::Separator();
 	}
 
-	EDITOR_INTERFACE(bool) Begin(const char* name, int* p_open, int flags)
+	EDITOR_INTERFACE(bool) ImGuiBegin(const char* name, int* p_open, int flags)
 	{
 		if (*p_open == -1) { return ImGui::Begin(name); }
 		return ImGui::Begin(name, (bool*)p_open, flags);
 	}
 
-	EDITOR_INTERFACE(void) End()
+	EDITOR_INTERFACE(void) ImGuiEnd()
 	{
 		ImGui::End();
 	}
 
-	EDITOR_INTERFACE(bool) CollapsingHeader(const char* label, int flags)
+	EDITOR_INTERFACE(bool) ImGuiCollapsingHeader(const char* label, int flags)
 	{
 		return ImGui::CollapsingHeader(label, flags);
 	}
 
-	EDITOR_INTERFACE(bool) InputText(const char* label, char* buf, int buf_size, int flags)
+	EDITOR_INTERFACE(bool) ImGuiInputText(const char* label, char* buf, int buf_size, int flags)
 	{
 		return ImGui::InputText(label, buf, buf_size, flags);
 	}
 
-	EDITOR_INTERFACE(void) Text(const char* text)
+	EDITOR_INTERFACE(void) ImGuiText(const char* text)
 	{
 		ImGui::Text(text);	
 	}
 
-	EDITOR_INTERFACE(void) SameLine(float offset_from_start_x, float spacing_w)
+	EDITOR_INTERFACE(void) ImGuiSameLine(float offset_from_start_x, float spacing_w)
 	{
 		ImGui::SameLine(offset_from_start_x, spacing_w);
 	}
 
-	EDITOR_INTERFACE(bool) Button(const char* label, float sizeX, float sizeY)
+	EDITOR_INTERFACE(bool) ImGuiButton(const char* label, float sizeX, float sizeY)
 	{
 		return ImGui::Button(label, ImVec2(sizeX, sizeY));
 	}
 
-	EDITOR_INTERFACE(bool) DragFloat3(const char* label, float* x, float* y, float* z, float v_speed, float v_min, float v_max)
+	EDITOR_INTERFACE(bool) ImGuiDragFloat3(const char* label, float* x, float* y, float* z, float v_speed, float v_min, float v_max)
 	{
 		float v[3] = {*x, *y, *z};
 		bool r = ImGui::DragFloat3(label, v, v_speed, v_min, v_max);
@@ -148,19 +157,34 @@ namespace ImGuiAPI
 		return r;
 	}
 
-	EDITOR_INTERFACE(void) GizmoEnable(bool enable)
+	EDITOR_INTERFACE(bool) ImGuiTreeNode(const char *title)
 	{
-		ImGuizmo::Enable(enable);
+		return ImGui::TreeNode(title);
 	}
 
-	EDITOR_INTERFACE(void) GizmoSetRect(float x, float y, float width, float height)
+	EDITOR_INTERFACE(void) ImGuiTreePop()
 	{
-		ImGuizmo::SetRect(x, y, width, height);
+		ImGui::TreePop();
 	}
 
-	EDITOR_INTERFACE(bool) GizmoManipulate(Mat4f proj, Mat4f view, Mat4f *world, int operation, int mode)
+	EDITOR_INTERFACE(bool) ImGuiBeginTabBar(const char* title, int flags)
 	{
-		Mat4f v = Translate(Mat4f(), Vec3f(0,0,10));	
-		return ImGuizmo::Manipulate(view.ptr, proj.ptr, (ImGuizmo::OPERATION)operation, (ImGuizmo::MODE)mode, world->ptr);
+		return ImGui::BeginTabBar("MyTabBar", flags);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiEndTabBar()
+	{
+		ImGui::EndTabBar();
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiBeginTabItem(const char* label, int* open, int flags)
+	{
+		if (*open == -1) { return ImGui::BeginTabItem(label); }
+		return ImGui::BeginTabItem(label, (bool*)open, flags);
+	}
+	
+	EDITOR_INTERFACE(void) ImGuiEndTabItem()
+	{
+		ImGui::EndTabItem();
 	}
 }

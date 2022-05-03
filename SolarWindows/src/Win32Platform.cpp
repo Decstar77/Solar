@@ -1,6 +1,5 @@
 #include "Core.h"
 #include "Win32Platform.h"
-#include "SolarMath.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule,	DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -16,7 +15,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,	DWORD ul_reason_for_call, LPVOID lpReserv
 }
 
 LRESULT CALLBACK WindProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-EDITOR_INTERFACE(bool) Win32CreateWindow(char* title, int width, int height, int xPos, int yPos)
+EDITOR_INTERFACE(bool) CreateWindow_(char* title, int width, int height, int xPos, int yPos)
 {
 	winState.hinstance = GetModuleHandleA(0);
 
@@ -103,13 +102,13 @@ EDITOR_INTERFACE(bool) Win32CreateWindow(char* title, int width, int height, int
 	return true;
 }
 
-EDITOR_INTERFACE(void) Win32PostQuitMessage()
+EDITOR_INTERFACE(void) PostQuitMessage_()
 {
 	winState.running = false;
 	PostQuitMessage(0);
 }
 
-EDITOR_INTERFACE(void) Win32DestroyWindow()
+EDITOR_INTERFACE(void) DestroyWindow_()
 {
 
 }
@@ -182,19 +181,12 @@ LRESULT CALLBACK WindProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 #define IsKeyJustDown(input, key) (input->##key && !input->oldInput->##key)
 #define IsKeyJustUp(input, key) (!input->##key && input->oldInput->##key)
 
-struct MouseInput
-{
-	int mouseLocked;
-	Vec2d mousePositionPixelCoords;
-	Vec2d mousePositionNormalCoords;
-	int mb1;
-	int mb2;
-	int mb3;
-};
 
 struct Input
 {
-
+	//Vec2f mousePositionPixelCoords;
+	//Vec2f mouseNorm;
+	//Vec2f mouseDelta;
 	//
 	//bool8 isPS4Controller;
 	//real32 controllerLeftTrigger;
@@ -202,93 +194,78 @@ struct Input
 	//Vec2f controllerLeftThumbDrag;
 	//Vec2f controllerRightThumbDrag;
 
-	MouseInput mouseInput;
-	int keys[UINT16_MAX];
+	//bool8 mouse_locked;
+
+	int mb1;
+	int mb2;
+	int mb3;
+	int alt;
+	int shift;
+	int ctrl;
+	int w;
+	int s;
+	int a;
+	int d;
+	int q;
+	int e;
+	int r;
+	int t;
+	int z;
+	int x;
+	int c;
+	int v;
+	int b;
+	int del;
+	int tlda;
+	int K1;
+	int K2;
+	int K3;
+	int K4;
+	int K5;
+	int K6;
+	int K7;
+	int K8;
+	int K9;
+	int K0;
+	int f1;
+	int f2;
+	int f3;
+	int f4;
+	int f5;
+	int f6;
+	int f7;
+	int f8;
+	int f9;
+	int f10;
+	int f11;
+	int f12;
+	int escape;
+	int space;
+	int controllerUp;
+	int controllerDown;
+	int controllerLeft;
+	int controllerRight;
+	int controllerStart;
+	int controllerBack;
+	int controllerLeftThumb;
+	int controllerRightThumb;
+	int controllerLeftShoulder;
+	int controllerRightShoulder;
+	int controllerA;
+	int controllerB;
+	int controllerX;
+	int controllerY;
 };
 
 static Input input = {};
-static void ProcessMouseInput()
-{
-	POINT mousep = {};
-	GetCursorPos(&mousep);
-	ScreenToClient((HWND)winState.window, &mousep);
-	real64 mx = (real64)mousep.x;
-	real64 my = (real64)mousep.y;
-
-	mx = Clamp<real64>(mx, 0.0f, (real64)winState.surfaceWidth);
-	my = Clamp<real64>(my, 0.0f, (real64)winState.surfaceHeight);
-
-	input.mouseInput.mousePositionPixelCoords.x = mx;
-	input.mouseInput.mousePositionPixelCoords.y = my;
-
-	input.mouseInput.mb1 = GetKeyState(VK_LBUTTON) & (1 << 15);
-	input.mouseInput.mb2 = GetKeyState(VK_RBUTTON) & (1 << 15);
-	input.mouseInput.mb3 = GetKeyState(VK_MBUTTON) & (1 << 15);
-
-	input.mouseInput.mousePositionNormalCoords.x = (mx / (real64)winState.surfaceWidth);
-	input.mouseInput.mousePositionNormalCoords.y = (my / (real64)winState.surfaceHeight);
-
-	if (input.mouseInput.mouseLocked && winState.active)
-	{
-		SetCursor(FALSE);
-
-		POINT p = {};
-		p.x = winState.surfaceWidth / 2;
-		p.y = winState.surfaceHeight / 2;
-
-		ClientToScreen((HWND)winState.window, &p);
-		SetCursorPos(p.x, p.y);
-	}	
-}
-
-//static void ProcessRawMouseInput()
-//{
-//	Input* input = Input::Get();
-//
-//	POINT mousep = {};
-//	GetCursorPos(&mousep);
-//	ScreenToClient((HWND)winState.window, &mousep);
-//	real32 mx = (real32)mousep.x;
-//	real32 my = (real32)mousep.y;
-//
-//	mx = Clamp<real32>(mx, 0.0f, (real32)winState.windowWidth);
-//	my = Clamp<real32>(my, 0.0f, (real32)winState.windowHeight);
-//
-//	input->mousePositionPixelCoords.x = mx;
-//	input->mousePositionPixelCoords.y = my;
-//
-//	if (input->mouse_locked && winState.active)
-//	{
-//		SetCursor(FALSE);
-//
-//		input->oldInput->mousePositionPixelCoords = Vec2f((real32)(winState.windowWidth / 2),
-//			(real32)(winState.windowHeight / 2));
-//
-//		POINT p = {};
-//		p.x = winState.windowWidth / 2;
-//		p.y = winState.windowHeight / 2;
-//
-//		ClientToScreen((HWND)winState.window, &p);
-//
-//		SetCursorPos(p.x, p.y);
-//	}
-//
-//	input->mouseNorm.x = mx / (real32)winState.windowWidth;
-//	input->mouseNorm.y = my / (real32)winState.windowHeight;
-//
-//	input->mb1 = GetKeyState(VK_LBUTTON) & (1 << 15);
-//	input->mb2 = GetKeyState(VK_RBUTTON) & (1 << 15);
-//	input->mb3 = GetKeyState(VK_MBUTTON) & (1 << 15);
-//}
-
-
-
-EDITOR_INTERFACE(bool) Win32PumpMessages(int* appInput, MouseInput *mouseInput)
+EDITOR_INTERFACE(bool) PumpMessages_(Input& appInput)
 {
 	if (winState.running)
-	{		
+	{
+		//oldInput = input;
+		//Input::Get()->mouseDelta = Vec2f(0);
+
 		winState.active = (bool8)GetFocus();
-		input.mouseInput.mouseLocked = mouseInput->mouseLocked;
 
 		MSG message = {};
 		while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE))
@@ -297,34 +274,8 @@ EDITOR_INTERFACE(bool) Win32PumpMessages(int* appInput, MouseInput *mouseInput)
 			DispatchMessageA(&message);
 		}
 
-		ProcessMouseInput();
-
-		input.keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL) & (1 << 15);
-		if (input.keys[VK_LCONTROL])
-		{
-			int a = 2;
-		}
-		input.keys[VK_RCONTROL] = GetAsyncKeyState(VK_RCONTROL) & (1 << 15);
-		input.keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT) & (1 << 15);
-		input.keys[VK_RSHIFT] = GetAsyncKeyState(VK_RSHIFT) & (1 << 15);
-
-		for (int i = 0; i < UINT16_MAX; i++)
-		{
-			appInput[i] = (bool)input.keys[i];
-		}
-
-		mouseInput->mb1 = input.mouseInput.mb1;
-		mouseInput->mb2 = input.mouseInput.mb2;
-		mouseInput->mb3 = input.mouseInput.mb3;
-		
-		
-		mouseInput->mousePositionNormalCoords = input.mouseInput.mousePositionNormalCoords;
-		mouseInput->mousePositionPixelCoords = input.mouseInput.mousePositionPixelCoords;		
-
-		//input->shift = (GetKeyState(VK_SHIFT) & (1 << 15));
-		//input->alt = (GetKeyState(VK_MENU) & (1 << 15));
-		//input->ctrl = (GetKeyState(VK_CONTROL) & (1 << 15));	
-
+		appInput = input;
+		//appInput.a = true;
 		//if (winState.rawInput)
 		//{
 		//	ProcessRawMouseInput();
@@ -340,6 +291,177 @@ EDITOR_INTERFACE(bool) Win32PumpMessages(int* appInput, MouseInput *mouseInput)
 
 void ProcessKeyboardInput(uint16 vkCode, bool32 isDown)
 {
-	input.keys[vkCode] = isDown;
+	if (vkCode == 'W')
+	{
+		input.w = isDown;
+	}
+	else if (vkCode == 'A')
+	{
+		input.a = isDown;
+	}
+	else if (vkCode == 'S')
+	{
+		input.s = isDown;
+	}
+	else if (vkCode == 'D')
+	{
+		input.d = isDown;
+	}
+	else if (vkCode == 'Q')
+	{
+		input.q = isDown;
+	}
+	else if (vkCode == 'E')
+	{
+		input.e = isDown;
+	}
+	else if (vkCode == 'R')
+	{
+		input.r = isDown;
+	}
+	else if (vkCode == 'T')
+	{
+		input.t = isDown;
+	}
+	else if (vkCode == 'Z')
+	{
+		input.z = isDown;
+	}
+	else if (vkCode == 'X')
+	{
+		input.x = isDown;
+	}
+	else if (vkCode == 'C')
+	{
+		input.c = isDown;
+	}
+	else if (vkCode == 'V')
+	{
+		input.v = isDown;
+	}
+	else if (vkCode == 'B')
+	{
+		input.b = isDown;
+	}
+	else if (vkCode == '0')
+	{
+		input.K0 = isDown;
+	}
+	else if (vkCode == '1')
+	{
+		input.K1 = isDown;
+	}
+	else if (vkCode == '2')
+	{
+		input.K2 = isDown;
+	}
+	else if (vkCode == '3')
+	{
+		input.K3 = isDown;
+	}
+	else if (vkCode == '4')
+	{
+		input.K4 = isDown;
+	}
+	else if (vkCode == '5')
+	{
+		input.K5 = isDown;
+	}
+	else if (vkCode == '6')
+	{
+		input.K6 = isDown;
+	}
+	else if (vkCode == '7')
+	{
+		input.K7 = isDown;
+	}
+	else if (vkCode == '8')
+	{
+		input.K8 = isDown;
+	}
+	else if (vkCode == '9')
+	{
+		input.K9 = isDown;
+	}
+	else if (vkCode == VK_F1)
+	{
+		input.f1 = isDown;
+	}
+	else if (vkCode == VK_F2)
+	{
+		input.f2 = isDown;
+	}
+	else if (vkCode == VK_F3)
+	{
+		input.f3 = isDown;
+	}
+	else if (vkCode == VK_F4)
+	{
+		input.f4 = isDown;
+	}
+	else if (vkCode == VK_F5)
+	{
+		input.f5 = isDown;
+	}
+	else if (vkCode == VK_F6)
+	{
+		input.f6 = isDown;
+	}
+	else if (vkCode == VK_F6)
+	{
+		input.f7 = isDown;
+	}
+	else if (vkCode == VK_F7)
+	{
+		input.f7 = isDown;
+	}
+	else if (vkCode == VK_F8)
+	{
+		input.f8 = isDown;
+	}
+	else if (vkCode == VK_F9)
+	{
+		input.f9 = isDown;
+	}
+	else if (vkCode == VK_F10)
+	{
+		input.f10 = isDown;
+	}
+	else if (vkCode == VK_F11)
+	{
+		input.f11 = isDown;
+	}
+	else if (vkCode == VK_F12)
+	{
+		input.f12 = isDown;
+	}
+	else if (vkCode == VK_ESCAPE)
+	{
+		input.escape = isDown;
+	}
+	else if (vkCode == VK_OEM_3)
+	{
+		input.tlda = isDown;
+	}
+	else if (vkCode == VK_DELETE)
+	{
+		input.del = isDown;
+	}
+	else if (vkCode == VK_SHIFT)
+	{
+		input.shift = isDown;
+	}
+	else if (vkCode == VK_MENU)
+	{
+		input.alt = isDown;
+	}
+	else if (vkCode == VK_CONTROL)
+	{
+		input.ctrl = isDown;
+	}
+	else if (vkCode == VK_SPACE)
+	{
+		input.space = isDown;
+	}
 }
 

@@ -4,24 +4,12 @@
     "net6.0": {
       "SolarSharp/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v6.0",
-        "dependencies": {
-          "SolarWindows": "1.0.0"
-        },
+        "framework": "Unsupported,Version=v0.0",
         "compile": {
           "bin/placeholder/SolarSharp.dll": {}
         },
         "runtime": {
           "bin/placeholder/SolarSharp.dll": {}
-        }
-      },
-      "SolarWindows/1.0.0": {
-        "type": "project",
-        "compile": {
-          "bin/placeholder/SolarWindows.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/SolarWindows.dll": {}
         }
       }
     }
@@ -31,11 +19,6 @@
       "type": "project",
       "path": "../SolarSharp/SolarSharp.csproj",
       "msbuildProject": "../SolarSharp/SolarSharp.csproj"
-    },
-    "SolarWindows/1.0.0": {
-      "type": "project",
-      "path": "../SolarWindows/SolarWindows.vcxproj",
-      "msbuildProject": "../SolarWindows/SolarWindows.vcxproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -95,13 +78,19 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "frameworkReferences": {
-          "Microsoft.NETCore.App": {
-            "privateAssets": "all"
-          }
-        },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project SolarSharp is not compatible with net6.0 (.NETCoreApp,Version=v6.0). Project SolarSharp supports: net6.0-windows7.0 (.NETCoreApp,Version=v6.0)",
+      "libraryId": "SolarSharp",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
 }

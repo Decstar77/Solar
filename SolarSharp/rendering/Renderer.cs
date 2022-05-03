@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+using SolarSharp.EngineAPI;
+
 namespace SolarSharp.Rendering
 {
     internal class RasterState
@@ -26,7 +28,7 @@ namespace SolarSharp.Rendering
         {
             this.fillMode = fillMode;
             this.cullMode = cullMode;
-            obj = EngineAPI.RendererCreateRasterState((int)fillMode, (int)cullMode);
+            obj = EngineAPI.EngineAPI.RendererCreateRasterState((int)fillMode, (int)cullMode);
         }
 
         public int State { get { return obj; } }
@@ -56,7 +58,7 @@ namespace SolarSharp.Rendering
             this.enabled = enabled;
             this.write = write; 
             this.comparison = comparison;
-            obj = EngineAPI.RendererCreateDepthStencilState(enabled, write, (int)comparison);
+            obj = EngineAPI.EngineAPI.RendererCreateDepthStencilState(enabled, write, (int)comparison);
         }
 
         public int State { get { return obj; } }
@@ -91,9 +93,9 @@ namespace SolarSharp.Rendering
 
     internal class StaticProgram
     {
-        public StaticProgram(string srcCode, VertexLayout layout)
-        {            
-            obj = EngineAPI.RendererCreateStaticProgram(srcCode, (int)layout);
+        public StaticProgram(string srcCode)
+        {
+            obj = EngineAPI.EngineAPI.RendererCreateStaticProgram(srcCode, 3);
         }
 
         public int State { get { return obj; } }
@@ -104,32 +106,18 @@ namespace SolarSharp.Rendering
     {
         public StaticMesh(float[] vertices, uint[] indices, VertexLayout layout)
         {
-            obj = EngineAPI.RendererCreateStaticMesh(vertices, vertices.Length, indices, indices.Length, (int)layout);
+            obj = EngineAPI.EngineAPI.RendererCreateStaticMesh(vertices, vertices.Length, indices, indices.Length, (int)layout);
         }
 
         public int State { get { return obj; } }
         private int obj;
     }
 
-    internal class DynamicMesh
-    {
-        internal DynamicMesh(int floatCount, VertexLayout layout)
-        {
-            vertices = new float[floatCount];
-            obj = EngineAPI.RendererCreateDynamicMesh(floatCount, (int)layout);
-        }
-
-        internal float[] vertices;
-
-        // @HACK @TODO: Make private !!
-        internal int obj;
-    }
-
     internal class ConstBuffer
     {
         public ConstBuffer(int floatCount)
-        {           
-            obj = EngineAPI.RendererCreateConstBuffer(floatCount * sizeof(float));
+        {
+            obj = EngineAPI.EngineAPI.RendererCreateConstBuffer(floatCount * sizeof(float));
             buffer = new float[floatCount];
             Reset();
         }
@@ -160,43 +148,45 @@ namespace SolarSharp.Rendering
     {
         public static void SetViewportState(int width, int height) 
         {
-            EngineAPI.RendererSetViewportState(width, height);
+            EngineAPI.EngineAPI.RendererSetViewportState(width, height);
         }
 
         public static void SetTopologyState(Topology topo)
         {
-            EngineAPI.RendererSetTopologyState((int)topo);
+            EngineAPI.EngineAPI.RendererSetTopologyState((int)topo);
         }
 
         public static void SetRasterState(RasterState rasterState) 
         {
-            EngineAPI.RendererSetRasterState(rasterState.State);
+            EngineAPI.EngineAPI.RendererSetRasterState(rasterState.State);
         }
 
         public static void SetDepthState(DepthState depthState) 
         {
-            EngineAPI.RendererSetDepthState(depthState.State);
+            EngineAPI.EngineAPI.RendererSetDepthState(depthState.State);
         }
 
         public static void SetVertexConstBuffer(ConstBuffer buffer, int slot)
         {
-            EngineAPI.RendererSetVertexConstBuffer(buffer.State, slot);
+            EngineAPI.EngineAPI.RendererSetVertexConstBuffer(buffer.State, slot);
         }
 
         public static void SetConstBufferData(ConstBuffer buffer)
         {
-            EngineAPI.RendererSetConstBufferData(buffer.State, buffer.GetData());
+            EngineAPI.EngineAPI.RendererSetConstBufferData(buffer.State, buffer.GetData());
         }
 
         public static void RendererSetStaticProgram(StaticProgram program)
         {
-            EngineAPI.RendererSetStaticProgram(program.State);  
+            EngineAPI.EngineAPI.RendererSetStaticProgram(program.State);  
         }
 
         public static void RendererDrawStaticMesh(StaticMesh mesh)
         {
-            EngineAPI.RendererDrawStaticMesh(mesh.State);
+            EngineAPI.EngineAPI.RendererDrawStaticMesh(mesh.State);
         }
+
+
     }
 
     internal class Renderer
@@ -206,25 +196,19 @@ namespace SolarSharp.Rendering
         private static int samplerState;
         private static int blendState;
         private static StaticProgram program;
-
-
-        private static ConstBuffer vertexShaderModelData;
-        private static ConstBuffer vertexShaderViewData;
-
+        private static ConstBuffer cbuf;
+        
         private static StaticMesh unitQuad;
         private static StaticMesh unitCube;
 
         public static StaticMesh testMesh;
-
-        public static DynamicMesh debugMesh;
-        public static StaticProgram debugProgram;
 
         public static bool Create()
         {
             rasterState = new RasterState(RasterState.FillMode.SOLID, RasterState.CullMode.BACK);
             depthState = new DepthState(true, true, DepthState.Comparison.LESS_EQUAL);
 
-            program = new StaticProgram(new StreamReader("F:/codes/Solar/SolarSharp/Programs/FirstShader.hlsl").ReadToEnd(), VertexLayout.PNT);
+            program = new StaticProgram(new StreamReader("F:/codes/Learning/SolarSharp/SolarSharp/Programs/FirstShader.hlsl").ReadToEnd());
 
             MeshResource quadResource = Tools.MeshFactory.CreateQuad(-1, 1, 2, 2, 0);
             MeshResource cubeResource = Tools.MeshFactory.CreateBox(2, 2, 2, 1);
@@ -232,29 +216,26 @@ namespace SolarSharp.Rendering
             unitQuad = new StaticMesh(quadResource.vertices.ToArray(), quadResource.indices.ToArray(), VertexLayout.PNT);
             unitCube = new StaticMesh(cubeResource.vertices.ToArray(), cubeResource.indices.ToArray(), VertexLayout.PNT);
 
-            vertexShaderModelData = new ConstBuffer(16 * 3);
-            RenderCommands.SetVertexConstBuffer(vertexShaderModelData, 0);
+            cbuf = new ConstBuffer(16 * 3);
+            RenderCommands.SetVertexConstBuffer(cbuf, 0);
 
-            vertexShaderViewData = new ConstBuffer(16 * 3);
-            RenderCommands.SetVertexConstBuffer(vertexShaderViewData, 1);
+
 
             //samplerState = EngineAPI.RendererCreateSamplerState(20, 1);
-            blendState = EngineAPI.RendererCreateBlendState();
-
-            Debug.Initialize();
+            blendState = EngineAPI.EngineAPI.RendererCreateBlendState();
     
             return true;
         }
 
         public static void Render(RenderPacket renderPacket)
         {
-            EngineAPI.RendererBeginFrame();
+            EngineAPI.EngineAPI.RendererBeginFrame();
 
             EventSystem.Fire(EventType.RENDER_START, null);
 
             RenderCommands.SetRasterState(rasterState);
             RenderCommands.SetDepthState(depthState);
-            EngineAPI.RendererSetBlendState(blendState);
+            EngineAPI.EngineAPI.RendererSetBlendState(blendState);
 
             RenderCommands.SetTopologyState(Topology.TRIANGLELIST);
             RenderCommands.SetViewportState(Application.SurfaceWidth, Application.SurfaceHeight);
@@ -282,34 +263,36 @@ namespace SolarSharp.Rendering
             RenderCommands.SetConstBufferData(cbuf);
             RenderCommands.RendererDrawStaticMesh(unitCube);
 #else
-            //Matrix4 proj = Matrix4.CreatePerspectiveRH((MathF.PI / 180) * 45.0f, Application.WindowAspect, 0.1f, 100.0f);
-            //Matrix4 view = Matrix4.CreateLookAtRH(new Vector3(8, 8, 8), Vector3.Zero, Vector3.UnitY).Inverse;
-            Matrix4 proj = renderPacket.projectionMatrix;
-            Matrix4 view = renderPacket.viewMatrix;
+            Matrix4 proj = Matrix4.CreatePerspectiveRH((MathF.PI / 180) * 45.0f, Application.WindowAspect, 0.1f, 100.0f);
+            Matrix4 cam = Matrix4.CreateLookAtRH(new Vector3(8, 8, 8), Vector3.Zero, Vector3.UnitY).Inverse;
 
-            vertexShaderViewData.Reset();
-            vertexShaderViewData.Prepare(proj);
-            vertexShaderViewData.Prepare(view);
-            RenderCommands.SetConstBufferData(vertexShaderViewData);
-
+            
             foreach (RenderEntry entry in renderPacket.renderEntries)
             {
-                Matrix4 mvp = (proj * view * entry.ComputeTransformMatrix());
+                Matrix4 mvp = (proj * cam * entry.ComputeTransformMatrix());
 
-                vertexShaderModelData.Reset();
-                vertexShaderModelData.Prepare(mvp);
-                RenderCommands.SetConstBufferData(vertexShaderModelData);
+                cbuf.Reset();
+                cbuf.Prepare(mvp);
+                RenderCommands.SetConstBufferData(cbuf);
                 RenderCommands.RendererDrawStaticMesh(unitCube);
             }
 
+
+            
+
+            //m = Matrix4.Identity; m.m14 = 0; m.m24 = 4; m.m34 = 0;
+            //mvp = (proj * cam * m);
+
+            //cbuf.Reset();
+            //cbuf.Prepare(mvp);
+            //RenderCommands.SetConstBufferData(cbuf);
+            //RenderCommands.RendererDrawStaticMesh(unitCube);
 #endif
 
-#if DEBUG         
-            Debug.Flush();
-#endif
+
             EventSystem.Fire(EventType.RENDER_END, null);
 
-            EngineAPI.RendererEndFrame(1);
+            EngineAPI.EngineAPI.RendererEndFrame(1);
         }
 
     }

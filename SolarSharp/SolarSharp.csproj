@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <BaseOutputPath>$(SolutionDir)</BaseOutputPath>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>AnyCPU;x64</Platforms>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,43 +25,37 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="collision\Intersection.cs" />
-    <Compile Include="collision\Primitives.cs" />
-    <Compile Include="collision\Raycast.cs" />
     <Compile Include="core\Application.cs" />
     <Compile Include="core\ApplicationConfig.cs" />
-    <Compile Include="core\Camera.cs" />
-    <Compile Include="core\Debug.cs" />
     <Compile Include="core\EventSystem.cs" />
     <Compile Include="core\Input.cs" />
-    <Compile Include="core\KeyCode.cs" />
     <Compile Include="core\MeshFactory.cs" />
     <Compile Include="core\RenderPacket.cs" />
     <Compile Include="core\Resources.cs" />
     <Compile Include="core\Util.cs" />
-    <Compile Include="engine\ImGuiAPI.cs" />
+    <Compile Include="core\Window.cs" />
+    <Compile Include="EngineAPI\ImGuiAPI.cs" />
     <Compile Include="core\Logger.cs" />
-    <Compile Include="game\Entity.cs" />
+    <Compile Include="EngineAPI\ImGuiTextAPI.cs" />
+    <Compile Include="EngineAPI\Win32API.cs" />
     <Compile Include="math\Basis.cs" />
+    <Compile Include="EngineAPI\D3D11API.cs" />
     <Compile Include="math\Matrix3.cs" />
+    <Compile Include="math\Matrix4.cs" />
     <Compile Include="math\Quaternion.cs" />
     <Compile Include="math\Vector2.cs" />
-    <Compile Include="rendering\Renderer.cs" />
-    <Compile Include="engine\EngineAPI.cs" />
-    <Compile Include="math\Matrix4.cs" />
     <Compile Include="math\Vector3.cs" />
     <Compile Include="math\Vector4.cs" />
-    <Compile Include="rendering\RenderPacket.cs" />
+    <Compile Include="rendering\D3D11.cs" />
+    <Compile Include="rendering\ImGui.cs" />
+    <Compile Include="rendering\ImGuiNodes.cs" />
+    <Compile Include="rendering\ImGuiTextEditor.cs" />
+    <Compile Include="assets\AssetSystem.cs" />
+    <Compile Include="assets\ShaderAsset.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SolarWindows\SolarWindows.vcxproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="core\TODO.txt" />
-    <None Include="Programs\Debug.hlsl" />
-    <None Include="Programs\FirstShader.hlsl" />
   </ItemGroup>
 
 </Project>

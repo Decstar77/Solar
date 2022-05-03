@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace SolarSharp
 {
@@ -54,7 +54,7 @@ namespace SolarSharp
             this.m44 = m44;
         }
 
-        public Matrix4(Matrix3 matrix3) 
+        public Matrix4(Matrix3 matrix3)
         {
             m11 = matrix3.m11;
             m12 = matrix3.m12;
@@ -78,7 +78,7 @@ namespace SolarSharp
         }
 
 
-        public Vector4 col1 { get { return new Vector4(m11, m21, m31, m41); }  set { m11 = value.x;  m21 = value.y; m31 = value.z; m41 = value.w; } }
+        public Vector4 col1 { get { return new Vector4(m11, m21, m31, m41); } set { m11 = value.x; m21 = value.y; m31 = value.z; m41 = value.w; } }
         public Vector4 col2 { get { return new Vector4(m12, m22, m32, m42); } set { m12 = value.x; m22 = value.y; m32 = value.z; m42 = value.w; } }
         public Vector4 col3 { get { return new Vector4(m13, m23, m33, m43); } set { m13 = value.x; m23 = value.y; m33 = value.z; m43 = value.w; } }
         public Vector4 col4 { get { return new Vector4(m14, m24, m34, m44); } set { m14 = value.x; m24 = value.y; m34 = value.z; m44 = value.w; } }
@@ -180,7 +180,7 @@ namespace SolarSharp
 
         public static Matrix4 CreateLookAtLH(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
         {
-            Vector3 cameraReverseDirection = Vector3.Normalize(cameraPosition - cameraTarget); 
+            Vector3 cameraReverseDirection = Vector3.Normalize(cameraPosition - cameraTarget);
 
             Vector3 right = Vector3.Normalize(Vector3.Cross(cameraReverseDirection, cameraUpVector));
             Vector3 up = Vector3.Cross(right, cameraReverseDirection);
@@ -188,8 +188,8 @@ namespace SolarSharp
 
             Matrix4 result;
 
-            result.m11 = right.x; 
-            result.m12 = right.y; 
+            result.m11 = right.x;
+            result.m12 = right.y;
             result.m13 = right.z;
             result.m14 = 0;
 
@@ -216,7 +216,7 @@ namespace SolarSharp
             matrix.m14 += translation.x;
             matrix.m24 += translation.y;
             matrix.m34 += translation.z;
-            return matrix; 
+            return matrix;
         }
 
         public static Matrix4 TranslateLH(Matrix4 matrix, Vector3 translation)
@@ -237,7 +237,7 @@ namespace SolarSharp
         }
 
         public static Quaternion ToQuaternion(Matrix4 matrix)
-        {            
+        {
             Quaternion result = Matrix3.ToQuaternion(new Matrix3(matrix));
 
             return result;
@@ -246,7 +246,7 @@ namespace SolarSharp
         public static void Decompose(Matrix4 transform, out Vector3 position, out Quaternion orientation, out Vector3 scale)
         {
             position = new Vector3(transform.col4);
-            
+
             float m1 = transform.col1.Mag;
             float m2 = transform.col2.Mag;
             float m3 = transform.col3.Mag;
@@ -427,7 +427,7 @@ namespace SolarSharp
 
             return m;
         }
-        
+
         public static Vector4 operator *(Matrix4 value1, Vector4 value2)
         {
             float x = Vector4.Dot(value1.col1, value2);

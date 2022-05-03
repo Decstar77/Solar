@@ -5,88 +5,34 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SolarSharp;
-using SolarSharp.Rendering;
+using SolarSharp.EngineAPI;
+using System.Text.Json;
 
 namespace SolarEditor
 {
     public class Program
     {
         private static EditorState? editorState;
-
-        public static bool ImGuiDraw()
-        {
-            if (editorState != null)
-            {
-               
-
-                if (ImGui.BeginMainMenuBar())
-                {
-                    if (ImGui.BeginMenu("File"))
-                    {
-                        if (ImGui.MenuItem("Open"))
-                        {
-
-                        }
-
-                        ImGui.EndMenu();
-                    }
-
-                    if (ImGui.BeginMenu("View"))
-                    {
-                        if (ImGui.MenuItem("Assets"))
-                        {
-                            editorState.AddWindow(new AssetWindow());
-                        }
-
-                        if (ImGui.MenuItem("Room"))
-                        {
-                            editorState.AddWindow(new RoomWindow());
-                        }
-
-                        ImGui.EndMenu();
-                    }
-
-                    ImGui.EndMainMenuBar();
-                }
-
-               
-                editorState.ShowWindows();
-
-                ImGui.EndFrame();
-            }
-
-            return false;
-        }
-
-
         public static bool OnInitialize()
         {
-            editorState = new EditorState(new EditorConfig());
-
-            EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { return ImGuiDraw(); });
-            return ImGui.Initialzie();
+            editorState = new EditorState(new EditorConfig());           
+            return true;
         }
 
         public static void OnUpdate()
         {
-            if (editorState != null)
-            {
-                ImGui.BeginFrame();
-                editorState.Update();     
-            }
+            editorState?.Update();
         }
 
-        public static void OnRender(RenderPacket renderPacket)
-        {
-            if (editorState != null)
-            {
-                editorState.Render(renderPacket);
-            }
-        }
+        //public static void OnRender(RenderPacket renderPacket)
+        //{
+        //    renderPacket.renderEntries.Add(new RenderEntry(new Vector3(5, 0, 0), Quaternion.Identity, new Vector3(0.1f, 1, 1)));
+        //    renderPacket.renderEntries.Add(new RenderEntry(new Vector3(0, 0, 0), Quaternion.Identity, new Vector3(1,1,1)));
+        //}
 
         public static void OnShutdown()
         {
-            ImGui.Shutdown();
+            editorState?.Shutdown();
         }
 
         public static void Main()
@@ -101,14 +47,10 @@ namespace SolarEditor
             config.Version = "0.1";
             config.OnInitializeCallback = OnInitialize;
             config.OnUpdateCallback = OnUpdate; 
-            config.OnRenderCallback = OnRender;
             config.OnShutdownCallback = OnShutdown;
 
-            //EditorConfig configEditor = new EditorConfig();
-            //System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(EditorConfig));
-            //FileStream file = File.Create("EditorConfig.xml");
-            //writer.Serialize(file, configEditor);
-            //file.Close();
+            //string json = JsonSerializer.Serialize(config);
+            //File.WriteAllText("appConfig.json", json);
 
             Application app = new Application(config);
         }

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using SolarSharp.Core;
 using SolarSharp.Rendering;
+using SolarSharp.EngineAPI;
+using SolarSharp.Assets;
 
 namespace SolarSharp
 {
@@ -15,7 +20,7 @@ namespace SolarSharp
         public static int SurfaceHeight { get { return surfaceHeight; } }
         private static int surfaceHeight;
 
-        public static float SurfaceAspect { get { return windowAspect; } }
+        public static float WindowAspect { get { return windowAspect; } }
         private static float windowAspect;
 
         public static string WindowName { get { return windowName; } }
@@ -24,10 +29,9 @@ namespace SolarSharp
         private static int windowX;   
         private static int windowY;        
 
-        private static Input input = new Input();
-        private static Input oldInput = new Input();
-
-        private static Vector2 mouseDelta = new Vector2(0, 0);
+        public static FrameInput Input { get { return input; } }
+        private static FrameInput input = new FrameInput();
+        public static FrameInput OldInput { get; set; }
 
         private static string version;
         private static string descrip;
@@ -36,210 +40,204 @@ namespace SolarSharp
 
         public Application(ApplicationConfig config)
         {
-            if (initialized)
-            {
-                Logger.Error("Application is already running !!");
-                return;
+            if (!EventSystem.Initialize()) {
+                Logger.Error("Could not initialize event system");
+            };
+            
+            Window window = new Window();
+            if (!window.Open(config.Title, config.SurfaceWidth, config.SurfaceHeight, config.WindowXPos, config.WindowYPos)) {
+                Logger.Error("Could not open window");
             }
 
-            initialized = true;
+            config.OnInitializeCallback.Invoke();
 
-            surfaceWidth = config.SurfaceWidth;
-            surfaceHeight = config.SurfaceHeight;
-            windowAspect = (float)surfaceWidth / (float)surfaceHeight;
-            windowX = config.WindowXPos;
-            windowY = config.WindowYPos;
-            windowName = config.Title;
-            version = config.Version;
-            descrip = config.Description;
+            DeviceContext deviceContext = new DeviceContext();
+            Swapchain swapchain = new Swapchain();
 
-            if (config.OnUpdateCallback != null 
-                && config.OnRenderCallback != null 
-                && config.OnInitializeCallback != null 
-                && config.OnShutdownCallback != null)
-            {
-                if (EngineAPI.Win32CreateWindow(windowName, surfaceWidth, surfaceHeight, windowY, windowX))
-                {
-                    Logger.Trace("Window created");
+            deviceContext.Create();
+            swapchain.Create();
 
-                    if (EngineAPI.Win32CreateRenderer())
-                    {
-                        Logger.Trace("Renderer created");
-                        if (EventSystem.Initialize())
-                        {
-                            if (Renderer.Create())
-                            {                                
-                                if (config.OnInitializeCallback())
-                                {
-                                    Logger.Info("Startup successful");
+            DepthStencilState depthStencilState = deviceContext.Device.CreateDepthStencilState(new DepthStencilDesc());
+            RasterizerState rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc());
+            BlendState blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
+            SamplerState samplerState = deviceContext.Device.CreateSamplerState(new SamplerDesc());
 
+            ShaderAsset shaderAsset = AssetSystem.LoadShaderAsset("F:/codes/Learning/SolarSharp/Assets/FirstShader.hlsl");
+                        
+            Blob vertexBlob = deviceContext.Device.CompileShader(shaderAsset.Src, "VSmain", "vs_5_0");
+            Blob pixelBlob = deviceContext.Device.CompileShader(shaderAsset.Src, "PSmain", "ps_5_0");
 
-                                    bool mouseUnlocked = true; // @NOTE: Used to stop snapping when first activating locking the mouse
-                                    while (EngineAPI.Win32PumpMessages(input.keys, ref input.mouseIput))
-                                    {
-                                        RenderPacket renderPacket = new RenderPacket();
+            VertexShader vertexShader = deviceContext.Device.CreateVertexShader(vertexBlob);
+            PixelShader pixelShader = deviceContext.Device.CreatePixelShader(pixelBlob);
 
-                                        if (input.mouseIput.mouseLocked)
-                                        {                   
-                                            if (mouseUnlocked)
-                                            {
-                                                mouseUnlocked = false;
-                                                input.mouseIput.mouseXPositionNormalCoords = 0.5f;
-                                                input.mouseIput.mouseYPositionNormalCoords = 0.5f;
-                                            }
+            InputElementDesc pDesc = new InputElementDesc();
+            pDesc.SemanticName = "Position";
+            pDesc.SemanticIndex = 0;
+            pDesc.Format = DXGIFormat.R32G32B32_FLOAT;
+            pDesc.InputSlot = 0;
+            pDesc.AlignedByteOffset = 0;
+            pDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
+            pDesc.InstanceDataStepRate = 0;
 
-                                            mouseDelta.x = (float)(input.mouseIput.mouseXPositionNormalCoords - 0.5);
-                                            mouseDelta.y = (float)(input.mouseIput.mouseYPositionNormalCoords - 0.5);
-                                        }
-                                        else
-                                        {
-                                            mouseUnlocked = true;
-                                            mouseDelta.x = (float)(input.mouseIput.mouseXPositionNormalCoords - oldInput.mouseIput.mouseXPositionNormalCoords);
-                                            mouseDelta.y = (float)(input.mouseIput.mouseYPositionNormalCoords - oldInput.mouseIput.mouseYPositionNormalCoords);
-                                        }
+            InputElementDesc nDesc = new InputElementDesc();
+            nDesc.SemanticName = "Normal";
+            nDesc.SemanticIndex = 0;
+            nDesc.Format = DXGIFormat.R32G32B32_FLOAT;
+            nDesc.InputSlot = 0;
+            nDesc.AlignedByteOffset = 0xffffffff;
+            nDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
+            nDesc.InstanceDataStepRate = 0;
 
-                                        config.OnUpdateCallback();
-                                        config.OnRenderCallback(renderPacket);
+            InputElementDesc tDesc = new InputElementDesc();
+            tDesc.SemanticName = "TexCord";
+            tDesc.SemanticIndex = 0;
+            tDesc.Format = DXGIFormat.R32G32_FLOAT;
+            tDesc.InputSlot = 0;
+            tDesc.AlignedByteOffset = 0xffffffff;
+            tDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
+            tDesc.InstanceDataStepRate = 0;
 
-                                        Renderer.Render(renderPacket);
+            InputLayout inputLayout = deviceContext.Device.CreateInputLayout(vertexBlob, pDesc, nDesc, tDesc);
 
-                                        oldInput.Copy(input);
-                                    }
-                                }
-                                else
-                                {
+            vertexBlob.Release();
+            pixelBlob.Release();
 
-                                }
-                            }
-                            else
-                            {
+            StaticMesh mesh = StaticMesh.CreateScreenSpaceQuad(deviceContext.Device);
 
-                            }
-                        }
-                        else
-                        {
+            DirectXBuffer constBuffer0 = deviceContext.Device.CreateBuffer(new BufferDesc { 
+                BindFlags = (uint)BufferBindFlag.CONSTANT_BUFFER,
+                Usage = BufferUsage.DEFAULT,
+                ByteWidth = sizeof(float) * 16 * 3
+            });
 
-                        }
+            Matrix4 proj = Matrix4.CreatePerspectiveLH((MathF.PI / 180) * 45.0f, window.WindowAspect, 0.1f, 100.0f);
+            Matrix4 cam = Matrix4.CreateLookAtLH(new Vector3(0, 0, -5), Vector3.Zero, Vector3.UnitY).Inverse;
+            Matrix4 mvp = cam * proj;
 
-                        EngineAPI.Win32DestroyRenderer();
-                    }
-                    else
-                    {
-                        Logger.Error("Could not create win32 renderer");
-                    }
+            int index = 0;
+            float[] constBufferData = new float[16 * 3];
+            constBufferData[index++] = mvp.m11; constBufferData[index++] = mvp.m12; constBufferData[index++] = mvp.m13; constBufferData[index++] = mvp.m14;
+            constBufferData[index++] = mvp.m21; constBufferData[index++] = mvp.m22; constBufferData[index++] = mvp.m23; constBufferData[index++] = mvp.m24;
+            constBufferData[index++] = mvp.m31; constBufferData[index++] = mvp.m32; constBufferData[index++] = mvp.m33; constBufferData[index++] = mvp.m34;
+            constBufferData[index++] = mvp.m41; constBufferData[index++] = mvp.m42; constBufferData[index++] = mvp.m43; constBufferData[index++] = mvp.m44;
 
-                    EngineAPI.Win32DestroyWindow();
-                }
-                else
-                {
-                    Logger.Error("Could not create win32 window");
-                }
-            }
-            else
-            {
-                Logger.Error("Update/render/init/shutdown callback(s) is null");
-            }
-        }
+            deviceContext.Context.UpdateSubresource(constBuffer0, constBufferData);
+            deviceContext.Context.SetVSConstBuffer(constBuffer0, 0);
 
-        public static void Quit()
-        {
-            EngineAPI.Win32PostQuitMessage();
-        }
-        public static float GetDeltaTime()
-        {
-            return 0.016f;
-        }
-        public static bool IsKeyDown(ushort vkCode)
-        {
-            return input.keys[vkCode] == 1;
-        }
-        public static bool IsKeyJustDown(ushort vkCode)
-        {
-            return input.keys[vkCode] == 1 && oldInput.keys[vkCode] == 0;
-        }
-        public static bool IsKeyJustUp(ushort vkCode)
-        {
-            return input.keys[vkCode] == 0 && oldInput.keys[vkCode] == 1;
-        }
-        public static bool IsKeyDown(KeyCode code)
-        {
-            return input.keys[(ushort)code] == 1;
-        }
-        public static bool IsKeyJustDown(KeyCode code)
-        {
-            return input.keys[(ushort)code] == 1 && oldInput.keys[(ushort)code] == 0;
-        }
-        public static bool IsKeyJustUp(KeyCode code)
-        {
-            return input.keys[(ushort)code] == 0 && oldInput.keys[(ushort)code] == 1;
-        }
-        public static void EnableMouse()
-        {
-            input.mouseIput.mouseLocked = false;
-        }
-        public static void DisableMouse()
-        {
-            input.mouseIput.mouseLocked = true;
-        }
-        public static bool IsMouseDown(int num)
-        {
-            if (num == 1)
-            {
-                return input.mouseIput.mb1;
-            }
-            else if (num == 2)
-            {
-                return input.mouseIput.mb2;
-            }
-            else if (num == 3)
-            {
-                return input.mouseIput.mb3;
+            ImGuiAPI.ImGuiInitialzie();
+            ImGuiTextEditor.Initialize();
+            ImGuiTextEditor.SetText(shaderAsset.Src.Replace("\t", "    "));
+
+            while (window.Running(ref input)) {
+                deviceContext.Context.ClearRenderTargetView(swapchain.renderTargetView);
+                deviceContext.Context.ClearDepthStencilView(swapchain.depthStencilView, (uint)ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0);
+                deviceContext.Context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
+                deviceContext.Context.SetViewPortState(window.SurfaceWidth, window.SurfaceHeight);
+                deviceContext.Context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST);
+                deviceContext.Context.SetDepthStencilState(depthStencilState);
+                deviceContext.Context.SetRasterizerState(rasterizerState);
+                //deviceContext.Context.SetBlendState(blendState);
+                deviceContext.Context.SetInputLayout(inputLayout);
+                deviceContext.Context.SetVertexShader(vertexShader);
+                deviceContext.Context.SetPixelShader(pixelShader);
+                deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
+
+                deviceContext.Context.DrawIndexed(mesh.IndexCount, 0, 0);
+
+                EventSystem.Fire(EventType.RENDER_END, null);
+
+                swapchain.Present(true);
+
+                OldInput = input;
             }
 
-            return false;
-        }
-        public static bool IsMouseJustDown(int num)
-        {
-            if (num == 1)
-            {
-                return input.mouseIput.mb1 && !oldInput.mouseIput.mb1;
-            }
-            else if (num == 2)
-            {
-                return input.mouseIput.mb2 && !oldInput.mouseIput.mb2; 
-            }
-            else if (num == 3)
-            {
-                return input.mouseIput.mb3 && !oldInput.mouseIput.mb3; 
-            }
+            ImGuiAPI.ImGuiShutdown();
 
-            return false;
-        }
 
-        public static bool IsMouseJustUp(int num)
-        {
-            if (num == 1)
-            {
-                return !input.mouseIput.mb1 && oldInput.mouseIput.mb1;
-            }
-            else if (num == 2)
-            {
-                return !input.mouseIput.mb2 && oldInput.mouseIput.mb2;
-            }
-            else if (num == 3)
-            {
-                return !input.mouseIput.mb3 && oldInput.mouseIput.mb3;
-            }
+            //    if (initialized)
+            //    {
+            //        Logger.Error("Application is already running !!");
+            //        return;
+            //    }
 
-            return false;
-        }
-        public static Vector2 GetMouseDelta()
-        {
-            return mouseDelta;
-        }
-        public static Vector2 GetMousePixelPosition()
-        {
-            return new Vector2((float)input.mouseIput.mouseXPositionPixelCoords, (float)input.mouseIput.mouseYPositionPixelCoords);
+            //    initialized = true;
+
+            //    surfaceWidth = config.SurfaceWidth;
+            //    surfaceHeight = config.SurfaceHeight;
+            //    windowAspect = (float)surfaceWidth / (float)surfaceHeight;
+            //    windowX = config.WindowXPos;
+            //    windowY = config.WindowYPos;
+            //    windowName = config.Title;
+            //    version = config.Version;
+            //    descrip = config.Description;
+
+            //    if (config.OnUpdateCallback != null 
+            //        && config.OnRenderCallback != null 
+            //        && config.OnInitializeCallback != null 
+            //        && config.OnShutdownCallback != null)
+            //    {
+            //        if (Win32API.CreateWindow_(windowName, surfaceWidth, surfaceHeight, windowY, windowX))
+            //        {
+            //            Logger.Trace("Window created");
+
+            //            if (EngineAPI.Win32CreateRenderer())
+            //            {
+            //                Logger.Trace("Renderer created");
+            //                if (EventSystem.Initialize())
+            //                {
+            //                    if (Renderer.Create())
+            //                    {                                
+            //                        if (config.OnInitializeCallback())
+            //                        {
+            //                            Logger.Info("Startup successful");
+
+            //                            while (Win32API.PumpMessages_(ref input))
+            //                            {
+            //                                RenderPacket renderPacket = new RenderPacket();
+
+            //                                //config.OnUpdateCallback();
+            //                                //config.OnRenderCallback(renderPacket);
+
+            //                                Renderer.Render(renderPacket);
+
+
+            //                                oldInput = input;
+            //                            }
+            //                        }
+            //                        else
+            //                        {
+
+            //                        }
+            //                    }
+            //                    else
+            //                    {
+
+            //                    }
+            //                }
+            //                else
+            //                {
+
+            //                }
+
+            //                EngineAPI.Win32DestroyRenderer();
+            //            }
+            //            else
+            //            {
+            //                Logger.Error("Could not create win32 renderer");
+            //            }
+
+            //            Win32API.DestroyWindow_();
+            //        }
+            //        else
+            //        {
+            //            Logger.Error("Could not create win32 window");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Logger.Error("Update/render/init/shutdown callback(s) is null");
+            //    }
         }
     }
 }

@@ -20,7 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="game\GameCamera.cs" />
     <Compile Include="game\GameCode.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>

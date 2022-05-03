@@ -2,7 +2,6 @@ F:\codes\Learning\SolarSharp\x64\Release\SolarEditor.exe
 F:\codes\Learning\SolarSharp\x64\Release\SolarEditor.deps.json
 F:\codes\Learning\SolarSharp\x64\Release\SolarEditor.runtimeconfig.json
 F:\codes\Learning\SolarSharp\x64\Release\SolarEditor.dll
-F:\codes\Learning\SolarSharp\x64\Release\ref\SolarEditor.dll
 F:\codes\Learning\SolarSharp\x64\Release\SolarEditor.pdb
 F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\SolarEditor.csproj.AssemblyReference.cache
 F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\SolarEditor.GeneratedMSBuildEditorConfig.editorconfig
@@ -14,3 +13,4 @@ F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\SolarEditor.dll
 F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\ref\SolarEditor.dll
 F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\SolarEditor.pdb
 F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\SolarEditor.genruntimeconfig.cache
+F:\codes\Learning\SolarSharp\SolarEditor\obj\x64\Release\refint\SolarEditor.dll

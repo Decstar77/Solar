@@ -4,88 +4,77 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SolarSharp;
-using SolarSharp.Rendering;
 
-using SolarSharp.GameLogic;
+using SolarSharp.Rendering;
+using SolarSharp.Assets;
 
 namespace SolarEditor
 {
-    internal interface Window
+    internal abstract class Window
     {
-        void Show(EditorState editorState);
-        bool ShouldRemove();
+        protected bool show = true;
+        public abstract void Show(EditorState editorState);
+
+        public bool ShouldClose() => !show;
+        public void Close() => show = false;
     }
 
-    internal class AssetWindow : Window
+    internal class ShaderEditorWindow : Window
     {
-        private bool show = true;
+        private bool compileOnSave = false;
 
-        public bool ShouldRemove() => !show;
-        public void Show(EditorState editorState)
+        public override void Show(EditorState editorState)
         {
-            if (ImGui.Begin("Assets", ref show))
-            {   
-                if (ImGui.InputText("Base asset path", ref editorState.AssetPath, 0))
-                {
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button("Browse"))
-                {
-                    //string path =  editorState.AssetPath + "testPlane.obj";
-
-                    //ModelResource? modelResource =  ModelImporter.LoadFromFile(path);
-                    //if (modelResource != null)
-                    //{
-                    //    Renderer.testMesh = new StaticMesh(modelResource.meshes[0].vertices.ToArray(),
-                    //        modelResource.meshes[0].indices.ToArray(),
-                    //        modelResource.meshes[0].layout);
-
-                    //    foreach (MeshResource meshResource in modelResource.meshes)
-                    //    {
-                    //        for (int i = 0; i < meshResource.indices.Count; i++)
-                    //        {
-                    //            Console.Write(meshResource.indices[i] + " ");
-                    //        }
-                    //        Console.WriteLine();
-                    //    }
-                    //}
-
-
-                }
-            }
-
-            ImGui.End();
-        }              
-    }
-
-    internal class RoomWindow : Window
-    {
-        private bool show = true;
-
-        public bool ShouldRemove() => !show;
-        public void Show(EditorState editorState)
-        {
-            if (ImGui.Begin("Room", ref show))
+            if (ImGui.Begin("Shader editor", ref show, (int)(ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.MenuBar)))
             {
-                if (editorState.currentRoom != null)
+                if (ImGui.BeginMenuBar())
                 {
-                    Room room = editorState.currentRoom;
-                    string name = room.Name; 
-                    if (ImGui.InputText("Name", ref name))
+                    if (ImGui.BeginMenu("File"))
                     {
-                        room.Name = name;
+                        if (ImGui.MenuItem("Open", "Ctrl+O"))
+                        {
+                        }
+                        if (ImGui.MenuItem("Save", "Ctrl+S"))
+                        {
+                        }
+                        if (ImGui.MenuItem("Compile", "F5"))
+                        {
+                        }
+
+                        ImGui.EndMenu();
                     }
 
-                    if (ImGui.Button("Save"))
+                    if (ImGui.BeginMenu("Edit"))
                     {
-                        ContentProcessor.SaveRoomToTextFile(room);
-                    }                    
+                        bool ro = ImGuiTextEditor.IsReadOnly();
+                        if (ImGui.MenuItem("Read-only mode", "", ro))
+                        {
+                            ImGuiTextEditor.SetReadOnly(!ro);
+                        }
+
+                        bool ws = ImGuiTextEditor.IsShowingWhitespaces();
+                        if (ImGui.MenuItem("Show white space", "", ws))
+                        {
+                            ImGuiTextEditor.SetShowWhitespaces(!ws);
+                        }
+
+                        if (ImGui.MenuItem("Compile on save", "", compileOnSave))
+                        {
+                            compileOnSave = !compileOnSave;
+                        }
+
+                        ImGui.EndMenu();
+                    }
+
+                    ImGui.EndMenuBar();
                 }
-                else
+
+                if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.SHIFT_L))
                 {
-                    ImGui.Text("Something has gone really wrong.");
+                    
                 }
+                
+                ImGuiTextEditor.Render("Shader");
             }
 
             ImGui.End();
@@ -93,5 +82,40 @@ namespace SolarEditor
     }
 
 
+    internal class AssetSystemWindow : Window
+    {
+        public override void Show(EditorState editorState)
+        {
+
+            if (ImGui.Begin("Assets ", ref show))
+            {
+                if (ImGui.BeginTabBar("MyTabBar"))
+                {
+                    if (ImGui.BeginTabItem("Avocado"))
+                    {
+                        ImGui.Text("This is the Avocado tab!\nblah blah blah blah blah");
+                        ImGui.EndTabItem();
+                    }
+                    if (ImGui.BeginTabItem("Broccoli"))
+                    {
+                        ImGui.Text("This is the Broccoli tab!\nblah blah blah blah blah");
+                        ImGui.EndTabItem();
+                    }
+                    if (ImGui.BeginTabItem("Cucumber"))
+                    {
+                        ImGui.Text("This is the Cucumber tab!\nblah blah blah blah blah");
+                        ImGui.EndTabItem();
+                    }
+
+                    ImGui.EndTabBar();
+                }
+
+                    
+                
+            }           
+
+            ImGui.End();
+        }
+    }
 
 }

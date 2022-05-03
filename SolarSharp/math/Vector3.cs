@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SolarSharp
 {
@@ -27,7 +27,7 @@ namespace SolarSharp
             this.z = z;
         }
 
-        public Vector3( Vector4 v4 )
+        public Vector3(Vector4 v4)
         {
             this.x = v4.x;
             this.y = v4.y;
