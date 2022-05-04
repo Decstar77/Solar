@@ -4560,19 +4560,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\porte\\.nuget\\packages\\": {}
+    "C:\\Users\\claud\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\codes\\Solar\\SolarEditor\\SolarEditor.csproj",
+      "projectUniqueName": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarEditor\\SolarEditor.csproj",
       "projectName": "SolarEditor",
-      "projectPath": "F:\\codes\\Solar\\SolarEditor\\SolarEditor.csproj",
-      "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
-      "outputPath": "F:\\codes\\Solar\\SolarEditor\\obj\\",
+      "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarEditor\\SolarEditor.csproj",
+      "packagesPath": "C:\\Users\\claud\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarEditor\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\claud\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4586,8 +4591,8 @@
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
           "projectReferences": {
-            "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
-              "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj"
+            "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj": {
+              "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj"
             }
           }
         }
@@ -4622,7 +4627,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
       }
     }
   }

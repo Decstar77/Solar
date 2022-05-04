@@ -23,7 +23,6 @@
     <Compile Include="content\ContentProcessor.cs" />
     <Compile Include="content\MetaFile.cs" />
     <Compile Include="content\ModelImporter.cs" />
-    <Compile Include="EditorConfig.cs" />
     <Compile Include="EditorState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="windows\Window.cs" />

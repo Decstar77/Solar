@@ -15,7 +15,7 @@ namespace SolarEditor
         private static EditorState? editorState;
         public static bool OnInitialize()
         {
-            editorState = new EditorState(new EditorConfig());           
+            editorState = new EditorState();           
             return true;
         }
 
@@ -48,6 +48,7 @@ namespace SolarEditor
             config.OnInitializeCallback = OnInitialize;
             config.OnUpdateCallback = OnUpdate; 
             config.OnShutdownCallback = OnShutdown;
+            config.AssetPath = "C:/Users/claud/OneDrive/Desktop/DeclanStuff/Solar/EngineAssets/";
 
             //string json = JsonSerializer.Serialize(config);
             //File.WriteAllText("appConfig.json", json);

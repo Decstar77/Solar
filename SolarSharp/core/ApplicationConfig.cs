@@ -19,6 +19,8 @@ namespace SolarSharp
         public int WindowXPos { get; set; }
         public int WindowYPos { get; set; }
 
+        public string AssetPath { get; set; }
+
         public delegate bool OnInitialize();
         public OnInitialize OnInitializeCallback;
 

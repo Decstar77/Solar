@@ -1,73 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "F:\\codes\\Solar\\GameCode\\GameCode.csproj": {}
+    "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\GameCode\\GameCode.csproj": {}
   },
   "projects": {
-    "F:\\codes\\Solar\\GameCode\\GameCode.csproj": {
+    "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\GameCode\\GameCode.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\codes\\Solar\\GameCode\\GameCode.csproj",
+        "projectUniqueName": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\GameCode\\GameCode.csproj",
         "projectName": "GameCode",
-        "projectPath": "F:\\codes\\Solar\\GameCode\\GameCode.csproj",
-        "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
-        "outputPath": "F:\\codes\\Solar\\GameCode\\obj\\",
+        "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\GameCode\\GameCode.csproj",
+        "packagesPath": "C:\\Users\\claud\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\GameCode\\obj\\",
         "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
-        "originalTargetFrameworks": [
-          "net6.0"
-        ],
-        "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net6.0": {
-            "targetAlias": "net6.0",
-            "projectReferences": {
-              "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
-                "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj"
-              }
-            }
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        }
-      },
-      "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
-        "projectName": "SolarSharp",
-        "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
-        "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
-        "outputPath": "F:\\codes\\Solar\\SolarSharp\\obj\\",
-        "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\claud\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -81,8 +32,8 @@
           "net6.0-windows7.0": {
             "targetAlias": "net6.0-windows",
             "projectReferences": {
-              "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
-                "projectPath": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj"
+              "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj": {
+                "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj"
               }
             }
           }
@@ -111,15 +62,77 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
+    "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj": {
+      "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj",
+        "projectUniqueName": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj",
+        "projectName": "SolarSharp",
+        "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj",
+        "packagesPath": "C:\\Users\\claud\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\claud\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0-windows7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0-windows7.0": {
+            "targetAlias": "net6.0-windows",
+            "projectReferences": {
+              "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
+                "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarWindows\\SolarWindows.vcxproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0-windows7.0": {
+          "targetAlias": "net6.0-windows",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarWindows\\SolarWindows.vcxproj",
         "projectName": "SolarWindows",
-        "projectPath": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj",
+        "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarWindows\\SolarWindows.vcxproj",
         "frameworks": {
           "native": {
             "projectReferences": {}

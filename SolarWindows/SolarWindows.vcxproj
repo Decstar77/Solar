@@ -110,13 +110,13 @@
     <ClCompile Include="src\vendor\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\vendor\imgui_text\TextEditor.cpp" />
+    <ClCompile Include="src\ImNodesAPI.cpp" />
     <ClCompile Include="src\vendor\imnodes\imnodes.cpp" />
     <ClCompile Include="src\Win32Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\DX11Renderer.h" />
-    <ClInclude Include="src\ImGuiAPI.h" />
     <ClInclude Include="src\SolarMath.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />

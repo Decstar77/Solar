@@ -30,7 +30,7 @@ namespace SolarEditor
         }
 
         public override void Show(EditorState editorState)
-        {
+        {            
             if (ImGui.Begin("Shader editor", ref show, (int)(ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.MenuBar)))
             {
                 if (ImGui.BeginMenuBar())
@@ -98,7 +98,7 @@ namespace SolarEditor
         }
 
         private void Save()
-        {            
+        {
             try
             {
                 shaderAsset.Src = ImGuiTextEditor.GetText();
@@ -117,8 +117,7 @@ namespace SolarEditor
             catch (Exception ex)
             {
                 Logger.Error($"Could not save shader {shaderAsset.Path}. Error: {ex.Message}");
-            }           
-            
+            }            
         }
     }
 
@@ -126,7 +125,6 @@ namespace SolarEditor
     {
         public override void Show(EditorState editorState)
         {
-            ImGui.ShowDemoWindow();
             if (ImGui.Begin("Assets ", ref show))
             {
                 if (ImGui.BeginTabBar("MyTabBar"))
@@ -141,7 +139,31 @@ namespace SolarEditor
                     }
                     if (ImGui.BeginTabItem("Shaders"))
                     {
-                        AssetSystem.shaderAssets.ForEach(x => ImGui.Text(x.Name));
+                        ImGui.Columns(3, "shaderColumns", true);
+                        ImGui.Separator();
+
+                        ImGui.Text("Name"); ImGui.NextColumn();                        
+                        ImGui.Text("Path"); ImGui.NextColumn();
+                        ImGui.Text("Actions"); ImGui.NextColumn();
+
+                        AssetSystem.ShaderAssets.ForEach(x => {
+                            ImGui.Separator();
+                            ImGui.Text(x.Name); ImGui.NextColumn();
+                            ImGui.Text(x.Path); ImGui.NextColumn();
+                            if (ImGui.Button("Edit")) {
+                                editorState.AddWindow(new ShaderEditorWindow(x));
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("Delete")) {
+                                
+                            }
+
+                            ImGui.NextColumn();
+                        });
+
+                        ImGui.Columns(1);
+                        ImGui.Separator();
+
                         ImGui.EndTabItem();
                     }
                     if (ImGui.BeginTabItem("Scenes"))
@@ -155,7 +177,8 @@ namespace SolarEditor
 
             ImGui.End();
         }
-
     }
+
+    
 
 }

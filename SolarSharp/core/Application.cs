@@ -49,19 +49,32 @@ namespace SolarSharp
                 Logger.Error("Could not open window");
             }
 
+            if (!AssetSystem.Initialize()) {
+                Logger.Error("Could not initalize assets");
+            }
+
+            AssetSystem.LoadEverything(config.AssetPath);
+
+            if (!RenderSystem.Initialize()) {
+                Logger.Error("Could not initalize renderer");
+            }
+
+
             DeviceContext deviceContext = new DeviceContext();
             Swapchain swapchain = new Swapchain();
 
             deviceContext.Create();
             swapchain.Create();
 
+            ShaderFactory.Initialize(deviceContext.Device);
+
             DepthStencilState depthStencilState = deviceContext.Device.CreateDepthStencilState(new DepthStencilDesc());
             RasterizerState rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc());
             BlendState blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
             SamplerState samplerState = deviceContext.Device.CreateSamplerState(new SamplerDesc());
 
-            ShaderAsset shaderAsset = AssetSystem.LoadShaderAsset("F:/codes/Solar/Assets/FirstShader.hlsl");
-            GraphicsShader shader = new GraphicsShader(deviceContext.Device).Create(shaderAsset);
+
+            GraphicsShader shader = new GraphicsShader(deviceContext.Device).Create(AssetSystem.ShaderAssets[0]);
 
             RenderSystem.graphicsShaders.Add( shader );
 
@@ -88,7 +101,8 @@ namespace SolarSharp
             deviceContext.Context.SetVSConstBuffer(constBuffer0, 0);
 
             ImGuiAPI.ImGuiInitialzie();
-            ImGuiTextEditor.Initialize();            
+            ImGuiTextEditor.Initialize();
+            ImNodes.Initialzie();
 
             config.OnInitializeCallback.Invoke();
 
@@ -101,7 +115,7 @@ namespace SolarSharp
                 deviceContext.Context.SetDepthStencilState(depthStencilState);
                 deviceContext.Context.SetRasterizerState(rasterizerState);
                 //deviceContext.Context.SetBlendState(blendState);
-                if (shader.inputLayout != null && shader.vertexShader != null && shader.pixelShader != null)
+                if (shader.IsValid())
                 {
                     deviceContext.Context.SetInputLayout(shader.inputLayout);
                     deviceContext.Context.SetVertexShader(shader.vertexShader);
@@ -119,6 +133,7 @@ namespace SolarSharp
                 OldInput = input;
             }
 
+            ImNodes.Shutdown();
             ImGuiAPI.ImGuiShutdown();
 
 

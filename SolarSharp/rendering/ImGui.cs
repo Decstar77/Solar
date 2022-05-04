@@ -68,6 +68,33 @@ namespace SolarSharp.Rendering
 		Trailing = 1 << 7    // Enforce the tab position to the right of the tab bar (before the scrolling buttons)
 	};
 
+	[Flags]
+	public enum ImGuiSelectableFlags
+	{
+		None = 0,
+		DontClosePopups = 1 << 0,   // Clicking this don't close parent popup window
+		SpanAllColumns = 1 << 1,   // Selectable frame can span all columns (text will still fit in current column)
+		AllowDoubleClick = 1 << 2,   // Generate press events on double clicks too
+		Disabled = 1 << 3,   // Cannot be selected, display grayed out text
+		AllowItemOverlap = 1 << 4    // (WIP) Hit testing to allow subsequent widgets to overlap this one
+	};
+
+	[Flags]
+	public enum ImGuiPopupFlags
+	{
+		None = 0,
+		MouseButtonLeft = 0,        // For BeginPopupContext*(): open on Left Mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)
+		MouseButtonRight = 1,        // For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
+		MouseButtonMiddle = 2,        // For BeginPopupContext*(): open on Middle Mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle)
+		MouseButtonMask_ = 0x1F,
+		MouseButtonDefault_ = 1,
+		NoOpenOverExistingPopup = 1 << 5,   // For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack
+		NoOpenOverItems = 1 << 6,   // For BeginPopupContextWindow(): don't return true when hovering items, only when hovering empty space
+		AnyPopupId = 1 << 7,   // For IsPopupOpen(): ignore the ImGuiID parameter and test for any popup.
+		AnyPopupLevel = 1 << 8,   // For IsPopupOpen(): search/test at any level of the popup stack (default test in the current level)
+		AnyPopup = AnyPopupId | AnyPopupLevel
+	};
+
 	public class ImGui
     {
 		public static bool Initialzie() => ImGuiAPI.ImGuiInitialzie();
@@ -134,13 +161,38 @@ namespace SolarSharp.Rendering
 			int open = -1;
 			return BeginTabItem(label, ref open);
 		}
-		public static bool ImGuiBeginTabItem(string label, ref bool open, ImGuiTabItemFlags flags)
+		public static bool BeginTabItem(string label, ref bool open, ImGuiTabItemFlags flags)
 		{
 			int op = open ? 1 : 0;
 			bool result = BeginTabItem(label, ref op, flags);
 			open = (op == 1 ? true : false);
 			return result;
-		}		
+		}				
 		public static bool EndTabItem() => ImGuiAPI.ImGuiEndTabItem();
+		public static void Columns(int number) => ImGuiAPI.ImGuiColumns(number);
+		public static void Columns(int number, string title, bool border) => ImGuiAPI.ImGuiColumnsEx(number, title, border);
+		public static void NextColumn() => ImGuiAPI.ImGuiNextColumn();
+		public static void Separtor() => ImGuiAPI.ImGuiSepartor();
+		public static bool Selectable(string label, bool selected = false, ImGuiSelectableFlags flags = 0, float xSize = 0, float ySize = 0) => ImGuiAPI.ImGuiSelectable(label, selected, (int)flags, xSize, ySize);
+		public static void OpenPopup(string id, ImGuiPopupFlags flags = 0) => ImGuiAPI.ImGuiOpenPopup(id, (int)flags);
+		public static bool BeginPopupModal(string id) => ImGuiAPI.ImGuiBeginPopupModal(id);
+
+		public static bool BeginPopupModal(string id, ImGuiWindowFlags flags)
+		{
+			int op = -1;
+			bool result = ImGuiAPI.ImGuiBeginPopupModalEx(id, ref op, (int)flags);
+			return result;
+		}
+
+		public static bool BeginPopupModal(string id, ref bool open, ImGuiWindowFlags flags)
+        {
+			int op = open ? 1 : 0;
+			bool result = ImGuiAPI.ImGuiBeginPopupModalEx(id, ref op, (int)flags);
+			open = (op == 1 ? true : false);
+			return result;
+		}
+
+		public static void CloseCurrentPopup() => ImGuiAPI.ImGuiCloseCurrentPopup();
+		public static void EndPopup() => ImGuiAPI.ImGuiEndPopup();
 	}
 }

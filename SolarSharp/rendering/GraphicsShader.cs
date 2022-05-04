@@ -54,6 +54,12 @@ namespace SolarSharp.Rendering
             return this;
         }
 
+        public bool IsValid()
+        {
+            return vertexShader != null && pixelShader != null && inputLayout != null && 
+                vertexShader.Ptr != IntPtr.Zero && pixelShader.Ptr != IntPtr.Zero && inputLayout.Ptr != IntPtr.Zero;
+        }
+
         private InputElementDesc[] GetInputElementDescs()
         {
             InputElementDesc pDesc = new InputElementDesc();

@@ -1,5 +1,3 @@
-#include "ImGuiAPI.h"
-
 #include "vendor/imgui/imgui.h"
 #include "vendor/imgui/imgui_impl_win32.h"
 #include "vendor/imgui/imgui_impl_dx11.h"
@@ -187,6 +185,66 @@ namespace ImGuiAPI
 	{
 		ImGui::EndTabItem();
 	}
+
+	EDITOR_INTERFACE(void) ImGuiColumns(int number)
+	{
+		ImGui::Columns(number);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiColumnsEx(int number, const char* title, bool32 border)
+	{
+		ImGui::Columns(number, title, border); 
+	}
+
+	EDITOR_INTERFACE(void) ImGuiNextColumn()
+	{
+		ImGui::NextColumn();
+	}
+	
+	EDITOR_INTERFACE(void) ImGuiSepartor()
+	{
+		ImGui::Separator();
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiSelectable(const char* label, bool32 selected, int flags, float xSize, float ySize)
+	{
+		return ImGui::Selectable(label, selected, flags, ImVec2(xSize, ySize));
+	}
+
+	EDITOR_INTERFACE(void) ImGuiOpenPopup(const char *id, int flags)
+	{
+		ImGui::OpenPopup(id, flags);
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiBeginPopupModal(const char *id)
+	{
+		bool result =  ImGui::BeginPopupModal(id);
+		return result;
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiBeginPopupModalEx(const char* id, int* open, int flags)
+	{
+		bool result = false;
+		if (*open == -1) { result = ImGui::BeginPopupModal(id, NULL, flags); }
+		else { result = ImGui::BeginPopupModal(id, (bool*)open, flags); }
+
+		return result;
+	}
+
+	EDITOR_INTERFACE(void) ImGuiCloseCurrentPopup()
+	{
+		ImGui::CloseCurrentPopup();
+	}
+
+	EDITOR_INTERFACE(void) ImGuiEndPopup()
+	{
+		ImGui::EndPopup();
+	}
+
+	
+
+	
+
 
 
 }

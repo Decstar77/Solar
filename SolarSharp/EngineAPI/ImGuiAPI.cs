@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.EngineAPI
 {
-
-
-    public static class ImGuiAPI
+	public static class ImGuiAPI
 	{
 		const string DLLName = "SolarWindows";
 
@@ -94,5 +92,36 @@ namespace SolarSharp.EngineAPI
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern bool ImGuiEndTabItem();
 
-    }
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiColumns(int number);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiColumnsEx(int number, string title, [MarshalAs(UnmanagedType.Bool)] bool border);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiNextColumn();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiSepartor();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiSelectable(string label, [MarshalAs(UnmanagedType.Bool)] bool selected, int flags, float xSize, float ySize);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiOpenPopup([MarshalAs(UnmanagedType.LPStr)] string id, int flags);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiBeginPopupModal([MarshalAs(UnmanagedType.LPStr)] string id);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiBeginPopupModalEx([MarshalAs(UnmanagedType.LPStr)] string id, ref int open, int flags);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiCloseCurrentPopup();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiEndPopup();
+
+
+}
 }

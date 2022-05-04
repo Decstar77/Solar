@@ -11,5 +11,12 @@ namespace SolarSharp.Rendering
         public static Device device;
 
         public static List<GraphicsShader> graphicsShaders = new List<GraphicsShader>();
+
+        public static bool Initialize()
+        {
+            return true;
+        }
+
+
     }
 }

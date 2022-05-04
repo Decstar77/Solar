@@ -1,18 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "k25iOv/bjo0Uh0YDCrc5K2J/flMl0exmkas3XXLPZ2aEamkNNm8wljmyxCSUsQwZosRnnlVRAfoUUGLThwgS8w==",
-  "success": false,
-  "projectFilePath": "F:\\codes\\Solar\\GameCode\\GameCode.csproj",
+  "dgSpecHash": "cIRUAUV9Gk7H8qpr2NM/gpRKucH4t4OR1hdRhycsTRa2Ca2Kn4DT/RPell9XvN6krjijPlqyUUCMIG6Onj3PPQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\GameCode\\GameCode.csproj",
   "expectedPackageFiles": [],
-  "logs": [
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Project SolarSharp is not compatible with net6.0 (.NETCoreApp,Version=v6.0). Project SolarSharp supports: net6.0-windows7.0 (.NETCoreApp,Version=v6.0)",
-      "libraryId": "SolarSharp",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  "logs": []
 }
