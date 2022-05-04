@@ -47,11 +47,13 @@
     <Compile Include="math\Vector3.cs" />
     <Compile Include="math\Vector4.cs" />
     <Compile Include="rendering\D3D11.cs" />
+    <Compile Include="rendering\GraphicsShader.cs" />
     <Compile Include="rendering\ImGui.cs" />
     <Compile Include="rendering\ImGuiNodes.cs" />
     <Compile Include="rendering\ImGuiTextEditor.cs" />
     <Compile Include="assets\AssetSystem.cs" />
     <Compile Include="assets\ShaderAsset.cs" />
+    <Compile Include="rendering\RenderSystem.cs" />
   </ItemGroup>
 
   <ItemGroup>

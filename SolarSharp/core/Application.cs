@@ -49,8 +49,6 @@ namespace SolarSharp
                 Logger.Error("Could not open window");
             }
 
-            config.OnInitializeCallback.Invoke();
-
             DeviceContext deviceContext = new DeviceContext();
             Swapchain swapchain = new Swapchain();
 
@@ -62,45 +60,10 @@ namespace SolarSharp
             BlendState blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
             SamplerState samplerState = deviceContext.Device.CreateSamplerState(new SamplerDesc());
 
-            ShaderAsset shaderAsset = AssetSystem.LoadShaderAsset("F:/codes/Learning/SolarSharp/Assets/FirstShader.hlsl");
-                        
-            Blob vertexBlob = deviceContext.Device.CompileShader(shaderAsset.Src, "VSmain", "vs_5_0");
-            Blob pixelBlob = deviceContext.Device.CompileShader(shaderAsset.Src, "PSmain", "ps_5_0");
+            ShaderAsset shaderAsset = AssetSystem.LoadShaderAsset("F:/codes/Solar/Assets/FirstShader.hlsl");
+            GraphicsShader shader = new GraphicsShader(deviceContext.Device).Create(shaderAsset);
 
-            VertexShader vertexShader = deviceContext.Device.CreateVertexShader(vertexBlob);
-            PixelShader pixelShader = deviceContext.Device.CreatePixelShader(pixelBlob);
-
-            InputElementDesc pDesc = new InputElementDesc();
-            pDesc.SemanticName = "Position";
-            pDesc.SemanticIndex = 0;
-            pDesc.Format = DXGIFormat.R32G32B32_FLOAT;
-            pDesc.InputSlot = 0;
-            pDesc.AlignedByteOffset = 0;
-            pDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
-            pDesc.InstanceDataStepRate = 0;
-
-            InputElementDesc nDesc = new InputElementDesc();
-            nDesc.SemanticName = "Normal";
-            nDesc.SemanticIndex = 0;
-            nDesc.Format = DXGIFormat.R32G32B32_FLOAT;
-            nDesc.InputSlot = 0;
-            nDesc.AlignedByteOffset = 0xffffffff;
-            nDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
-            nDesc.InstanceDataStepRate = 0;
-
-            InputElementDesc tDesc = new InputElementDesc();
-            tDesc.SemanticName = "TexCord";
-            tDesc.SemanticIndex = 0;
-            tDesc.Format = DXGIFormat.R32G32_FLOAT;
-            tDesc.InputSlot = 0;
-            tDesc.AlignedByteOffset = 0xffffffff;
-            tDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
-            tDesc.InstanceDataStepRate = 0;
-
-            InputLayout inputLayout = deviceContext.Device.CreateInputLayout(vertexBlob, pDesc, nDesc, tDesc);
-
-            vertexBlob.Release();
-            pixelBlob.Release();
+            RenderSystem.graphicsShaders.Add( shader );
 
             StaticMesh mesh = StaticMesh.CreateScreenSpaceQuad(deviceContext.Device);
 
@@ -125,8 +88,9 @@ namespace SolarSharp
             deviceContext.Context.SetVSConstBuffer(constBuffer0, 0);
 
             ImGuiAPI.ImGuiInitialzie();
-            ImGuiTextEditor.Initialize();
-            ImGuiTextEditor.SetText(shaderAsset.Src.Replace("\t", "    "));
+            ImGuiTextEditor.Initialize();            
+
+            config.OnInitializeCallback.Invoke();
 
             while (window.Running(ref input)) {
                 deviceContext.Context.ClearRenderTargetView(swapchain.renderTargetView);
@@ -137,13 +101,16 @@ namespace SolarSharp
                 deviceContext.Context.SetDepthStencilState(depthStencilState);
                 deviceContext.Context.SetRasterizerState(rasterizerState);
                 //deviceContext.Context.SetBlendState(blendState);
-                deviceContext.Context.SetInputLayout(inputLayout);
-                deviceContext.Context.SetVertexShader(vertexShader);
-                deviceContext.Context.SetPixelShader(pixelShader);
-                deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
-                deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
+                if (shader.inputLayout != null && shader.vertexShader != null && shader.pixelShader != null)
+                {
+                    deviceContext.Context.SetInputLayout(shader.inputLayout);
+                    deviceContext.Context.SetVertexShader(shader.vertexShader);
+                    deviceContext.Context.SetPixelShader(shader.pixelShader);
 
-                deviceContext.Context.DrawIndexed(mesh.IndexCount, 0, 0);
+                    deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                    deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
+                    deviceContext.Context.DrawIndexed(mesh.IndexCount, 0, 0);
+                }
 
                 EventSystem.Fire(EventType.RENDER_END, null);
 

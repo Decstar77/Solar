@@ -20,7 +20,9 @@ namespace SolarSharp.Rendering
 
         public void Release()
         {
-            D3D11API.Release(ptr);
+            if (ptr != IntPtr.Zero) { 
+                D3D11API.Release(ptr); 
+            }            
             ptr = IntPtr.Zero;
         }
     }

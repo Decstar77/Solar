@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SolarSharp;
 using SolarSharp.Rendering;
+using SolarSharp.Assets;
 
 namespace SolarEditor
 {
@@ -16,7 +17,7 @@ namespace SolarEditor
         internal EditorState(EditorConfig config)
         {
             AssetPath = config.AssetPath;
-            AddWindow(new ShaderEditorWindow());
+            AddWindow(new ShaderEditorWindow( AssetSystem.shaderAssets[0] ));
             AddWindow(new AssetSystemWindow());
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; });
         }

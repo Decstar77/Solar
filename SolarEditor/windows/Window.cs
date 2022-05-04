@@ -21,7 +21,13 @@ namespace SolarEditor
 
     internal class ShaderEditorWindow : Window
     {
-        private bool compileOnSave = false;
+        private bool compileOnSave = true;
+        private ShaderAsset shaderAsset;
+        public ShaderEditorWindow(ShaderAsset shaderAsset)
+        {
+            this.shaderAsset = shaderAsset;
+            ImGuiTextEditor.SetText(shaderAsset.Src);
+        }
 
         public override void Show(EditorState editorState)
         {
@@ -36,9 +42,12 @@ namespace SolarEditor
                         }
                         if (ImGui.MenuItem("Save", "Ctrl+S"))
                         {
+                            Save();
                         }
                         if (ImGui.MenuItem("Compile", "F5"))
                         {
+                            Save();
+                            Compile();
                         }
 
                         ImGui.EndMenu();
@@ -69,9 +78,11 @@ namespace SolarEditor
                     ImGui.EndMenuBar();
                 }
 
-                if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.SHIFT_L))
+                ImGui.Text(shaderAsset.Path);
+
+                if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
                 {
-                    
+                    Save();
                 }
                 
                 ImGuiTextEditor.Render("Shader");
@@ -79,43 +90,72 @@ namespace SolarEditor
 
             ImGui.End();
         }
-    }
 
+        private void Compile()
+        {
+            Logger.Info($"Compiling {shaderAsset.Name}");
+            RenderSystem.graphicsShaders[0].Release().Create(shaderAsset);
+        }
+
+        private void Save()
+        {            
+            try
+            {
+                shaderAsset.Src = ImGuiTextEditor.GetText();
+
+                StreamWriter writer = new StreamWriter(shaderAsset.Path);
+                writer.Write(shaderAsset.Src);
+                writer.Close();
+
+                Logger.Info($"Saved {shaderAsset.Path}");
+
+                if (compileOnSave)
+                {
+                    Compile();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Could not save shader {shaderAsset.Path}. Error: {ex.Message}");
+            }           
+            
+        }
+    }
 
     internal class AssetSystemWindow : Window
     {
         public override void Show(EditorState editorState)
         {
-
+            ImGui.ShowDemoWindow();
             if (ImGui.Begin("Assets ", ref show))
             {
                 if (ImGui.BeginTabBar("MyTabBar"))
                 {
-                    if (ImGui.BeginTabItem("Avocado"))
+                    if (ImGui.BeginTabItem("Models"))
                     {
-                        ImGui.Text("This is the Avocado tab!\nblah blah blah blah blah");
                         ImGui.EndTabItem();
                     }
-                    if (ImGui.BeginTabItem("Broccoli"))
+                    if (ImGui.BeginTabItem("Textures"))
                     {
-                        ImGui.Text("This is the Broccoli tab!\nblah blah blah blah blah");
                         ImGui.EndTabItem();
                     }
-                    if (ImGui.BeginTabItem("Cucumber"))
+                    if (ImGui.BeginTabItem("Shaders"))
                     {
-                        ImGui.Text("This is the Cucumber tab!\nblah blah blah blah blah");
+                        AssetSystem.shaderAssets.ForEach(x => ImGui.Text(x.Name));
+                        ImGui.EndTabItem();
+                    }
+                    if (ImGui.BeginTabItem("Scenes"))
+                    {
                         ImGui.EndTabItem();
                     }
 
                     ImGui.EndTabBar();
                 }
-
-                    
-                
             }           
 
             ImGui.End();
         }
+
     }
 
 }

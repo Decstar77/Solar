@@ -14,3 +14,6 @@ F:\codes\Learning\SolarSharp\GameCode\obj\Debug\GameCode.pdb
 F:\codes\Learning\SolarSharp\GameCode\obj\Debug\GameCode.genruntimeconfig.cache
 F:\codes\Learning\SolarSharp\GameCode\obj\Debug\GameCode.csproj.AssemblyReference.cache
 F:\codes\Learning\SolarSharp\GameCode\obj\Debug\refint\GameCode.dll
+F:\codes\Solar\GameCode\obj\Debug\GameCode.dll
+F:\codes\Solar\GameCode\obj\Debug\refint\GameCode.dll
+F:\codes\Solar\GameCode\obj\Debug\GameCode.pdb
