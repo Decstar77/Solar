@@ -23,9 +23,9 @@ namespace SolarSharp.Rendering.Graph
             DrawFlowPins();
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

@@ -9,6 +9,7 @@ using SolarSharp.Core;
 using SolarSharp.Rendering;
 using SolarSharp.EngineAPI;
 using SolarSharp.Assets;
+using SolarSharp.Rendering.Graph;
 
 namespace SolarSharp
 {
@@ -37,6 +38,8 @@ namespace SolarSharp
         private static string descrip;
 
         private static bool initialized = false;
+
+        public static RenderGraph renderGraph = null;
 
         public Application(ApplicationConfig config)
         {
@@ -110,26 +113,37 @@ namespace SolarSharp
 
             config.OnInitializeCallback.Invoke();
 
+            renderGraph = new RenderGraph("My Render Graph", RenderSystem.device, RenderSystem.context);
+
+            renderGraph.Create();
+
             while (window.Running(ref input)) {
-                deviceContext.Context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); // @DONE
-                deviceContext.Context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0); // @DONE
-                deviceContext.Context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView); // @DONE
-                deviceContext.Context.SetViewPortState(window.SurfaceWidth, window.SurfaceHeight); // @DONE
-                deviceContext.Context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST); // @DONE
-                deviceContext.Context.SetDepthStencilState(depthStencilState); // @DONE
-                deviceContext.Context.SetRasterizerState(rasterizerState); // @DONE
-                //deviceContext.Context.SetBlendState(blendState);
 
-                if (shader.IsValid())
-                {
-                    deviceContext.Context.SetInputLayout(shader.inputLayout);   // @DONE
-                    deviceContext.Context.SetVertexShader(shader.vertexShader); // @DONE
-                    deviceContext.Context.SetPixelShader(shader.pixelShader);   // @DONE
+                renderGraph.Run();
 
-                    deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
-                    deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
-                    deviceContext.Context.DrawIndexed(mesh.IndexCount, 0, 0);
-                }
+                deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
+                deviceContext.Context.DrawIndexed(mesh.IndexCount, 0, 0);
+
+                //deviceContext.Context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); // @DONE
+                //deviceContext.Context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0); // @DONE
+                //deviceContext.Context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView); // @DONE
+                //deviceContext.Context.SetViewPortState(window.SurfaceWidth, window.SurfaceHeight); // @DONE
+                //deviceContext.Context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST); // @DONE
+                //deviceContext.Context.SetDepthStencilState(depthStencilState); // @DONE
+                //deviceContext.Context.SetRasterizerState(rasterizerState); // @DONE
+                ////deviceContext.Context.SetBlendState(blendState);
+                //
+                //if (shader.IsValid())
+                //{
+                //    deviceContext.Context.SetInputLayout(shader.inputLayout);   // @DONE
+                //    deviceContext.Context.SetVertexShader(shader.vertexShader); // @DONE
+                //    deviceContext.Context.SetPixelShader(shader.pixelShader);   // @DONE
+                //
+                //    deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                //    deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
+                //    deviceContext.Context.DrawIndexed(mesh.IndexCount, 0, 0);
+                //}
 
                 EventSystem.Fire(EventType.RENDER_END, null);
 

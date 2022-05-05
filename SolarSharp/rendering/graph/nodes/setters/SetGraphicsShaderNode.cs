@@ -8,7 +8,7 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetGraphicsShaderNode : Node
     {
-        private GraphicsShaderPin shaderPin = null;
+        public GraphicsShaderPin shaderPin = null;
 
         public SetGraphicsShaderNode() : base("Set Graphics Shader")
         {
@@ -27,7 +27,7 @@ namespace SolarSharp.Rendering.Graph
             shaderPin.DrawUI();
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
             GraphicsShader graphicsShader = shaderPin.GetValue();
 
@@ -38,7 +38,7 @@ namespace SolarSharp.Rendering.Graph
                     context.SetPixelShader(graphicsShader.pixelShader);
                 }
             }
-
+            return outPin.GetConnectedPin().Node;
         }
     }
 }

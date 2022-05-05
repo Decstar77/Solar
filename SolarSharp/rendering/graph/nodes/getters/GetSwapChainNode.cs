@@ -8,8 +8,8 @@ namespace SolarSharp.Rendering.Graph
 {
     public class GetSwapChainNode : Node
     {
-        private ColourTargetPin colour = null;
-        private DepthTargetPin depth = null;
+        public ColourTargetPin colour = null;
+        public DepthTargetPin depth = null;
 
         public GetSwapChainNode() : base("Swap chain")
         {
@@ -31,9 +31,9 @@ namespace SolarSharp.Rendering.Graph
             colour.DrawUI();
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

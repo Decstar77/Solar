@@ -8,8 +8,8 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetViewPortNode : Node
     {
-        private IntPin width = null;
-        private IntPin height = null;
+        public IntPin width = null;
+        public IntPin height = null;
 
         public SetViewPortNode() : base("Set ViewPort State")
         {
@@ -31,9 +31,10 @@ namespace SolarSharp.Rendering.Graph
             height.DrawUI();
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
             context.SetViewPortState(width.GetValue(), height.GetValue());
+            return outPin.GetConnectedPin().Node;
         }
     }
 }

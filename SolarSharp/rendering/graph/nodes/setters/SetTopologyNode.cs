@@ -39,9 +39,10 @@ namespace SolarSharp.Rendering.Graph
             topology = (PrimitiveTopology)Enum.ToObject(type, values.GetValue(index));
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
-            throw new NotImplementedException();
+            context.SetPrimitiveTopology(topology);
+            return outPin.GetConnectedPin().Node;
         }
     }
 }

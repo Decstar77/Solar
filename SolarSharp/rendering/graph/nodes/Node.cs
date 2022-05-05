@@ -18,8 +18,8 @@ namespace SolarSharp.Rendering.Graph
 
         public string Name { get; set; }
 
-        protected FlowPin inPin;
-        protected FlowPin outPin;
+        public FlowPin inPin;
+        public FlowPin outPin;
 
         public Node(string name)
         {
@@ -31,7 +31,7 @@ namespace SolarSharp.Rendering.Graph
 
         public abstract void DrawUI();
         public abstract bool CreateResources(RenderGraph renderGraph);
-        public abstract void Run(RenderGraph graph, Context context);
+        public abstract Node Run(RenderGraph graph, Context context);
 
         protected void AddFlowPins() {
             inPin = new FlowPin("In", this, PinInputType.INPUT);

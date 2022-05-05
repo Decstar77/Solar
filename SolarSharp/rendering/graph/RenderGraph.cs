@@ -19,6 +19,8 @@ namespace SolarSharp.Rendering.Graph
         private Device device;
         private Context context;
 
+        private Node root = null;
+
         public RenderGraph(string name, Device device, Context context)
         {
             Name = name;
@@ -26,19 +28,30 @@ namespace SolarSharp.Rendering.Graph
             this.context = context;
 
             Nodes = new List<Node>();
-            Node cs = new SetDepthNode();
-            Node ss = new SetDepthNode();
-
             rasterizerStates = new List<RasterizerState>();
             depthStencilStates = new List<DepthStencilState>();
             graphicsShaders = new List<GraphicsShader>();
 
-            //cs.OutputPins[0].Connect( ss.InputPins[0] );
+            CreateDummy();
+        }
 
-            Nodes.Add(cs);
-            Nodes.Add(new SetRasterizerNode());
+        public bool Create()
+        {
+            foreach (Node node in Nodes) {
+                if (!node.CreateResources(this))
+                    return false;
+            }
 
-            //Nodes.Add(ss);
+            return true;
+        }
+
+        public void Run() 
+        {
+            Node node = root;
+
+            while (node != null) {
+                node = node.Run(this, context);
+            }
         }
 
         public DepthStencilState CreateOrGetDepthStencilState(DepthStencilDesc desc)
@@ -95,6 +108,69 @@ namespace SolarSharp.Rendering.Graph
             }
 
             return null;
+        }
+
+        private void CreateDummy()
+        {
+            CMDClearColourTargetNode clearColourTargetNode = new CMDClearColourTargetNode();
+            CMDClearDepthTargetNode clearDepthTargetNode = new CMDClearDepthTargetNode();
+            CMDDrawSceneNode drawSceneNode = new CMDDrawSceneNode();
+
+            GetGraphicsShaderNode getGraphicsShaderNode = new GetGraphicsShaderNode();
+            GetSwapChainNode getSwapChainNode1 = new GetSwapChainNode();
+            GetSwapChainNode getSwapChainNode2 = new GetSwapChainNode();
+
+            SetDepthStateNode setDepthNode = new SetDepthStateNode();
+            SetRasterizerStateNode setRasterizerNode = new SetRasterizerStateNode();
+            SetGraphicsShaderNode setGraphicsShaderNode = new SetGraphicsShaderNode();
+            SetTopologyNode setTopologyNode = new SetTopologyNode();
+            SetViewPortNode setViewPortNode = new SetViewPortNode();
+            SetRenderTargetsNode setRenderTargetsNode = new SetRenderTargetsNode();
+
+            setViewPortNode.width.SetValue(1900);
+            setViewPortNode.height.SetValue(1000);
+
+            getSwapChainNode1.SetPositionScreenSpace(new Vector2(1200, 450));
+            getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(200, 450));
+
+            setDepthNode.SetPositionScreenSpace(new Vector2(0, 150)).outPin.Connect(setRasterizerNode.inPin);
+            setRasterizerNode.SetPositionScreenSpace(new Vector2(200, 150)).outPin.Connect(setTopologyNode.inPin);
+
+            setTopologyNode.SetPositionScreenSpace(new Vector2(400, 150)).outPin.Connect(setViewPortNode.inPin);
+            setViewPortNode.SetPositionScreenSpace(new Vector2(650, 150)).outPin.Connect(setGraphicsShaderNode.inPin);
+            setGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 150)).outPin.Connect(setRenderTargetsNode.inPin);
+            getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 450));
+            getGraphicsShaderNode.shaderPin.Connect(setGraphicsShaderNode.shaderPin);
+            getGraphicsShaderNode.shaderAsset = AssetSystem.shaderAssets[0];
+
+            getSwapChainNode2.SetPositionScreenSpace(new Vector2(870, 0));
+            getSwapChainNode2.colour.Connect(setRenderTargetsNode.renderTargetPin);
+            getSwapChainNode2.depth.Connect(setRenderTargetsNode.depthTargetPin);
+
+            setRenderTargetsNode.SetPositionScreenSpace(new Vector2(1060, 150)).outPin.Connect(clearColourTargetNode.inPin);
+
+            clearColourTargetNode.SetPositionScreenSpace(new Vector2(1260, 150)).outPin.Connect(clearDepthTargetNode.inPin);
+            clearColourTargetNode.colourTargetPin.Connect(getSwapChainNode1.colour);
+
+            clearDepthTargetNode.SetPositionScreenSpace(new Vector2(1470, 150)).outPin.Connect(drawSceneNode.inPin);
+            clearDepthTargetNode.depthTargetPin.Connect(getSwapChainNode1.depth);
+
+            drawSceneNode.SetPositionScreenSpace(new Vector2(1670, 150));
+
+            Nodes.Add(clearColourTargetNode);
+            Nodes.Add(clearDepthTargetNode);
+            Nodes.Add(drawSceneNode);
+            Nodes.Add(setDepthNode);
+            Nodes.Add(setRasterizerNode);
+            Nodes.Add(setTopologyNode);
+            Nodes.Add(setViewPortNode);
+            Nodes.Add(setRenderTargetsNode);
+            Nodes.Add(getGraphicsShaderNode);
+            Nodes.Add(setGraphicsShaderNode);
+            Nodes.Add(getSwapChainNode1);
+            Nodes.Add(getSwapChainNode2);
+
+            root = setDepthNode;
         }
     }
 }

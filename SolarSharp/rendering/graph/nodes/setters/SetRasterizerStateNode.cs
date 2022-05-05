@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class SetRasterizerNode : Node
+    public class SetRasterizerStateNode : Node
     {
         private RasterizerState rasterizerState = null;
         private RasterizerDesc createDesc = new RasterizerDesc();
 
-        public SetRasterizerNode() : base("Set Rasterizer State")
+        public SetRasterizerStateNode() : base("Set Rasterizer State")
         {
             AddFlowPins();
         }
@@ -28,9 +28,10 @@ namespace SolarSharp.Rendering.Graph
            createDesc = DrawStruct<RasterizerDesc>(createDesc);
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
             context.SetRasterizerState(rasterizerState);
+            return outPin.GetConnectedPin().Node;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SolarSharp.Rendering.Graph
 {
     public class CMDClearColourTargetNode : Node
     {
-        private ColourTargetPin colourTargetPin = null;
+        public ColourTargetPin colourTargetPin = null;
 
         public CMDClearColourTargetNode() : base("Clear Colour Target")
         {
@@ -27,9 +27,10 @@ namespace SolarSharp.Rendering.Graph
             colourTargetPin.DrawUI();
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
-            throw new NotImplementedException();
+            context.ClearRenderTargetView(colourTargetPin.GetValue(), new Vector4(0.5f, 0.1f, 0.1f, 1.0f));
+            return outPin.GetConnectedPin().Node;
         }
     }
 }

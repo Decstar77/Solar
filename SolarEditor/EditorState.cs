@@ -24,13 +24,14 @@ namespace SolarEditor
         private string path = "C:/Users/claud/OneDrive/Desktop/DeclanStuff/Solar/EngineAssets/";
         private string name = "";
         private bool open = false;
-        
-        public RenderGraph renderGraph = new RenderGraph("My Render Graph", RenderSystem.device, RenderSystem.context);
+
 
         internal void UIDraw()
         {
             ImGui.BeginFrame();
             DrawGlobalMenu();
+            
+            RenderGraph renderGraph = Application.renderGraph;
 
             if (ImGui.Begin(renderGraph.Name))
             {
@@ -93,7 +94,7 @@ namespace SolarEditor
                         }
 
                         if (ImGui.MenuItem("Depth")) {
-                            renderGraph.Nodes.Add(new SetDepthNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            renderGraph.Nodes.Add(new SetDepthStateNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Topology")) {
@@ -101,7 +102,7 @@ namespace SolarEditor
                         }
 
                         if (ImGui.MenuItem("Rasterizer")) {
-                            renderGraph.Nodes.Add(new SetRasterizerNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            renderGraph.Nodes.Add(new SetRasterizerStateNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Viewport")) {

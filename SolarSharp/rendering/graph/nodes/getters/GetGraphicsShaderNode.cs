@@ -9,8 +9,8 @@ namespace SolarSharp.Rendering.Graph
 {
     public class GetGraphicsShaderNode : Node
     {
-        private ShaderAsset shaderAsset = null;
-        private GraphicsShaderPin shaderPin = null;
+        public ShaderAsset shaderAsset = null;
+        public GraphicsShaderPin shaderPin = null;
 
         public GetGraphicsShaderNode() : base("Get Graphics Shader")
         {
@@ -48,9 +48,9 @@ namespace SolarSharp.Rendering.Graph
 
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
-            
+            return null;
         }
     }
 }

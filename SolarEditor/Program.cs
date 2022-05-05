@@ -40,8 +40,8 @@ namespace SolarEditor
             ApplicationConfig config = new ApplicationConfig();
             config.Title = "Editor";
             config.Description = "Solar editor";
-            config.SurfaceWidth = 1280;
-            config.SurfaceHeight = 720;
+            config.SurfaceWidth = 1900;
+            config.SurfaceHeight = 1000;
             config.WindowXPos = 200;
             config.WindowYPos = 200;
             config.Version = "0.1";

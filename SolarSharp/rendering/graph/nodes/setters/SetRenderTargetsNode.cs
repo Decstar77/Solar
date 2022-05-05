@@ -8,8 +8,8 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetRenderTargetsNode : Node
     {
-        private ColourTargetPin renderTargetPin = null;
-        private DepthTargetPin depthTargetPin = null;
+        public ColourTargetPin renderTargetPin = null;
+        public DepthTargetPin depthTargetPin = null;
 
         public SetRenderTargetsNode() : base("Set Render Targets")
         {
@@ -21,7 +21,7 @@ namespace SolarSharp.Rendering.Graph
 
         public override bool CreateResources(RenderGraph renderGraph)
         {
-            return false;
+            return true;
         }
 
         public override void DrawUI()
@@ -31,9 +31,10 @@ namespace SolarSharp.Rendering.Graph
             renderTargetPin.DrawUI();
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
-            throw new NotImplementedException();
+            context.SetRenderTargets(depthTargetPin.GetValue(), renderTargetPin.GetValue());
+            return outPin.GetConnectedPin().Node;
         }
     }
 }

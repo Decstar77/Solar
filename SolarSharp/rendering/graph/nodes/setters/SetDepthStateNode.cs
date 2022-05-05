@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class SetDepthNode : Node
+    public class SetDepthStateNode : Node
     {
         private DepthStencilState depthStencilState = null;
         private DepthStencilDesc createDesc = new DepthStencilDesc();
 
-        public SetDepthNode() : base("Set Depth State")
+        public SetDepthStateNode() : base("Set Depth State")
         {
             AddFlowPins();
         }
@@ -29,9 +29,10 @@ namespace SolarSharp.Rendering.Graph
             return depthStencilState != null;
         }
 
-        public override void Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, Context context)
         {
             context.SetDepthStencilState(depthStencilState);
+            return outPin.GetConnectedPin().Node;
         }
     }
 
