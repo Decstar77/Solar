@@ -29,8 +29,13 @@ namespace SolarSharp.Rendering.Graph
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            context.ClearRenderTargetView(colourTargetPin.GetValue(), new Vector4(0.5f, 0.1f, 0.1f, 1.0f));
-            return outPin.GetConnectedPin().Node;
+            RenderTargetView renderTargetView = colourTargetPin.GetValue();
+            if (renderTargetView != null) {
+                context.ClearRenderTargetView(renderTargetView, new Vector4(0.5f, 0.1f, 0.1f, 1.0f));
+                return outFlowPin?.GetConnectedPin()?.Node;
+            }
+
+            return null;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace SolarSharp.Rendering.Graph
         public override Node Run(RenderGraph graph, Context context)
         {
             context.SetDepthStencilState(depthStencilState);
-            return outPin.GetConnectedPin().Node;
+            return outFlowPin?.GetConnectedPin()?.Node;
         }
     }
 

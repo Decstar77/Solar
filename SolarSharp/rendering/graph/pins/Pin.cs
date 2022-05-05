@@ -15,15 +15,19 @@ namespace SolarSharp.Rendering.Graph
     public abstract class Pin
     {
         private static int IdCounter = 10000;
+
         public int Id { get { return id; } }
+
         private int id = -1;
-        
-        public Node Node { get { return node; } }
+
+        public Node Node { get { return node; } }        
         protected Node node = null;
 
         public string Name { get; set; }
-        public PinInputType PinType { get; }
         
+        public PinInputType PinType { get; set; }
+
+
         protected Pin connectedTo = null;
 
         public Pin(string name, Node node, PinInputType pinType)

@@ -117,6 +117,8 @@ namespace SolarSharp
 
             renderGraph.Create();
 
+            renderGraph.Save();
+
             while (window.Running(ref input)) {
 
                 renderGraph.Run();

@@ -7,6 +7,31 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
+    public struct SerNode
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<int> OuputPinIds { get; set; }
+        public List<int> InputPinIds { get; set; }
+        public int InFlowPin { get; set; }
+        public int OutFlowPin { get; set; }
+        public object Data { get; set; }
+
+        public SerNode()
+        {
+            Id = -1;
+            Name = string.Empty;
+            OuputPinIds = new List<int>();
+            InputPinIds = new List<int>();
+            OutFlowPin = 0;
+            InFlowPin = 0;
+            Data = null;
+        }
+    }
+
+
+
+
     public abstract class Node
     {
         private static int IdCounter = 0;
@@ -17,9 +42,8 @@ namespace SolarSharp.Rendering.Graph
         public List<Pin> InputPins { get; set; }
 
         public string Name { get; set; }
-
-        public FlowPin inPin;
-        public FlowPin outPin;
+        public FlowPin inFlowPin = null;
+        public FlowPin outFlowPin = null;
 
         public Node(string name)
         {
@@ -29,22 +53,36 @@ namespace SolarSharp.Rendering.Graph
             InputPins = new List<Pin>();
         }
 
+        public SerNode CreateSerNode()
+        {
+            SerNode serNode = new SerNode();
+            serNode.Id = id;
+            serNode.Name = Name;
+            serNode.InFlowPin = inFlowPin == null ? -1 : inFlowPin.Id;
+            serNode.OutFlowPin = outFlowPin == null ? -1 : outFlowPin.Id;
+            serNode.OuputPinIds.AddRange(OutputPins.Select(x => x.Id));
+            serNode.InputPinIds.AddRange(InputPins.Select(x => x.Id));
+            serNode.Data = new DepthStencilDesc();
+
+            return serNode;
+        }
+
         public abstract void DrawUI();
         public abstract bool CreateResources(RenderGraph renderGraph);
         public abstract Node Run(RenderGraph graph, Context context);
 
         protected void AddFlowPins() {
-            inPin = new FlowPin("In", this, PinInputType.INPUT);
-            outPin = new FlowPin("Out", this, PinInputType.OUTPUT);
+            inFlowPin = new FlowPin("In", this, PinInputType.INPUT);
+            outFlowPin = new FlowPin("Out", this, PinInputType.OUTPUT);
         }
 
         protected void DrawFlowPins() {
-            ImNodes.BeginInputAttribute(inPin.Id, ImNodesPinShape.CircleFilled);
-            ImGui.Text(inPin.Name);
+            ImNodes.BeginInputAttribute(inFlowPin.Id, ImNodesPinShape.CircleFilled);
+            ImGui.Text(inFlowPin.Name);
             ImNodes.EndInputAttribute();
             ImGui.SameLine();
-            ImNodes.BeginOutputAttribute(outPin.Id, ImNodesPinShape.CircleFilled);
-            ImGui.Text(outPin.Name);
+            ImNodes.BeginOutputAttribute(outFlowPin.Id, ImNodesPinShape.CircleFilled);
+            ImGui.Text(outFlowPin.Name);
             ImNodes.EndOutputAttribute();
         }
 
@@ -84,7 +122,5 @@ namespace SolarSharp.Rendering.Graph
 
             return (T)obj;
         }
-
-
     }
 }

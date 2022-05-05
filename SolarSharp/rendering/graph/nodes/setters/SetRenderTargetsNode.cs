@@ -33,8 +33,13 @@ namespace SolarSharp.Rendering.Graph
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            context.SetRenderTargets(depthTargetPin.GetValue(), renderTargetPin.GetValue());
-            return outPin.GetConnectedPin().Node;
+            DepthStencilView depthStencilView = depthTargetPin.GetValue();
+            RenderTargetView renderTargetView = renderTargetPin.GetValue();
+            if (depthStencilView != null && renderTargetView != null) {
+                context.SetRenderTargets(depthTargetPin.GetValue(), renderTargetPin.GetValue());
+                return outFlowPin?.GetConnectedPin()?.Node;
+            }
+            return null;
         }
     }
 }

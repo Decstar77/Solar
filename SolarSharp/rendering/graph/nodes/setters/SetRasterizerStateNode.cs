@@ -31,7 +31,7 @@ namespace SolarSharp.Rendering.Graph
         public override Node Run(RenderGraph graph, Context context)
         {
             context.SetRasterizerState(rasterizerState);
-            return outPin.GetConnectedPin().Node;
+            return outFlowPin?.GetConnectedPin()?.Node;
         }
     }
 }

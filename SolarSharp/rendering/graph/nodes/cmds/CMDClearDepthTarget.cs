@@ -29,8 +29,14 @@ namespace SolarSharp.Rendering.Graph
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            context.ClearDepthStencilView(depthTargetPin.GetValue(), ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0);
-            return outPin.GetConnectedPin().Node;
+            DepthStencilView depthStencilView = depthTargetPin.GetValue();
+
+            if (depthStencilView != null) {
+                context.ClearDepthStencilView(depthTargetPin.GetValue(), ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0);
+                return outFlowPin?.GetConnectedPin()?.Node;
+            }
+
+            return null;
         }
     }
 }

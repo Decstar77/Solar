@@ -34,7 +34,7 @@ namespace SolarSharp.Rendering.Graph
         public override Node Run(RenderGraph graph, Context context)
         {
             context.SetViewPortState(width.GetValue(), height.GetValue());
-            return outPin.GetConnectedPin().Node;
+            return outFlowPin?.GetConnectedPin()?.Node;
         }
     }
 }

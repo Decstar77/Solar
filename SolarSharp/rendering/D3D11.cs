@@ -43,17 +43,23 @@ namespace SolarSharp.Rendering
     [StructLayout(LayoutKind.Sequential)]
     public struct DepthStencilDesc
     {
-        [MarshalAs(UnmanagedType.Bool)] public bool DepthTest = false;
-        [MarshalAs(UnmanagedType.Bool)] public bool DepthWrite = false;
-        [MarshalAs(UnmanagedType.I4)] public DepthComparisonFunc DepthFunc = DepthComparisonFunc.NEVER;
-        [MarshalAs(UnmanagedType.Bool)] public bool StencilEnable = false;
-        [MarshalAs(UnmanagedType.I1)] public byte StencilReadMask = 0;
-        [MarshalAs(UnmanagedType.I1)] public byte StencilWriteMask = 0;
+        public bool DepthTest { get { return depthTest; } set { depthTest = value; } }
+        [MarshalAs(UnmanagedType.Bool)] public bool depthTest;
+        [MarshalAs(UnmanagedType.Bool)] public bool DepthWrite;
+        [MarshalAs(UnmanagedType.I4)] public DepthComparisonFunc DepthFunc;
+        [MarshalAs(UnmanagedType.Bool)] public bool StencilEnable;
+        [MarshalAs(UnmanagedType.I1)] public byte StencilReadMask;
+        [MarshalAs(UnmanagedType.I1)] public byte StencilWriteMask;
         //D3D11_DEPTH_STENCILOP_DESC FrontFace;
         //D3D11_DEPTH_STENCILOP_DESC BackFace;
         public DepthStencilDesc()
         {
-
+            depthTest = false;
+            DepthWrite = false;
+            DepthFunc = DepthComparisonFunc.NEVER;
+            StencilEnable = false;
+            StencilReadMask = 0;
+            StencilWriteMask = 0;
         }
 
         public static bool operator ==(DepthStencilDesc a, DepthStencilDesc b)

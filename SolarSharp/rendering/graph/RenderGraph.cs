@@ -1,9 +1,12 @@
 ﻿using SolarSharp.Assets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SolarSharp.Rendering.Graph
 {
@@ -52,6 +55,14 @@ namespace SolarSharp.Rendering.Graph
             while (node != null) {
                 node = node.Run(this, context);
             }
+        }
+
+        public void Save()
+        {
+            SetDepthStateNode setDepthNode = new SetDepthStateNode();
+            
+            string json = JsonSerializer.Serialize(setDepthNode.CreateSerNode());
+            File.WriteAllText("render.json", json);
         }
 
         public DepthStencilState CreateOrGetDepthStencilState(DepthStencilDesc desc)
@@ -133,12 +144,12 @@ namespace SolarSharp.Rendering.Graph
             getSwapChainNode1.SetPositionScreenSpace(new Vector2(1200, 450));
             getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(200, 450));
 
-            setDepthNode.SetPositionScreenSpace(new Vector2(0, 150)).outPin.Connect(setRasterizerNode.inPin);
-            setRasterizerNode.SetPositionScreenSpace(new Vector2(200, 150)).outPin.Connect(setTopologyNode.inPin);
+            setDepthNode.SetPositionScreenSpace(new Vector2(0, 150)).outFlowPin.Connect(setRasterizerNode.inFlowPin);
+            setRasterizerNode.SetPositionScreenSpace(new Vector2(200, 150)).outFlowPin.Connect(setTopologyNode.inFlowPin);
 
-            setTopologyNode.SetPositionScreenSpace(new Vector2(400, 150)).outPin.Connect(setViewPortNode.inPin);
-            setViewPortNode.SetPositionScreenSpace(new Vector2(650, 150)).outPin.Connect(setGraphicsShaderNode.inPin);
-            setGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 150)).outPin.Connect(setRenderTargetsNode.inPin);
+            setTopologyNode.SetPositionScreenSpace(new Vector2(400, 150)).outFlowPin.Connect(setViewPortNode.inFlowPin);
+            setViewPortNode.SetPositionScreenSpace(new Vector2(650, 150)).outFlowPin.Connect(setGraphicsShaderNode.inFlowPin);
+            setGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 150)).outFlowPin.Connect(setRenderTargetsNode.inFlowPin);
             getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 450));
             getGraphicsShaderNode.shaderPin.Connect(setGraphicsShaderNode.shaderPin);
             getGraphicsShaderNode.shaderAsset = AssetSystem.shaderAssets[0];
@@ -147,12 +158,12 @@ namespace SolarSharp.Rendering.Graph
             getSwapChainNode2.colour.Connect(setRenderTargetsNode.renderTargetPin);
             getSwapChainNode2.depth.Connect(setRenderTargetsNode.depthTargetPin);
 
-            setRenderTargetsNode.SetPositionScreenSpace(new Vector2(1060, 150)).outPin.Connect(clearColourTargetNode.inPin);
+            setRenderTargetsNode.SetPositionScreenSpace(new Vector2(1060, 150)).outFlowPin.Connect(clearColourTargetNode.inFlowPin);
 
-            clearColourTargetNode.SetPositionScreenSpace(new Vector2(1260, 150)).outPin.Connect(clearDepthTargetNode.inPin);
+            clearColourTargetNode.SetPositionScreenSpace(new Vector2(1260, 150)).outFlowPin.Connect(clearDepthTargetNode.inFlowPin);
             clearColourTargetNode.colourTargetPin.Connect(getSwapChainNode1.colour);
 
-            clearDepthTargetNode.SetPositionScreenSpace(new Vector2(1470, 150)).outPin.Connect(drawSceneNode.inPin);
+            clearDepthTargetNode.SetPositionScreenSpace(new Vector2(1470, 150)).outFlowPin.Connect(drawSceneNode.inFlowPin);
             clearDepthTargetNode.depthTargetPin.Connect(getSwapChainNode1.depth);
 
             drawSceneNode.SetPositionScreenSpace(new Vector2(1670, 150));

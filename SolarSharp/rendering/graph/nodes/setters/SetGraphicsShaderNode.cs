@@ -36,9 +36,11 @@ namespace SolarSharp.Rendering.Graph
                     context.SetInputLayout(graphicsShader.inputLayout);
                     context.SetVertexShader(graphicsShader.vertexShader);
                     context.SetPixelShader(graphicsShader.pixelShader);
+                    return outFlowPin?.GetConnectedPin()?.Node;
                 }
             }
-            return outPin.GetConnectedPin().Node;
+
+            return null;            
         }
     }
 }

@@ -26,68 +26,71 @@ namespace SolarEditor
         public ShaderEditorWindow(ShaderAsset shaderAsset)
         {
             this.shaderAsset = shaderAsset;
-            ImGuiTextEditor.SetText(shaderAsset.Src);
+            if (shaderAsset != null)
+                ImGuiTextEditor.SetText(shaderAsset.Src);
         }
 
         public override void Show(EditorState editorState)
         {            
             if (ImGui.Begin("Shader editor", ref show, (int)(ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.MenuBar)))
             {
-                if (ImGui.BeginMenuBar())
+                if (shaderAsset != null)
                 {
-                    if (ImGui.BeginMenu("File"))
+                    if (ImGui.BeginMenuBar())
                     {
-                        if (ImGui.MenuItem("Open", "Ctrl+O"))
+                        if (ImGui.BeginMenu("File"))
                         {
-                        }
-                        if (ImGui.MenuItem("Save", "Ctrl+S"))
-                        {
-                            Save();
-                        }
-                        if (ImGui.MenuItem("Compile", "F5"))
-                        {
-                            Save();
-                            Compile();
+                            if (ImGui.MenuItem("Open", "Ctrl+O"))
+                            {
+                            }
+                            if (ImGui.MenuItem("Save", "Ctrl+S"))
+                            {
+                                Save();
+                            }
+                            if (ImGui.MenuItem("Compile", "F5"))
+                            {
+                                Save();
+                                Compile();
+                            }
+
+                            ImGui.EndMenu();
                         }
 
-                        ImGui.EndMenu();
+                        if (ImGui.BeginMenu("Edit"))
+                        {
+                            bool ro = ImGuiTextEditor.IsReadOnly();
+                            if (ImGui.MenuItem("Read-only mode", "", ro))
+                            {
+                                ImGuiTextEditor.SetReadOnly(!ro);
+                            }
+
+                            bool ws = ImGuiTextEditor.IsShowingWhitespaces();
+                            if (ImGui.MenuItem("Show white space", "", ws))
+                            {
+                                ImGuiTextEditor.SetShowWhitespaces(!ws);
+                            }
+
+                            if (ImGui.MenuItem("Compile on save", "", compileOnSave))
+                            {
+                                compileOnSave = !compileOnSave;
+                            }
+
+                            ImGui.EndMenu();
+                        }
+
+                        ImGui.EndMenuBar();
                     }
 
-                    if (ImGui.BeginMenu("Edit"))
+                    ImGui.Text(shaderAsset.Path);
+
+                    if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
                     {
-                        bool ro = ImGuiTextEditor.IsReadOnly();
-                        if (ImGui.MenuItem("Read-only mode", "", ro))
-                        {
-                            ImGuiTextEditor.SetReadOnly(!ro);
-                        }
-
-                        bool ws = ImGuiTextEditor.IsShowingWhitespaces();
-                        if (ImGui.MenuItem("Show white space", "", ws))
-                        {
-                            ImGuiTextEditor.SetShowWhitespaces(!ws);
-                        }
-
-                        if (ImGui.MenuItem("Compile on save", "", compileOnSave))
-                        {
-                            compileOnSave = !compileOnSave;
-                        }
-
-                        ImGui.EndMenu();
+                        Save();
                     }
 
-                    ImGui.EndMenuBar();
+                    ImGuiTextEditor.Render("Shader");
                 }
-
-                ImGui.Text(shaderAsset.Path);
-
-                if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
-                {
-                    Save();
-                }
-                
-                ImGuiTextEditor.Render("Shader");
             }
-
             ImGui.End();
         }
 
