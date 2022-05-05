@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolarSharp.Assets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace SolarSharp.Rendering.Graph
 
         private List<DepthStencilState> depthStencilStates;
         private List<RasterizerState> rasterizerStates;
+        private List<GraphicsShader> graphicsShaders;
 
         private Device device;
         private Context context;
@@ -29,8 +31,7 @@ namespace SolarSharp.Rendering.Graph
 
             rasterizerStates = new List<RasterizerState>();
             depthStencilStates = new List<DepthStencilState>();
-
-
+            graphicsShaders = new List<GraphicsShader>();
 
             //cs.OutputPins[0].Connect( ss.InputPins[0] );
 
@@ -66,18 +67,16 @@ namespace SolarSharp.Rendering.Graph
             return state;
         }
 
+        public GraphicsShader CreateOrGetGraphicsShader(ShaderAsset shaderAsset) {
+            GraphicsShader shader = graphicsShaders.Find(x => { return x.Name == shaderAsset.Name; });
 
-        public Node Find( Pin pin )
-        {
-            foreach ( Node node in Nodes )
-            {
-                if (node.InputPins.Contains(pin))
-                    return node;
-                if (node.OutputPins.Contains(pin))
-                    return node;
+            if (shader == null) {
+                Logger.Trace("Creating new graphics shader " + shaderAsset.Name);
+                shader = new GraphicsShader(device).Create(shaderAsset);
+                graphicsShaders.Add(shader);
             }
 
-            return null;
+            return shader;
         }
 
         public Pin FindPin(int pinId)

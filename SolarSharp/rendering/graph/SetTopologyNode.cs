@@ -15,9 +15,9 @@ namespace SolarSharp.Rendering.Graph
             AddFlowPins();
         }
 
-        public override void CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public override void DrawUI()

@@ -8,19 +8,19 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetViewPortNode : Node
     {
-        private IntPin width = new IntPin("Width", true);
-        private IntPin height = new IntPin("Height", true);
+        private IntPin width = null;
+        private IntPin height = null;
 
         public SetViewPortNode() : base("Set ViewPort")
         {
             AddFlowPins();
-
-            InputPins.Add(width);
-            InputPins.Add(height);
+            width = new IntPin("Width", this, PinInputType.INPUT);
+            height = new IntPin("Height", this, PinInputType.INPUT);
         }
 
-        public override void CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph)
         {
+            return true;
         }
 
         public override void DrawUI()

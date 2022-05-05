@@ -49,12 +49,14 @@
     <Compile Include="math\Vector4.cs" />
     <Compile Include="rendering\D3D11.cs" />
     <Compile Include="rendering\GraphicsShader.cs" />
+    <Compile Include="rendering\graph\GetGraphicsShaderNode.cs" />
+    <Compile Include="rendering\graph\Node.cs" />
     <Compile Include="rendering\graph\pins\FlowPin.cs" />
     <Compile Include="rendering\graph\pins\IntPin.cs" />
-    <Compile Include="rendering\graph\pins\ShaderPin.cs" />
+    <Compile Include="rendering\graph\pins\GraphicsShaderPin.cs" />
+    <Compile Include="rendering\graph\pins\PinInputType.cs" />
     <Compile Include="rendering\graph\SetDepthNode.cs" />
-    <Compile Include="rendering\graph\Node.cs" />
-    <Compile Include="rendering\graph\Pin.cs" />
+    <Compile Include="rendering\graph\pins\Pin.cs" />
     <Compile Include="rendering\graph\RenderGraph.cs" />
     <Compile Include="rendering\graph\SetRasterizerNode.cs" />
     <Compile Include="rendering\graph\SetGraphicsShaderNode.cs" />

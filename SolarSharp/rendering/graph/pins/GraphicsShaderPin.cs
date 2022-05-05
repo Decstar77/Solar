@@ -6,42 +6,35 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class ShaderPin : Pin
+    public class GraphicsShaderPin : ValuePin<GraphicsShader>
     {
-        public ShaderPin(string name, bool isInputPin) : base(name, isInputPin)
+        public GraphicsShaderPin(string name, Node node, PinInputType pinInputType) : base(name, node, pinInputType)
         {
         }
 
         public override bool CanConnect(Pin pin)
         {
-            return pin is ShaderPin;
+            return pin is GraphicsShaderPin;
         }
 
         public override void DrawUI()
         {
             ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit( Util.ColourVec(185, 43, 204, 245) ));
-            if (IsInputPin)
+
+            if (PinType.HasFlag(PinInputType.INPUT))
             {
                 ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
                 ImGui.Text(Name + " ");
                 ImNodes.EndInputAttribute();
             }
-            else
+            else if (PinType.HasFlag(PinInputType.OUTPUT))
             {
                 ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
                 ImGui.Text(Name + " ");
                 ImNodes.EndInputAttribute();
             }
+
             ImNodes.PopColorStyle();
         }
-        public GraphicsShader GetValue()
-        {
-            if (IsConnected()) {
-                return ((ShaderPin)connectedTo).GetValue();
-            }
-
-            return null;
-        }
-
     }
 }

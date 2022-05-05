@@ -8,16 +8,17 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetGraphicsShaderNode : Node
     {
-        private ShaderPin shaderPin = new ShaderPin("Shader", true);
+        private GraphicsShaderPin shaderPin = null;
 
         public SetGraphicsShaderNode() : base("Set Graphics Shader")
         {
             AddFlowPins();
+            shaderPin = new GraphicsShaderPin("Shader", this, PinInputType.INPUT);
         }
 
-        public override void CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public override void DrawUI()

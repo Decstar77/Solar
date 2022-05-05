@@ -8,7 +8,7 @@ namespace SolarSharp.Rendering.Graph
 {
     public class FlowPin : Pin
     {
-        public FlowPin(string name, bool isInputPin) : base(name, isInputPin)
+        public FlowPin(string name, Node node, PinInputType pinType) : base(name, node, pinType)
         {
         }
 
@@ -19,6 +19,13 @@ namespace SolarSharp.Rendering.Graph
 
         public override void DrawUI()
         {
+            //ImNodes.BeginInputAttribute(InputPinId, ImNodesPinShape.CircleFilled);
+            //ImGui.Text("In");
+            //ImNodes.EndInputAttribute();
+            //ImGui.SameLine();
+            //ImNodes.BeginOutputAttribute(OutputPinId, ImNodesPinShape.CircleFilled);
+            //ImGui.Text("Out");
+            //ImNodes.EndOutputAttribute();
         }
     }
 }

@@ -11,16 +11,26 @@ namespace SolarSharp.Rendering.Graph
         private static int IdCounter = 10000;
         public int Id { get { return id; } }
         private int id = -1;
-        protected Pin connectedTo = null;
+        
+        public Node Node { get { return node; } }
+        protected Node node = null;
 
         public string Name { get; set; }
-        public bool IsInputPin { get; }
+        public PinInputType PinType { get; }
+        
+        protected Pin connectedTo = null;
 
-        public Pin(string name, bool isInputPin)
+        public Pin(string name, Node node, PinInputType pinType)
         {
             id = IdCounter++;
             Name = name;
-            IsInputPin = isInputPin;
+            this.node = node;
+            PinType = pinType;
+
+            if (pinType == PinInputType.INPUT)
+                node.InputPins.Add(this);
+            if (pinType == PinInputType.OUTPUT)
+                node.OutputPins.Add(this);
         }
 
         public abstract void DrawUI();
@@ -46,4 +56,30 @@ namespace SolarSharp.Rendering.Graph
         public bool IsConnected() => connectedTo != null;
         public Pin GetConnectedPin() => connectedTo;
     }
+
+    public abstract class ValuePin<T> : Pin
+    {
+        protected T value = default(T);
+
+        protected ValuePin(string name, Node node, PinInputType pinType) : base(name, node, pinType)
+        {
+        }
+
+        public void SetValue(T t)
+        {
+            value = t;
+        }
+
+        public T GetValue()
+        {
+            if (IsConnected() && PinType == PinInputType.INPUT)
+            {
+                return ((ValuePin<T>)connectedTo).GetValue();
+            }
+
+            return value;
+        }
+    }
+
+
 }

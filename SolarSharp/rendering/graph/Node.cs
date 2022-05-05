@@ -30,14 +30,12 @@ namespace SolarSharp.Rendering.Graph
         }
 
         public abstract void DrawUI();
-        public abstract void CreateResources(RenderGraph renderGraph);
+        public abstract bool CreateResources(RenderGraph renderGraph);
         public abstract void Run(RenderGraph graph, Context context);
 
         protected void AddFlowPins() {
-            inPin = new FlowPin("In", true);
-            outPin = new FlowPin("Out", false);
-            InputPins.Add(inPin);
-            OutputPins.Add(outPin);
+            inPin = new FlowPin("In", this, PinInputType.INPUT);
+            outPin = new FlowPin("Out", this, PinInputType.OUTPUT);
         }
 
         protected void DrawFlowPins() {

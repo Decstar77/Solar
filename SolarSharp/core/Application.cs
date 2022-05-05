@@ -115,15 +115,15 @@ namespace SolarSharp
                 deviceContext.Context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
                 deviceContext.Context.SetViewPortState(window.SurfaceWidth, window.SurfaceHeight); // @DONE
                 deviceContext.Context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST); // @DONE
-                deviceContext.Context.SetDepthStencilState(depthStencilState);
-                deviceContext.Context.SetRasterizerState(rasterizerState);
+                deviceContext.Context.SetDepthStencilState(depthStencilState); // @DONE
+                deviceContext.Context.SetRasterizerState(rasterizerState); // @DONE
                 //deviceContext.Context.SetBlendState(blendState);
 
                 if (shader.IsValid())
                 {
-                    deviceContext.Context.SetInputLayout(shader.inputLayout);
-                    deviceContext.Context.SetVertexShader(shader.vertexShader);
-                    deviceContext.Context.SetPixelShader(shader.pixelShader);
+                    deviceContext.Context.SetInputLayout(shader.inputLayout);   // @DONE
+                    deviceContext.Context.SetVertexShader(shader.vertexShader); // @DONE
+                    deviceContext.Context.SetPixelShader(shader.pixelShader);   // @DONE
 
                     deviceContext.Context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
                     deviceContext.Context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);

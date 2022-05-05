@@ -16,9 +16,10 @@ namespace SolarSharp.Rendering.Graph
             AddFlowPins();
         }
 
-        public override void CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph)
         {
-             rasterizerState = renderGraph.CreateOrGetRasterizerState(createDesc);
+            rasterizerState = renderGraph.CreateOrGetRasterizerState(createDesc);
+            return rasterizerState != null;
         }
 
         public override void DrawUI()

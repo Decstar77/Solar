@@ -51,7 +51,7 @@ namespace SolarEditor
                 int linkId = 0;
                 renderGraph.Nodes.ForEach(node => {
                     node.OutputPins.ForEach(pin => { 
-                        if (pin.IsConnected()) {
+                        if (pin.IsConnected() && pin.PinType == PinInputType.OUTPUT) {
                             ImNodes.Link(linkId++, pin.Id, pin.GetConnectedPin().Id);
                         }
                     });

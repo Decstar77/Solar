@@ -10,10 +10,15 @@ namespace SolarSharp.Rendering
 {
     public class GraphicsShader
     {
+        public string Name { get; set; }
         public VertexShader vertexShader;
         public PixelShader pixelShader;
         public InputLayout inputLayout;
-        private Device device;
+        private Device device = null;
+
+        public GraphicsShader() {
+
+        }
 
         public GraphicsShader(Device device)
         {
@@ -22,6 +27,8 @@ namespace SolarSharp.Rendering
 
         public GraphicsShader Create(ShaderAsset shaderAsset)
         {
+            Name = shaderAsset.Name;
+
             Blob vertexBlob = device.CompileShader(shaderAsset.Src, "VSmain", "vs_5_0");
             Blob pixelBlob = device.CompileShader(shaderAsset.Src, "PSmain", "ps_5_0");
 

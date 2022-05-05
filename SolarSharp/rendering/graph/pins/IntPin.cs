@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class IntPin : Pin
+    public class IntPin : ValuePin<int>
     {
-        private int value = 0;
-        public IntPin(string name, bool isInputPin) : base(name, isInputPin)
+        public IntPin(string name, Node node, PinInputType inputType) : base(name, node, inputType)
         {
         }
 
@@ -21,18 +20,20 @@ namespace SolarSharp.Rendering.Graph
         public override void DrawUI()
         {            
             ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit(0.1f, 0.85f, 0.13f, 0.95f));
-            if (IsInputPin)
+            
+            if (PinType == PinInputType.INPUT)
             {
                 ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
                 ImGui.Text(Name + " ");
                 ImNodes.EndInputAttribute();
             }
-            else
+            else if (PinType == PinInputType.OUTPUT)
             {
                 ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
                 ImGui.Text(Name + " ");
                 ImNodes.EndInputAttribute();
             }
+
             ImNodes.PopColorStyle();
 
             ImGui.SameLine();
@@ -47,14 +48,7 @@ namespace SolarSharp.Rendering.Graph
                 ImGui.Text(((IntPin)connectedTo).GetValue().ToString());
             }
         }
-        public int GetValue()
-        {
-            if (IsConnected()) {
-                return ((IntPin)connectedTo).GetValue();
-            }
-
-            return value;
-        }
+ 
 
     }
 }
