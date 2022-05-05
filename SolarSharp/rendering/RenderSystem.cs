@@ -9,6 +9,7 @@ namespace SolarSharp.Rendering
     public static class RenderSystem
     {
         public static Device device;
+        public static Context context;
 
         public static List<GraphicsShader> graphicsShaders = new List<GraphicsShader>();
 

@@ -241,10 +241,47 @@ namespace ImGuiAPI
 		ImGui::EndPopup();
 	}
 
-	
+	EDITOR_INTERFACE(bool) ImGuiBeginPopup(const char* id, int flags)
+	{
+		bool result = ImGui::BeginPopup(id, flags);
+		return result;
+	}
 
-	
+	EDITOR_INTERFACE(bool) ImGuiCheckBox(const char* label, bool32* b)
+	{
+		bool result = ImGui::Checkbox(label, (bool*)b);	
+		return result;
+	}
 
+	EDITOR_INTERFACE(bool) ImGuiComboStringArr(const char* label, int *currentItem, const char *items[], int count, int heightInItems)
+	{
+		bool result = ImGui::Combo(label, currentItem, items, count, heightInItems);
+		return result;
+	}
 
+	EDITOR_INTERFACE(void) ImGuiPushItemWidth(float width)
+	{
+		ImGui::PushItemWidth(width);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiPopItemWidth()
+	{
+		ImGui::PopItemWidth();
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiInputInt(const char *label, int* v, int step, int step_fast, int flags)
+	{
+		return ImGui::InputInt(label, v, step, step_fast, flags);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiPushId(int id)
+	{
+		ImGui::PushID(id);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiPopId()
+	{
+		ImGui::PopID();
+	}
 
 }

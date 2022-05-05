@@ -6,27 +6,34 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class Pin
+    public abstract class Pin
     {
         private static int IdCounter = 10000;
         public int Id { get { return id; } }
         private int id = -1;
-        private Pin connectedTo = null;
+        protected Pin connectedTo = null;
 
         public string Name { get; set; }
+        public bool IsInputPin { get; }
 
-        public Pin(string name)
+        public Pin(string name, bool isInputPin)
         {
             id = IdCounter++;
             Name = name;
+            IsInputPin = isInputPin;
         }
+
+        public abstract void DrawUI();
+        public abstract bool CanConnect(Pin pin);
 
         public void Connect(Pin pin)
         {
-            Disconnect();
-            pin.Disconnect();
-            connectedTo = pin;
-            pin.connectedTo = this;
+            if (CanConnect(pin)) {
+                Disconnect();
+                pin.Disconnect();
+                connectedTo = pin;
+                pin.connectedTo = this;
+            }
         }
 
         public void Disconnect()

@@ -122,6 +122,28 @@ namespace SolarSharp.EngineAPI
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern void ImGuiEndPopup();
 
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiBeginPopup([MarshalAs(UnmanagedType.LPStr)] string id, int flags);
 
-}
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiCheckBox([MarshalAs(UnmanagedType.LPStr)] string label, [MarshalAs(UnmanagedType.Bool)] ref bool b);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiComboStringArr([MarshalAs(UnmanagedType.LPStr)] string label, ref int currentItem, string[] items, int count, int heightInItems);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiPushItemWidth(float width);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiPopItemWidth();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool ImGuiInputInt([MarshalAs(UnmanagedType.LPStr)] string label, ref int v, int step, int step_fast, int flags);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiPushId(int id);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiPopId();
+	}
 }

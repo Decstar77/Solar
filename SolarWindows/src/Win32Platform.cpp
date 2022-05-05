@@ -1,6 +1,9 @@
 #include "Core.h"
 #include "Win32Platform.h"
 
+#include "SolarMath.h"
+#include <vector>
+
 BOOL APIENTRY DllMain(HMODULE hModule,	DWORD ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
@@ -13,6 +16,37 @@ BOOL APIENTRY DllMain(HMODULE hModule,	DWORD ul_reason_for_call, LPVOID lpReserv
 	}
 	return TRUE;
 }
+
+static void InitializeRawInput()
+{
+	// @NOTE: Mouse
+	{
+		RAWINPUTDEVICE mouseRID = {};
+		mouseRID.usUsagePage = 0x1;
+		mouseRID.usUsage = 0x02;
+		mouseRID.dwFlags = 0;
+		mouseRID.hwndTarget = (HWND)winState.window;
+
+		RAWINPUTDEVICE ps4ControllerRID;
+		ps4ControllerRID.usUsagePage = 0x01;
+		ps4ControllerRID.usUsage = 0x05;
+		ps4ControllerRID.dwFlags = RIDEV_INPUTSINK;
+		ps4ControllerRID.hwndTarget = (HWND)winState.window;
+
+		if (RegisterRawInputDevices(&mouseRID, 1, sizeof(mouseRID)) &&
+			RegisterRawInputDevices(&ps4ControllerRID, 1, sizeof(ps4ControllerRID)))
+		{
+			winState.rawInput = true;
+		}
+		else
+		{
+			winState.rawInput = false;
+			ERROR("Could not init raw input");
+			MessageBoxA(NULL, "Raw input creation failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+		}
+	}
+}
+
 
 LRESULT CALLBACK WindProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 EDITOR_INTERFACE(bool) CreateWindow_(char* title, int width, int height, int xPos, int yPos)
@@ -82,7 +116,7 @@ EDITOR_INTERFACE(bool) CreateWindow_(char* title, int width, int height, int xPo
 			winState.surfaceWidth = cleintRect.right - cleintRect.left;
 			winState.surfaceHeight = cleintRect.bottom - cleintRect.top;
 
-			//InitializeRawInput();
+			InitializeRawInput();
 			//InitializeClock();
 		}
 		else
@@ -184,17 +218,11 @@ LRESULT CALLBACK WindProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 struct Input
 {
-	//Vec2f mousePositionPixelCoords;
-	//Vec2f mouseNorm;
-	//Vec2f mouseDelta;
-	//
-	//bool8 isPS4Controller;
-	//real32 controllerLeftTrigger;
-	//real32 controllerRightTrigger;
-	//Vec2f controllerLeftThumbDrag;
-	//Vec2f controllerRightThumbDrag;
-
-	//bool8 mouse_locked;
+	Vec2f mousePositionPixelCoords;
+	Vec2f mouseNorm;
+	Vec2f mouseDelta;
+	
+	bool32 mouseLocked;
 
 	int mb1;
 	int mb2;
@@ -257,33 +285,97 @@ struct Input
 	int controllerY;
 };
 
+static void ProcessRawInput(LPARAM lparam, Input* input)
+{
+	uint32 size = 0;
+	GetRawInputData(reinterpret_cast<HRAWINPUT>(lparam), RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+
+	if (size > 0)
+	{
+		auto data = std::vector<uint8>(size);
+		uint32 read = GetRawInputData(reinterpret_cast<HRAWINPUT>(lparam), RID_INPUT, data.data(), &size, sizeof(RAWINPUTHEADER));
+
+		if (read == size)
+		{
+			RAWINPUT* rawInput = reinterpret_cast<RAWINPUT*>(data.data());
+			if (rawInput->header.dwType == RIM_TYPEMOUSE)
+			{
+				real32 x = static_cast<real32>(rawInput->data.mouse.lLastX);
+				real32 y = static_cast<real32>(rawInput->data.mouse.lLastY);
+
+				input->mouseDelta += Vec2f(x, y);
+			}
+		}
+	}
+}
+
+
+static void ProcessMouseInput()
+{
+
+}
+
+
 static Input input = {};
+static Input oldInput = {};
 EDITOR_INTERFACE(bool) PumpMessages_(Input& appInput)
 {
 	if (winState.running)
 	{
-		//oldInput = input;
-		//Input::Get()->mouseDelta = Vec2f(0);
+		oldInput = input;
+		input.mouseDelta = Vec2f(0);
 
 		winState.active = (bool8)GetFocus();
 
 		MSG message = {};
 		while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE))
 		{
+			if (message.message == WM_INPUT)
+			{
+				ProcessRawInput(message.lParam, &input);
+			}
+
 			TranslateMessage(&message);
 			DispatchMessageA(&message);
 		}
 
+		POINT mousep = {};
+		GetCursorPos(&mousep);
+		ScreenToClient((HWND)winState.window, &mousep);
+		real32 mx = (real32)mousep.x;
+		real32 my = (real32)mousep.y;
+
+		mx = Clamp<real32>(mx, 0.0f, (real32)winState.surfaceWidth);
+		my = Clamp<real32>(my, 0.0f, (real32)winState.surfaceHeight);
+
+		input.mousePositionPixelCoords.x = mx;
+		input.mousePositionPixelCoords.y = my;
+
+		if (input.mouseLocked && winState.active)
+		{
+			SetCursor(FALSE);
+
+			oldInput.mousePositionPixelCoords = Vec2f((real32)(winState.surfaceWidth / 2), (real32)(winState.surfaceHeight / 2));
+
+			POINT p = {};
+			p.x = winState.surfaceWidth / 2;
+			p.y = winState.surfaceHeight / 2;
+
+			ClientToScreen((HWND)winState.window, &p);
+
+			SetCursorPos(p.x, p.y);
+		}
+
+		input.del = (GetKeyState(VK_DELETE) & (1 << 15));
+
+		input.mouseNorm.x = mx / (real32)winState.surfaceWidth;
+		input.mouseNorm.y = my / (real32)winState.surfaceHeight;
+
+		input.mb1 = GetKeyState(VK_LBUTTON) & (1 << 15);
+		input.mb2 = GetKeyState(VK_RBUTTON) & (1 << 15);
+		input.mb3 = GetKeyState(VK_MBUTTON) & (1 << 15);
+
 		appInput = input;
-		//appInput.a = true;
-		//if (winState.rawInput)
-		//{
-		//	ProcessRawMouseInput();
-		//}
-		//else
-		//{
-		//	ProcessMouseInput();
-		//}
 	}
 
 	return winState.running;

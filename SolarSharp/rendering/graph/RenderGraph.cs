@@ -11,22 +11,61 @@ namespace SolarSharp.Rendering.Graph
         public List<Node> Nodes { get; set; }
         public string Name { get; set; }
 
-        public RenderGraph(string name)
+        private List<DepthStencilState> depthStencilStates;
+        private List<RasterizerState> rasterizerStates;
+
+        private Device device;
+        private Context context;
+
+        public RenderGraph(string name, Device device, Context context)
         {
             Name = name;
+            this.device = device;
+            this.context = context;
+
             Nodes = new List<Node>();
-            Node cs = new Node("Create shader");
-            Node ss = new Node("Set Shader");
+            Node cs = new SetDepthNode();
+            Node ss = new SetDepthNode();
 
-            cs.OutputPins.Add(new Pin("ouput"));
-            cs.InputPins.Add(new Pin("input"));
-            ss.InputPins.Add(new Pin("input"));
+            rasterizerStates = new List<RasterizerState>();
+            depthStencilStates = new List<DepthStencilState>();
 
-            cs.OutputPins[0].Connect( ss.InputPins[0] );
+
+
+            //cs.OutputPins[0].Connect( ss.InputPins[0] );
 
             Nodes.Add(cs);
-            Nodes.Add(ss);
+            Nodes.Add(new SetRasterizerNode());
+
+            //Nodes.Add(ss);
         }
+
+        public DepthStencilState CreateOrGetDepthStencilState(DepthStencilDesc desc)
+        {
+            DepthStencilState state = depthStencilStates.Find(x => { return x.Description == desc; });
+
+            if (state == null) {
+                Logger.Trace("Creating new depth stencil state");
+                state = device.CreateDepthStencilState(desc);
+                depthStencilStates.Add(state);
+            }
+
+            return state;            
+        }
+
+        public RasterizerState CreateOrGetRasterizerState(RasterizerDesc desc)
+        {
+            RasterizerState state = rasterizerStates.Find(x => { return x.Description == desc; });
+
+            if (state == null) {
+                Logger.Trace("Creating new rasterizer state");
+                state = device.CreateRasterizerState(desc);
+                rasterizerStates.Add(state);
+            }
+
+            return state;
+        }
+
 
         public Node Find( Pin pin )
         {

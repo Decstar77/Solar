@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 using SolarSharp.EngineAPI;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SolarSharp.Rendering
 {
@@ -54,12 +55,29 @@ namespace SolarSharp.Rendering
         {
 
         }
+
+        public static bool operator ==(DepthStencilDesc a, DepthStencilDesc b)
+        {
+            return a.DepthTest == b.DepthTest &&
+                a.DepthWrite == b.DepthWrite &&
+                a.DepthFunc == b.DepthFunc &&
+                a.StencilEnable == b.StencilEnable &&
+                a.StencilReadMask == b.StencilReadMask &&
+                a.StencilWriteMask == b.StencilWriteMask;
+        }
+
+        public static bool operator !=(DepthStencilDesc a, DepthStencilDesc b)
+        {
+            return !(a == b);
+        }
     }
 
     public class DepthStencilState : DirectXObject
     {
-        public DepthStencilState(IntPtr ptr) : base(ptr)
+        public DepthStencilDesc Description { get; }
+        public DepthStencilState(IntPtr ptr, DepthStencilDesc desc) : base(ptr)
         {
+            Description = desc;
         }
     }
 
@@ -94,12 +112,34 @@ namespace SolarSharp.Rendering
         {
 
         }
+
+        public static bool operator ==(RasterizerDesc a, RasterizerDesc b)
+        {
+            return a.FillMode == b.FillMode &&
+                a.CullMode == b.CullMode &&
+                a.FrontCounterClockwise == b.FrontCounterClockwise &&
+                a.DepthBias == b.DepthBias &&
+                a.DepthBiasClamp == b.DepthBiasClamp &&
+                a.SlopeScaledDepthBias == b.SlopeScaledDepthBias &&
+                a.DepthClipEnable == b.DepthClipEnable &&
+                a.ScissorEnable == b.ScissorEnable &&
+                a.MultisampleEnable == b.MultisampleEnable &&
+                a.AntialiasedLineEnable == b.AntialiasedLineEnable;
+
+        }
+
+        public static bool operator !=(RasterizerDesc a, RasterizerDesc b)
+        {
+            return !(a == b);
+        }
     }
 
     public class RasterizerState : DirectXObject
     {
-        public RasterizerState(IntPtr ptr) : base(ptr)
+        public RasterizerDesc Description { get; }
+        public RasterizerState(IntPtr ptr, RasterizerDesc desc) : base(ptr)
         {
+            Description = desc;
         }
     }
 
@@ -664,12 +704,12 @@ namespace SolarSharp.Rendering
 
         public DepthStencilState CreateDepthStencilState(DepthStencilDesc desc)
         {
-           return new DepthStencilState(D3D11API.DeviceCreateDepthStencilState(ref desc));
+           return new DepthStencilState(D3D11API.DeviceCreateDepthStencilState(ref desc), desc);
         }
 
         public RasterizerState CreateRasterizerState(RasterizerDesc desc)
         {
-            return new RasterizerState(D3D11API.DeviceCreateRasterizerState(ref desc));
+            return new RasterizerState(D3D11API.DeviceCreateRasterizerState(ref desc), desc);
         }
 
         public BlendState CreateBlendState(BlendDesc desc)

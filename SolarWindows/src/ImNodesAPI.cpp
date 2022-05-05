@@ -93,3 +93,8 @@ EDITOR_INTERFACE(bool) ImNodesIsEditorHovered()
 {
 	return ImNodes::IsEditorHovered();
 }
+
+EDITOR_INTERFACE(void) ImNodesSetNodeScreenSpacePos(int id, float x, float y)
+{
+	ImNodes::SetNodeScreenSpacePos(id, ImVec2(x, y));	
+}

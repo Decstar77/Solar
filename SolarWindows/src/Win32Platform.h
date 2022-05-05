@@ -10,7 +10,7 @@ struct Win32State
 
 	bool running;
 	bool active;
-	bool rawInput;
+	bool rawInput;	
 
 	int windowWidth;
 	int windowHeight;

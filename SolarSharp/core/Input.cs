@@ -10,6 +10,11 @@ namespace SolarSharp
 	[StructLayout(LayoutKind.Sequential)]
 	public struct FrameInput
 	{
+		public Vector2 mousePositionPixelCoords;
+		public Vector2 mouseNorm;
+		public Vector2 mouseDelta;
+
+		[MarshalAs(UnmanagedType.Bool)] public bool mouseLocked;
 		[MarshalAs(UnmanagedType.Bool)] public bool mb1;
 		[MarshalAs(UnmanagedType.Bool)] public bool mb2;
 		[MarshalAs(UnmanagedType.Bool)] public bool mb3;

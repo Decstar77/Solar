@@ -25,7 +25,7 @@ namespace SolarEditor
         private string name = "";
         private bool open = false;
         
-        public RenderGraph renderGraph = new RenderGraph("My Render Graph");
+        public RenderGraph renderGraph = new RenderGraph("My Render Graph", RenderSystem.device, RenderSystem.context);
 
         internal void UIDraw()
         {
@@ -43,20 +43,8 @@ namespace SolarEditor
                     ImGui.Text(node.Name);
                     ImNodes.EndNodeTitleBar();
 
-                    node.InputPins.ForEach(pin => {
-                        ImNodes.BeginInputAttribute(pin.Id, ImNodesPinShape.CircleFilled);
-                        ImGui.Text(pin.Name);
-                        ImNodes.EndInputAttribute();
+                    node.DrawUI();
 
-                    });
-
-                    node.OutputPins.ForEach(pin => {
-                        ImNodes.BeginOutputAttribute(pin.Id, ImNodesPinShape.CircleFilled);
-                        ImGui.Text(pin.Name);
-                        ImNodes.EndOutputAttribute();
-                    });
-
-                    ImGui.Text("stuff");
                     ImNodes.EndNode();
                 });
 
@@ -64,15 +52,12 @@ namespace SolarEditor
                 renderGraph.Nodes.ForEach(node => {
                     node.OutputPins.ForEach(pin => { 
                         if (pin.IsConnected()) {
-                            ImNodes.Link(linkId, pin.Id, pin.GetConnectedPin().Id);
+                            ImNodes.Link(linkId++, pin.Id, pin.GetConnectedPin().Id);
                         }
                     });
                 });
-                
-                if (Input.IsMouseButtonJustDown(MouseButton.MOUSE2) )
-                {
-                    Logger.Info("Hit");
-                }
+
+                bool isEditorHovered = ImNodes.IsEditorHovered();
 
                 ImNodes.EndNodeEditor();
 
@@ -80,7 +65,6 @@ namespace SolarEditor
                 int endedAtPin = -1;
                 int ignore = -1;
                 if (ImNodes.IsLinkCreated(ref startedAtPin, ref endedAtPin, ref ignore)) {
-
                     Pin startPin = renderGraph.FindPin(startedAtPin);
                     Pin endPin = renderGraph.FindPin(endedAtPin);
 
@@ -95,9 +79,59 @@ namespace SolarEditor
                     renderGraph.FindPin(killedPin)?.Disconnect();
                 }
 
+                if (Input.IsMouseButtonJustDown(MouseButton.MOUSE2) && isEditorHovered)
+                {
+                    ImGui.OpenPopup("Create Node");
+                }
+
+                if (ImGui.BeginPopup("Create Node"))
+                {
+                    if (ImGui.BeginMenu("Set"))
+                    {
+                        if (ImGui.MenuItem("Graphics Shader")) {
+                            renderGraph.Nodes.Add(new SetGraphicsShaderNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Depth")) {
+                            renderGraph.Nodes.Add(new SetDepthNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Topology")) {
+                            renderGraph.Nodes.Add(new SetTopologyNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Rasterizer")) {
+                            renderGraph.Nodes.Add(new SetRasterizerNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Viewport")) {
+                            renderGraph.Nodes.Add(new SetViewPortNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+
+                        if (ImGui.MenuItem("Blend")) {
+                        }
+
+                        ImGui.EndMenu();
+                    }
+
+                    if (ImGui.BeginMenu("Get"))
+                    {
+
+                        ImGui.EndMenu();
+                    }
+
+                    if (ImGui.BeginMenu("Command"))
+                    {
+
+                        ImGui.EndMenu();
+                    }
+
+                    ImGui.EndPopup();
+                }
             }
             ImGui.End();
-            
+
 
             if (open)
             {

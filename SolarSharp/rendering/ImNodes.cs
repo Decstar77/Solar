@@ -83,10 +83,12 @@ namespace SolarSharp.Rendering
         
         public static bool IsLinkDropped(ref int startedAtPinId, bool includingDetachedLinks) => ImNodesAPI.ImNodesIsLinkDropped(ref startedAtPinId, includingDetachedLinks);
 
-        public static void PushColorStyle(int item, uint col) => ImNodesAPI.ImNodesPushColorStyle(item, col);
+        public static void PushColorStyle(ImNodesCol item, uint col) => ImNodesAPI.ImNodesPushColorStyle((int)item, col);
 
 		public static void PopColorStyle() => ImNodesAPI.ImNodesPopColorStyle();
 
         public static bool IsEditorHovered() => ImNodesAPI.ImNodesIsEditorHovered();
+
+        public static bool SetNodeScreenSpacePos(int id, float x, float y) => ImNodesAPI.ImNodesSetNodeScreenSpacePos((int)id, x, y);
     }
 }
