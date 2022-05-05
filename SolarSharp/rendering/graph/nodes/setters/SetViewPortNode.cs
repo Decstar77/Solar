@@ -11,7 +11,7 @@ namespace SolarSharp.Rendering.Graph
         private IntPin width = null;
         private IntPin height = null;
 
-        public SetViewPortNode() : base("Set ViewPort")
+        public SetViewPortNode() : base("Set ViewPort State")
         {
             AddFlowPins();
             width = new IntPin("Width", this, PinInputType.INPUT);

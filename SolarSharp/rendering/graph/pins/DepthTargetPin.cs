@@ -6,22 +6,23 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class GraphicsShaderPin : ValuePin<GraphicsShader>
+    public class DepthTargetPin : ValuePin<DepthStencilView>
     {
-        public GraphicsShaderPin(string name, Node node, PinInputType pinInputType) : base(name, node, pinInputType)
+        public DepthTargetPin(string name, Node node, PinInputType pinType) : base(name, node, pinType)
         {
         }
 
         public override bool CanConnect(Pin pin)
         {
-            return pin is GraphicsShaderPin;
+            return pin is DepthTargetPin;
         }
 
         public override void DrawUI()
         {
-            ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit( Util.ColourVec(185, 43, 204, 245) ));
+            ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit(0.16f, 0.85f, 0.43f, 0.95f));
             DrawBasicPins();
             ImNodes.PopColorStyle();
         }
     }
+
 }

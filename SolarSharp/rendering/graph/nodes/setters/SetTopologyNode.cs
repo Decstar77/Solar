@@ -10,7 +10,7 @@ namespace SolarSharp.Rendering.Graph
     {
         private PrimitiveTopology topology = PrimitiveTopology.TRIANGLELIST;
 
-        public SetTopologyNode() : base("Set Topology")
+        public SetTopologyNode() : base("Set Topology State")
         {
             AddFlowPins();
         }

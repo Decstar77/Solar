@@ -759,14 +759,14 @@ namespace SolarSharp.Rendering
         {
         }
 
-        public void ClearRenderTargetView(RenderTargetView renderTargetView)
+        public void ClearRenderTargetView(RenderTargetView renderTargetView, Vector4 colour)
         {
-           D3D11API.ContextClearRenderTargetView(renderTargetView.Ptr, 0.2f, 0.2f, 0.2f, 1.0f);
+            D3D11API.ContextClearRenderTargetView(renderTargetView.Ptr, colour.x, colour.y, colour.z, colour.w);
         }
 
-        public void ClearDepthStencilView(DepthStencilView depthStencilView, uint clearFlags, float depth, byte stencil)
+        public void ClearDepthStencilView(DepthStencilView depthStencilView, ClearFlag clearFlags, float depth, byte stencil)
         {
-            D3D11API.ContextClearDepthStencilView(depthStencilView.Ptr, clearFlags, depth, stencil);
+            D3D11API.ContextClearDepthStencilView(depthStencilView.Ptr, (uint)clearFlags, depth, stencil);
         }
 
         public void SetRenderTargets(DepthStencilView depthStencilView, params RenderTargetView[] renderTargetViews)

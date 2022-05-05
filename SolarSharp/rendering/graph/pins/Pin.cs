@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
+    public enum PinInputType
+    {
+        INPUT = 0x1,
+        OUTPUT = 0x2,
+    }
+
     public abstract class Pin
     {
         private static int IdCounter = 10000;
@@ -35,6 +41,22 @@ namespace SolarSharp.Rendering.Graph
 
         public abstract void DrawUI();
         public abstract bool CanConnect(Pin pin);
+
+        protected void DrawBasicPins()
+        {
+            if (PinType == PinInputType.INPUT)
+            {
+                ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
+                ImGui.Text(Name + " ");
+                ImNodes.EndInputAttribute();
+            }
+            else if (PinType == PinInputType.OUTPUT)
+            {
+                ImNodes.BeginOutputAttribute(Id, ImNodesPinShape.CircleFilled);
+                ImGui.Text(Name + " ");
+                ImNodes.EndOutputAttribute();
+            }
+        }
 
         public void Connect(Pin pin)
         {

@@ -11,7 +11,7 @@ namespace SolarSharp.Rendering.Graph
         private RasterizerState rasterizerState = null;
         private RasterizerDesc createDesc = new RasterizerDesc();
 
-        public SetRasterizerNode() : base("Set Rasterizer")
+        public SetRasterizerNode() : base("Set Rasterizer State")
         {
             AddFlowPins();
         }

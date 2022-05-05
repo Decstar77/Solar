@@ -20,20 +20,7 @@ namespace SolarSharp.Rendering.Graph
         public override void DrawUI()
         {            
             ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit(0.1f, 0.85f, 0.13f, 0.95f));
-            
-            if (PinType == PinInputType.INPUT)
-            {
-                ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
-                ImGui.Text(Name + " ");
-                ImNodes.EndInputAttribute();
-            }
-            else if (PinType == PinInputType.OUTPUT)
-            {
-                ImNodes.BeginInputAttribute(Id, ImNodesPinShape.CircleFilled);
-                ImGui.Text(Name + " ");
-                ImNodes.EndInputAttribute();
-            }
-
+            DrawBasicPins();
             ImNodes.PopColorStyle();
 
             ImGui.SameLine();

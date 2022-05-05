@@ -6,22 +6,23 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class GraphicsShaderPin : ValuePin<GraphicsShader>
+    public class ColourTargetPin : ValuePin<RenderTargetView>
     {
-        public GraphicsShaderPin(string name, Node node, PinInputType pinInputType) : base(name, node, pinInputType)
+        public ColourTargetPin(string name, Node node, PinInputType pinType) : base(name, node, pinType)
         {
         }
 
         public override bool CanConnect(Pin pin)
         {
-            return pin is GraphicsShaderPin;
+           return pin is ColourTargetPin;
         }
 
         public override void DrawUI()
         {
-            ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit( Util.ColourVec(185, 43, 204, 245) ));
+            ImNodes.PushColorStyle(ImNodesCol.Pin, Util.ColourUnit(0.66f, 0.15f, 0.33f, 0.95f));
             DrawBasicPins();
             ImNodes.PopColorStyle();
         }
     }
+
 }

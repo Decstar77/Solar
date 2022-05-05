@@ -12,7 +12,7 @@ namespace SolarSharp.Rendering.Graph
         private DepthStencilState depthStencilState = null;
         private DepthStencilDesc createDesc = new DepthStencilDesc();
 
-        public SetDepthNode() : base("Set Depth")
+        public SetDepthNode() : base("Set Depth State")
         {
             AddFlowPins();
         }

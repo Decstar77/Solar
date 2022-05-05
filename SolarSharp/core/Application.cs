@@ -106,13 +106,14 @@ namespace SolarSharp
 
             RenderSystem.device = deviceContext.Device;
             RenderSystem.context = deviceContext.Context;
+            RenderSystem.swapchain = swapchain;
 
             config.OnInitializeCallback.Invoke();
 
             while (window.Running(ref input)) {
-                deviceContext.Context.ClearRenderTargetView(swapchain.renderTargetView);
-                deviceContext.Context.ClearDepthStencilView(swapchain.depthStencilView, (uint)ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0);
-                deviceContext.Context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
+                deviceContext.Context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); // @DONE
+                deviceContext.Context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0); // @DONE
+                deviceContext.Context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView); // @DONE
                 deviceContext.Context.SetViewPortState(window.SurfaceWidth, window.SurfaceHeight); // @DONE
                 deviceContext.Context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST); // @DONE
                 deviceContext.Context.SetDepthStencilState(depthStencilState); // @DONE

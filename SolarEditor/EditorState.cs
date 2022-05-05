@@ -108,6 +108,10 @@ namespace SolarEditor
                             renderGraph.Nodes.Add(new SetViewPortNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
+                        if (ImGui.MenuItem("Render Targets"))
+                        {
+                            renderGraph.Nodes.Add(new SetRenderTargetsNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
 
                         if (ImGui.MenuItem("Blend")) {
                         }
@@ -117,12 +121,31 @@ namespace SolarEditor
 
                     if (ImGui.BeginMenu("Get"))
                     {
+                        if (ImGui.MenuItem("Swap chain")) {
+                            renderGraph.Nodes.Add(new GetSwapChainNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Graphics Shader")) {
+                            renderGraph.Nodes.Add(new GetGraphicsShaderNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
 
                         ImGui.EndMenu();
                     }
 
                     if (ImGui.BeginMenu("Command"))
                     {
+                        if (ImGui.MenuItem("Clear Colour Target")) {
+                            renderGraph.Nodes.Add(new CMDClearColourTargetNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Clear Depth Target")) {
+                            renderGraph.Nodes.Add(new CMDClearDepthTargetNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
+
+                        if (ImGui.MenuItem("Draw Scene"))
+                        {
+                            renderGraph.Nodes.Add(new CMDDrawSceneNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                        }
 
                         ImGui.EndMenu();
                     }
