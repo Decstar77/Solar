@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public class GraphicsShaderPin : ValuePin<GraphicsShader>
+    public class GraphicsShaderPin : ValuePin<string>
     {
+        [RenderGraphSerializable]
+        public string ShaderName { get { return GetValue(); } set { SetValue(value); } }
+
+
         public GraphicsShaderPin() : base("INVALID", null, PinInputType.INPUT)
         {
         }

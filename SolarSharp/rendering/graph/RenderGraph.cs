@@ -18,7 +18,7 @@ namespace SolarSharp.Rendering.Graph
 
         private List<DepthStencilState> depthStencilStates;
         private List<RasterizerState> rasterizerStates;
-        private List<GraphicsShader> graphicsShaders;
+        public List<GraphicsShader> graphicsShaders;
 
         private Device device;
         private Context context;
@@ -58,7 +58,6 @@ namespace SolarSharp.Rendering.Graph
             }
         }
 
-
         public List<Pin> GetPins()
         {
             List<Pin> pins = new List<Pin>();
@@ -86,21 +85,35 @@ namespace SolarSharp.Rendering.Graph
             Console.WriteLine();
         }
 
-        public void Save()
+        class RenderGraphSaveData
         {
-            string json = JsonSerializer.Serialize<List<SerializationNode>>(Nodes.Select(x => { return x.CreateSerNode(); }).ToList());
-            
-            File.WriteAllText("render.json", json);
+            public string GraphName { get; set; }
+            public int RootId { get; set; }
+            public List<SerNode> Nodes { get; set; }
+        }
 
-            Print();
+        public void Save(string path)
+        {
+            Logger.Info("Saving: " + path);
 
-            var nodes = JsonSerializer.Deserialize<List<SerializationNode>>(json);
-            Nodes = nodes.Select(x => Node.CreateFromSerNode(x)).ToList();
+            RenderGraphSaveData renderGraphSaveData = new RenderGraphSaveData();
+            renderGraphSaveData.Nodes = Nodes.Select(x => { return x.CreateSerNode(); }).ToList();
+            renderGraphSaveData.RootId = root.Id;
+            renderGraphSaveData.GraphName = "A name";
+
+            string json = JsonSerializer.Serialize<RenderGraphSaveData>(renderGraphSaveData);            
+            File.WriteAllText(path, json);
+        }
+
+        public void Load(string path)
+        {
+            string json = File.ReadAllText(path);
+            RenderGraphSaveData renderGraphSaveData = JsonSerializer.Deserialize<RenderGraphSaveData>(json);
+
+            Nodes = renderGraphSaveData.Nodes.Select(x => Node.CreateFromSerNode(x)).ToList();
             Nodes.ForEach(x => x.SerializeConnections(this));
 
-            Print();
-
-            int a = 2;
+            root = Nodes.Find(x => renderGraphSaveData.RootId == x.Id);
         }
 
         public DepthStencilState CreateOrGetDepthStencilState(DepthStencilDesc desc)
@@ -176,8 +189,8 @@ namespace SolarSharp.Rendering.Graph
             SetViewPortNode setViewPortNode = new SetViewPortNode();
             SetRenderTargetsNode setRenderTargetsNode = new SetRenderTargetsNode();
 
-            setViewPortNode.Width.SetValue(1900);
-            setViewPortNode.Height.SetValue(1000);
+            setViewPortNode.WidthPin.SetValue(1900);
+            setViewPortNode.HeightPin.SetValue(1000);
 
             getSwapChainNode1.SetPositionScreenSpace(new Vector2(1200, 450));
             getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(200, 450));
@@ -190,7 +203,7 @@ namespace SolarSharp.Rendering.Graph
             setGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 150)).outFlowPin.Connect(setRenderTargetsNode.inFlowPin);
             getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 450));
             getGraphicsShaderNode.ShaderPin.Connect(setGraphicsShaderNode.ShaderPin);
-            getGraphicsShaderNode.shaderAsset = AssetSystem.shaderAssets[0];
+            getGraphicsShaderNode.ShaderName = AssetSystem.shaderAssets[0].Name;
 
             getSwapChainNode2.SetPositionScreenSpace(new Vector2(870, 0));
             getSwapChainNode2.ColourPin.Connect(setRenderTargetsNode.RenderTargetPin);

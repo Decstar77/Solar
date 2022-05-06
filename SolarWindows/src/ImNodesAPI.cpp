@@ -98,3 +98,15 @@ EDITOR_INTERFACE(void) ImNodesSetNodeScreenSpacePos(int id, float x, float y)
 {
 	ImNodes::SetNodeScreenSpacePos(id, ImVec2(x, y));	
 }
+
+EDITOR_INTERFACE(void) ImNodesSetNodeEditorSpacePos(int id, float x, float y)
+{
+	ImNodes::SetNodeEditorSpacePos(id, ImVec2(x, y));
+}
+
+EDITOR_INTERFACE(void) ImNodesGetNodeEditorSpacePos(int id, float* x, float* y)
+{
+	ImVec2 r =  ImNodes::GetNodeEditorSpacePos(id);
+	*x = r.x;
+	*y = r.y;
+}

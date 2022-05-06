@@ -29,7 +29,7 @@ namespace SolarSharp.Rendering.Graph
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            GraphicsShader graphicsShader = ShaderPin.GetValue();
+            GraphicsShader graphicsShader = graph.graphicsShaders.Find(x => x.Name == ShaderPin.GetValue());
 
             if (graphicsShader != null) {
                 if (graphicsShader.IsValid()) {

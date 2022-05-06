@@ -155,6 +155,13 @@ namespace SolarEditor
                 }
             }
             ImGui.End();
+
+
+            if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
+            {                
+                renderGraph.Save("render.json");
+            }
+
         }
     }
 }

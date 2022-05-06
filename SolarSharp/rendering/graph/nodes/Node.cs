@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public struct SerializationNode
+    public struct SerNode
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -19,7 +19,7 @@ namespace SolarSharp.Rendering.Graph
         public float PositionEditorSpaceY { get; set; }
     }
 
-    public class RenderGraphSerializableData : System.Attribute
+    public class RenderGraphSerializable : System.Attribute
     {    
     }
 
@@ -29,7 +29,7 @@ namespace SolarSharp.Rendering.Graph
         public int Id { get { return id; } }
         private int id = -1;
         public string Name { get; set; }
-        public Vector2 PositionEditorSpace { get; set; }
+        public Vector2 PositionEditorSpace { get { return ImNodes.GetNodeEditorSpacePos(Id); } set { ImNodes.SetNodeEditorSpacePos(id, value.x, value.y);  } }
         public List<Pin> OutputPins { get; set; }
         public List<Pin> InputPins { get; set; }
         public FlowPin inFlowPin { get; set; }
@@ -47,9 +47,9 @@ namespace SolarSharp.Rendering.Graph
         public abstract bool CreateResources(RenderGraph renderGraph);
         public abstract Node Run(RenderGraph graph, Context context);
 
-        public SerializationNode CreateSerNode()
+        public SerNode CreateSerNode()
         {
-            SerializationNode serNode = new SerializationNode();
+            SerNode serNode = new SerNode();
             serNode.Id = id;
             serNode.Name = Name;
             serNode.PositionEditorSpaceX = PositionEditorSpace.x;
@@ -59,7 +59,7 @@ namespace SolarSharp.Rendering.Graph
             serNode.ClassName = type.FullName;
             
             serNode.ClassData = type.GetProperties().
-                Where(x => Attribute.IsDefined(x, typeof(RenderGraphSerializableData))).
+                Where(x => Attribute.IsDefined(x, typeof(RenderGraphSerializable))).
                 ToDictionary(x => x.Name, x => x.GetValue(this, null));
 
             serNode.Pins = type.GetProperties().
@@ -69,7 +69,7 @@ namespace SolarSharp.Rendering.Graph
             return serNode;
         }
 
-        public static Node CreateFromSerNode(SerializationNode serNode) 
+        public static Node CreateFromSerNode(SerNode serNode) 
         {
             Type t = Type.GetType(serNode.ClassName);
             Node node = (Node)Activator.CreateInstance(t);
@@ -105,7 +105,7 @@ namespace SolarSharp.Rendering.Graph
         public void SerializeConnections(RenderGraph renderGraph)
         {
             OutputPins.ForEach(x => x.SerializeConnections(renderGraph));
-            InputPins.ForEach(x => x.SerializeConnections(renderGraph));
+            InputPins.ForEach(x => x.SerializeConnections(renderGraph));            
         }
 
         protected void AddFlowPins() {

@@ -66,6 +66,13 @@ namespace SolarSharp.EngineAPI
 		public static extern bool ImNodesIsEditorHovered();
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-		public static extern bool ImNodesSetNodeScreenSpacePos(int id, float x, float y);
+		public static extern void ImNodesSetNodeScreenSpacePos(int id, float x, float y);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImNodesSetNodeEditorSpacePos(int id, float x, float y);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImNodesGetNodeEditorSpacePos(int id, ref float x, ref float y);
+
 	}
 }

@@ -11,7 +11,7 @@ namespace SolarSharp.Rendering.Graph
     {
         private DepthStencilState depthStencilState = null;
 
-        [RenderGraphSerializableData]
+        [RenderGraphSerializable]
         public DepthStencilDesc CreateDesc { get; set; }
 
         public SetDepthStateNode() : base("Set Depth State")

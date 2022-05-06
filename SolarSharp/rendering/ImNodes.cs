@@ -89,6 +89,14 @@ namespace SolarSharp.Rendering
 
         public static bool IsEditorHovered() => ImNodesAPI.ImNodesIsEditorHovered();
 
-        public static bool SetNodeScreenSpacePos(int id, float x, float y) => ImNodesAPI.ImNodesSetNodeScreenSpacePos((int)id, x, y);
+        public static void SetNodeScreenSpacePos(int id, float x, float y) => ImNodesAPI.ImNodesSetNodeScreenSpacePos((int)id, x, y);
+
+        public static void SetNodeEditorSpacePos(int id, float x, float y) => ImNodesAPI.ImNodesSetNodeEditorSpacePos((int)id, x, y);
+
+        public static Vector2 GetNodeEditorSpacePos(int id) {
+            Vector2 v = new Vector2();
+            ImNodesAPI.ImNodesGetNodeEditorSpacePos(id, ref v.x, ref v.y);
+            return v;
+        }
     }
 }

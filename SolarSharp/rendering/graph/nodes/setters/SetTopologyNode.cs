@@ -8,7 +8,7 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetTopologyNode : Node
     {
-        [RenderGraphSerializableData]
+        [RenderGraphSerializable]
         public PrimitiveTopology Topology { get; set; }
         
 
