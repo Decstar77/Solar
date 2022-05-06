@@ -8,6 +8,10 @@ namespace SolarSharp.Rendering.Graph
 {
     public class IntPin : ValuePin<int>
     {
+        public IntPin() : base("INVALID", null, PinInputType.INPUT)
+        {
+        }
+
         public IntPin(string name, Node node, PinInputType inputType) : base(name, node, inputType)
         {
         }

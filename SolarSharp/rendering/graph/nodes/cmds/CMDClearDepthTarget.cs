@@ -8,12 +8,12 @@ namespace SolarSharp.Rendering.Graph
 {
     public class CMDClearDepthTargetNode : Node
     {
-        public DepthTargetPin depthTargetPin = null;
+        public DepthTargetPin DepthTargetPin { get; set; } 
 
         public CMDClearDepthTargetNode() : base("Clear Depth Target")
         {
             AddFlowPins();
-            depthTargetPin = new DepthTargetPin("Depth target", this, PinInputType.INPUT);
+            DepthTargetPin = new DepthTargetPin("Depth target", this, PinInputType.INPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -24,15 +24,15 @@ namespace SolarSharp.Rendering.Graph
         public override void DrawUI()
         {
             DrawFlowPins();
-            depthTargetPin.DrawUI();
+            DepthTargetPin.DrawUI();
         }
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            DepthStencilView depthStencilView = depthTargetPin.GetValue();
+            DepthStencilView depthStencilView = DepthTargetPin.GetValue();
 
             if (depthStencilView != null) {
-                context.ClearDepthStencilView(depthTargetPin.GetValue(), ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0);
+                context.ClearDepthStencilView(DepthTargetPin.GetValue(), ClearFlag.D3D11_CLEAR_DEPTH, 0.0f, 0);
                 return outFlowPin?.GetConnectedPin()?.Node;
             }
 

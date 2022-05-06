@@ -3,47 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public struct SerNode
+    public struct SerializationNode
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<int> OuputPinIds { get; set; }
-        public List<int> InputPinIds { get; set; }
-        public int InFlowPin { get; set; }
-        public int OutFlowPin { get; set; }
-        public object Data { get; set; }
-
-        public SerNode()
-        {
-            Id = -1;
-            Name = string.Empty;
-            OuputPinIds = new List<int>();
-            InputPinIds = new List<int>();
-            OutFlowPin = 0;
-            InFlowPin = 0;
-            Data = null;
-        }
+        public IDictionary<string, object> Pins { get; set; }
+        public string ClassName { get; set; }
+        public IDictionary<string, object> ClassData { get; set; }
+        public float PositionEditorSpaceX { get; set; }
+        public float PositionEditorSpaceY { get; set; }
     }
 
-
-
+    public class RenderGraphSerializableData : System.Attribute
+    {    
+    }
 
     public abstract class Node
     {
-        private static int IdCounter = 0;
+        public static int IdCounter = 0;
         public int Id { get { return id; } }
         private int id = -1;
-
+        public string Name { get; set; }
+        public Vector2 PositionEditorSpace { get; set; }
         public List<Pin> OutputPins { get; set; }
         public List<Pin> InputPins { get; set; }
-
-        public string Name { get; set; }
-        public FlowPin inFlowPin = null;
-        public FlowPin outFlowPin = null;
+        public FlowPin inFlowPin { get; set; }
+        public FlowPin outFlowPin { get; set; }
 
         public Node(string name)
         {
@@ -53,23 +43,70 @@ namespace SolarSharp.Rendering.Graph
             InputPins = new List<Pin>();
         }
 
-        public SerNode CreateSerNode()
+        public abstract void DrawUI();
+        public abstract bool CreateResources(RenderGraph renderGraph);
+        public abstract Node Run(RenderGraph graph, Context context);
+
+        public SerializationNode CreateSerNode()
         {
-            SerNode serNode = new SerNode();
+            SerializationNode serNode = new SerializationNode();
             serNode.Id = id;
             serNode.Name = Name;
-            serNode.InFlowPin = inFlowPin == null ? -1 : inFlowPin.Id;
-            serNode.OutFlowPin = outFlowPin == null ? -1 : outFlowPin.Id;
-            serNode.OuputPinIds.AddRange(OutputPins.Select(x => x.Id));
-            serNode.InputPinIds.AddRange(InputPins.Select(x => x.Id));
-            serNode.Data = new DepthStencilDesc();
+            serNode.PositionEditorSpaceX = PositionEditorSpace.x;
+            serNode.PositionEditorSpaceY = PositionEditorSpace.y;
+
+            Type type = GetType();
+            serNode.ClassName = type.FullName;
+            
+            serNode.ClassData = type.GetProperties().
+                Where(x => Attribute.IsDefined(x, typeof(RenderGraphSerializableData))).
+                ToDictionary(x => x.Name, x => x.GetValue(this, null));
+
+            serNode.Pins = type.GetProperties().
+                Where(x => x.PropertyType.IsAssignableTo(typeof(Pin))).
+                ToDictionary(x => x.Name, x => x.GetValue(this, null));
 
             return serNode;
         }
 
-        public abstract void DrawUI();
-        public abstract bool CreateResources(RenderGraph renderGraph);
-        public abstract Node Run(RenderGraph graph, Context context);
+        public static Node CreateFromSerNode(SerializationNode serNode) 
+        {
+            Type t = Type.GetType(serNode.ClassName);
+            Node node = (Node)Activator.CreateInstance(t);
+
+            node.id = serNode.Id;
+            node.Name = serNode.Name;
+            node.PositionEditorSpace = new Vector2(serNode.PositionEditorSpaceX, serNode.PositionEditorSpaceY);
+
+            node.OutputPins.Clear();
+            node.InputPins.Clear();
+
+            foreach (var v in serNode.Pins) {
+                PropertyInfo f = t.GetProperty(v.Key);
+                if (v.Value != null) {
+                    Pin pin = (Pin)JsonSerializer.Deserialize((JsonElement)v.Value, f.PropertyType);
+                    pin.Node = node;
+                    f.SetValue(node, pin);
+
+                    if (pin.PinType == PinInputType.INPUT) node.InputPins.Add(pin);
+                    if (pin.PinType == PinInputType.OUTPUT) node.OutputPins.Add(pin);
+                }
+            }
+
+            foreach (var v in serNode.ClassData) {
+                PropertyInfo f = t.GetProperty(v.Key);
+                object a = JsonSerializer.Deserialize((JsonElement)v.Value, f.PropertyType);
+                f.SetValue(node, a);
+            }           
+
+            return node;
+        }
+
+        public void SerializeConnections(RenderGraph renderGraph)
+        {
+            OutputPins.ForEach(x => x.SerializeConnections(renderGraph));
+            InputPins.ForEach(x => x.SerializeConnections(renderGraph));
+        }
 
         protected void AddFlowPins() {
             inFlowPin = new FlowPin("In", this, PinInputType.INPUT);
@@ -91,7 +128,6 @@ namespace SolarSharp.Rendering.Graph
             ImNodes.SetNodeScreenSpacePos(id, pos.x, pos.y);
             return this;
         }
-
         protected T DrawStruct<T>(object obj)
         {
             FieldInfo[] fields = obj.GetType().GetFields();

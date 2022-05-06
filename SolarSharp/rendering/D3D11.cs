@@ -30,6 +30,7 @@ namespace SolarSharp.Rendering
 
     public enum DepthComparisonFunc
     {
+        INVALID = 0,
         NEVER = 1,
         LESS = 2,
         EQUAL = 3,
@@ -43,33 +44,30 @@ namespace SolarSharp.Rendering
     [StructLayout(LayoutKind.Sequential)]
     public struct DepthStencilDesc
     {
-        public bool DepthTest { get { return depthTest; } set { depthTest = value; } }
         [MarshalAs(UnmanagedType.Bool)] public bool depthTest;
-        [MarshalAs(UnmanagedType.Bool)] public bool DepthWrite;
-        [MarshalAs(UnmanagedType.I4)] public DepthComparisonFunc DepthFunc;
-        [MarshalAs(UnmanagedType.Bool)] public bool StencilEnable;
-        [MarshalAs(UnmanagedType.I1)] public byte StencilReadMask;
-        [MarshalAs(UnmanagedType.I1)] public byte StencilWriteMask;
+        [MarshalAs(UnmanagedType.Bool)] public bool depthWrite;
+        [MarshalAs(UnmanagedType.I4)] public DepthComparisonFunc depthFunc;
+        [MarshalAs(UnmanagedType.Bool)] public bool stencilEnable;
+        [MarshalAs(UnmanagedType.I1)] public byte stencilReadMask;
+        [MarshalAs(UnmanagedType.I1)] public byte stencilWriteMask;
         //D3D11_DEPTH_STENCILOP_DESC FrontFace;
         //D3D11_DEPTH_STENCILOP_DESC BackFace;
-        public DepthStencilDesc()
-        {
-            depthTest = false;
-            DepthWrite = false;
-            DepthFunc = DepthComparisonFunc.NEVER;
-            StencilEnable = false;
-            StencilReadMask = 0;
-            StencilWriteMask = 0;
-        }
+
+        public bool DepthTest { get { return depthTest; } set { depthTest = value; } }
+        public bool DepthWrite { get { return depthWrite; } set { depthWrite = value; } }        
+        public DepthComparisonFunc DepthFunc { get { return depthFunc; } set { depthFunc = value; } }
+        public bool StencilEnable { get { return stencilEnable; } set { stencilEnable = value; } }
+        public byte StencilReadMask { get { return stencilReadMask; } set { stencilReadMask = value; } }        
+        public byte StencilWriteMask { get { return stencilWriteMask; } set { stencilWriteMask = value; } }
 
         public static bool operator ==(DepthStencilDesc a, DepthStencilDesc b)
         {
             return a.DepthTest == b.DepthTest &&
-                a.DepthWrite == b.DepthWrite &&
-                a.DepthFunc == b.DepthFunc &&
-                a.StencilEnable == b.StencilEnable &&
-                a.StencilReadMask == b.StencilReadMask &&
-                a.StencilWriteMask == b.StencilWriteMask;
+                a.depthWrite == b.depthWrite &&
+                a.depthFunc == b.depthFunc &&
+                a.stencilEnable == b.stencilEnable &&
+                a.stencilReadMask == b.stencilReadMask &&
+                a.stencilWriteMask == b.stencilWriteMask;
         }
 
         public static bool operator !=(DepthStencilDesc a, DepthStencilDesc b)
@@ -89,12 +87,14 @@ namespace SolarSharp.Rendering
 
     public enum RasterizerFillMode
     {
+        INVALID = 0,
         WIREFRAME = 2,
         SOLID = 3
     }
 
     public enum RasterizerCullMode
     {
+        INVALID = 0,
         NONE = 1,
         FRONT = 2,
         BACK = 3
@@ -152,6 +152,7 @@ namespace SolarSharp.Rendering
 
     public enum BlendFac
     {
+        INVALID = 0,
         ZERO = 1,
         ONE = 2,
         SRC_COLOR = 3,
@@ -173,6 +174,7 @@ namespace SolarSharp.Rendering
 
     public enum BlendOp
     {
+        INVALID = 0,
         ADD = 1,
         SUBTRACT = 2,
         REV_SUBTRACT = 3,
@@ -269,6 +271,7 @@ namespace SolarSharp.Rendering
 
     public enum TextureAddressMode
     {
+        INVALID = 0,
         WRAP = 1,
         MIRROR = 2,
         CLAMP = 3,
@@ -330,6 +333,7 @@ namespace SolarSharp.Rendering
     [Flags]
     public enum BufferBindFlag
     {
+        INVALID = 0,
         VERTEX_BUFFER = 0x1,
         INDEX_BUFFER = 0x2,
         CONSTANT_BUFFER = 0x4,
@@ -345,6 +349,7 @@ namespace SolarSharp.Rendering
     [Flags]
     public enum CPUAccessFlag
     {
+        INVALID = 0,
         D3D11_CPU_ACCESS_WRITE = 0x10000,
         D3D11_CPU_ACCESS_READ = 0x20000
     }
@@ -352,6 +357,7 @@ namespace SolarSharp.Rendering
     [Flags]
     public enum ResourceMiscFlag
     {
+        INVALID = 0,
         GENERATE_MIPS = 0x1,
         SHARED = 0x2,
         TEXTURECUBE = 0x4,
@@ -687,6 +693,7 @@ namespace SolarSharp.Rendering
     [Flags]
     public enum ClearFlag : uint
     {
+        INVALID = 0,
         D3D11_CLEAR_DEPTH = 0x1,
         D3D11_CLEAR_STENCIL = 0x2
     }

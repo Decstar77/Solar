@@ -8,27 +8,27 @@ namespace SolarSharp.Rendering.Graph
 {
     public class GetSwapChainNode : Node
     {
-        public ColourTargetPin colour = null;
-        public DepthTargetPin depth = null;
+        public ColourTargetPin ColourPin { get; set; }
+        public DepthTargetPin DepthPin { get; set; }
 
         public GetSwapChainNode() : base("Swap chain")
         {
-            colour = new ColourTargetPin("Colour", this, PinInputType.OUTPUT);
-            depth = new DepthTargetPin("Depth", this, PinInputType.OUTPUT);
+            ColourPin = new ColourTargetPin("Colour", this, PinInputType.OUTPUT);
+            DepthPin = new DepthTargetPin("Depth", this, PinInputType.OUTPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
         {
-            colour.SetValue(RenderSystem.swapchain.renderTargetView);
-            depth.SetValue(RenderSystem.swapchain.depthStencilView);
+            ColourPin.SetValue(RenderSystem.swapchain.renderTargetView);
+            DepthPin.SetValue(RenderSystem.swapchain.depthStencilView);
 
             return true;
         }
 
         public override void DrawUI()
         {
-            depth.DrawUI();
-            colour.DrawUI();
+            DepthPin.DrawUI();
+            ColourPin.DrawUI();
         }
 
         public override Node Run(RenderGraph graph, Context context)

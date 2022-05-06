@@ -8,11 +8,14 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetTopologyNode : Node
     {
-        private PrimitiveTopology topology = PrimitiveTopology.TRIANGLELIST;
+        [RenderGraphSerializableData]
+        public PrimitiveTopology Topology { get; set; }
+        
 
         public SetTopologyNode() : base("Set Topology State")
         {
             AddFlowPins();
+            Topology = PrimitiveTopology.TRIANGLELIST;
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -27,7 +30,7 @@ namespace SolarSharp.Rendering.Graph
             Type type = typeof(PrimitiveTopology);
 
             string[] names = type.GetEnumNames();
-            string curName = type.GetEnumName(topology);
+            string curName = type.GetEnumName(Topology);
             Array values = type.GetEnumValues();
 
             int index = Array.IndexOf(names, curName);
@@ -36,12 +39,12 @@ namespace SolarSharp.Rendering.Graph
             ImGui.Combo(type.Name, ref index, names);
             ImGui.PopItemWidth();
 
-            topology = (PrimitiveTopology)Enum.ToObject(type, values.GetValue(index));
+            Topology = (PrimitiveTopology)Enum.ToObject(type, values.GetValue(index));
         }
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            context.SetPrimitiveTopology(topology);
+            context.SetPrimitiveTopology(Topology);
             return outFlowPin?.GetConnectedPin()?.Node;
         }
     }

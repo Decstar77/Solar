@@ -15,10 +15,12 @@ namespace SolarEditor
         {
             RenderGraph renderGraph = Application.renderGraph;
 
+            
+
             if (ImGui.Begin(renderGraph.Name))
             {
                 ImNodes.BeginNodeEditor();
-
+                
                 renderGraph.Nodes.ForEach(node =>
                 {
                     ImNodes.BeginNode(node.Id);
@@ -32,11 +34,14 @@ namespace SolarEditor
                 });
 
                 int linkId = 0;
-                renderGraph.Nodes.ForEach(node => {
-                    node.OutputPins.ForEach(pin => {
+                renderGraph.Nodes.ForEach(node =>
+                {
+                    node.OutputPins.ForEach(pin =>
+                    {
                         if (pin.IsConnected() && pin.PinType == PinInputType.OUTPUT)
                         {
-                            ImNodes.Link(linkId++, pin.Id, pin.GetConnectedPin().Id);
+                            int c = pin.GetConnectedPin().Id;
+                            ImNodes.Link(linkId++, pin.Id, c);
                         }
                     });
                 });
@@ -52,7 +57,7 @@ namespace SolarEditor
                 {
                     Pin startPin = renderGraph.FindPin(startedAtPin);
                     Pin endPin = renderGraph.FindPin(endedAtPin);
-
+                    
                     if (startPin != null && endPin != null)
                     {
                         startPin.Connect(endPin);

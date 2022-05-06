@@ -10,22 +10,25 @@ namespace SolarSharp.Rendering.Graph
     public class SetDepthStateNode : Node
     {
         private DepthStencilState depthStencilState = null;
-        private DepthStencilDesc createDesc = new DepthStencilDesc();
+
+        [RenderGraphSerializableData]
+        public DepthStencilDesc CreateDesc { get; set; }
 
         public SetDepthStateNode() : base("Set Depth State")
         {
             AddFlowPins();
+            CreateDesc = new DepthStencilDesc();
         }
 
         public override void DrawUI()
         {
             DrawFlowPins();
-            createDesc = DrawStruct<DepthStencilDesc>(createDesc);
+            CreateDesc = DrawStruct<DepthStencilDesc>(CreateDesc);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
         {
-            depthStencilState = renderGraph.CreateOrGetDepthStencilState(createDesc);
+            depthStencilState = renderGraph.CreateOrGetDepthStencilState(CreateDesc);
             return depthStencilState != null;
         }
 

@@ -19,6 +19,7 @@ namespace SolarEditor
         {
             AddWindow(new AssetSystemWindow());
             AddWindow(new ShaderEditorWindow(AssetSystem.ShaderAssets[0]));
+            AddWindow(new RenderGraphWindow());
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; });
         }
 

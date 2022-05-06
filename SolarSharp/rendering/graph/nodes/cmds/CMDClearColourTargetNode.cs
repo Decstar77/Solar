@@ -8,12 +8,12 @@ namespace SolarSharp.Rendering.Graph
 {
     public class CMDClearColourTargetNode : Node
     {
-        public ColourTargetPin colourTargetPin = null;
+        public ColourTargetPin ColourTargetPin { get; set; }
 
         public CMDClearColourTargetNode() : base("Clear Colour Target")
         {
             AddFlowPins();
-            colourTargetPin = new ColourTargetPin("Colour target", this, PinInputType.INPUT);
+            ColourTargetPin = new ColourTargetPin("Colour target", this, PinInputType.INPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -24,12 +24,12 @@ namespace SolarSharp.Rendering.Graph
         public override void DrawUI()
         {
             DrawFlowPins();
-            colourTargetPin.DrawUI();
+            ColourTargetPin.DrawUI();
         }
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            RenderTargetView renderTargetView = colourTargetPin.GetValue();
+            RenderTargetView renderTargetView = ColourTargetPin.GetValue();
             if (renderTargetView != null) {
                 context.ClearRenderTargetView(renderTargetView, new Vector4(0.5f, 0.1f, 0.1f, 1.0f));
                 return outFlowPin?.GetConnectedPin()?.Node;

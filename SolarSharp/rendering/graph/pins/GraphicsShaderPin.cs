@@ -8,6 +8,10 @@ namespace SolarSharp.Rendering.Graph
 {
     public class GraphicsShaderPin : ValuePin<GraphicsShader>
     {
+        public GraphicsShaderPin() : base("INVALID", null, PinInputType.INPUT)
+        {
+        }
+
         public GraphicsShaderPin(string name, Node node, PinInputType pinInputType) : base(name, node, pinInputType)
         {
         }

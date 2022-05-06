@@ -9,23 +9,26 @@ namespace SolarSharp.Rendering.Graph
     public class SetRasterizerStateNode : Node
     {
         private RasterizerState rasterizerState = null;
-        private RasterizerDesc createDesc = new RasterizerDesc();
+
+        
+        public RasterizerDesc CreateDesc { get; set; }
 
         public SetRasterizerStateNode() : base("Set Rasterizer State")
         {
             AddFlowPins();
+            CreateDesc = new RasterizerDesc();
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
         {
-            rasterizerState = renderGraph.CreateOrGetRasterizerState(createDesc);
+            rasterizerState = renderGraph.CreateOrGetRasterizerState(CreateDesc);
             return rasterizerState != null;
         }
 
         public override void DrawUI()
         {
            DrawFlowPins();
-           createDesc = DrawStruct<RasterizerDesc>(createDesc);
+           CreateDesc = DrawStruct<RasterizerDesc>(CreateDesc);
         }
 
         public override Node Run(RenderGraph graph, Context context)

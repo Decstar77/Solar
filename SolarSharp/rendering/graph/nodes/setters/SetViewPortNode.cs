@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 namespace SolarSharp.Rendering.Graph
 {
     public class SetViewPortNode : Node
-    {
-        public IntPin width = null;
-        public IntPin height = null;
+    {       
+        public IntPin Width { get; set; }
+        public IntPin Height { get; set; }
 
         public SetViewPortNode() : base("Set ViewPort State")
         {
             AddFlowPins();
-            width = new IntPin("Width", this, PinInputType.INPUT);
-            height = new IntPin("Height", this, PinInputType.INPUT);
+            Width = new IntPin("Width", this, PinInputType.INPUT);
+            Height = new IntPin("Height", this, PinInputType.INPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -27,13 +27,13 @@ namespace SolarSharp.Rendering.Graph
         {
             DrawFlowPins();
 
-            width.DrawUI();
-            height.DrawUI();
+            Width.DrawUI();
+            Height.DrawUI();
         }
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            context.SetViewPortState(width.GetValue(), height.GetValue());
+            context.SetViewPortState(Width.GetValue(), Height.GetValue());
             return outFlowPin?.GetConnectedPin()?.Node;
         }
     }

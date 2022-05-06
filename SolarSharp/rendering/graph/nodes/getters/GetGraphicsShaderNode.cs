@@ -10,11 +10,11 @@ namespace SolarSharp.Rendering.Graph
     public class GetGraphicsShaderNode : Node
     {
         public ShaderAsset shaderAsset = null;
-        public GraphicsShaderPin shaderPin = null;
+        public GraphicsShaderPin ShaderPin { get; set; }
 
         public GetGraphicsShaderNode() : base("Get Graphics Shader")
         {
-            shaderPin = new GraphicsShaderPin("Shader", this, PinInputType.OUTPUT);
+            ShaderPin = new GraphicsShaderPin("Shader", this, PinInputType.OUTPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -22,7 +22,7 @@ namespace SolarSharp.Rendering.Graph
             if (shaderAsset != null) {
                 GraphicsShader graphicsShader = renderGraph.CreateOrGetGraphicsShader(shaderAsset);
                 if (graphicsShader.IsValid()) {
-                    shaderPin.SetValue(graphicsShader);
+                    ShaderPin.SetValue(graphicsShader);
                     return true;
                 }                
             }
@@ -36,7 +36,7 @@ namespace SolarSharp.Rendering.Graph
 
             int currentItem = shaderAsset == null ? -1 : Array.IndexOf(names, shaderAsset.Name);
             
-            shaderPin.DrawUI();
+            ShaderPin.DrawUI();
 
             ImGui.PushItemWidth(100);
             ImGui.Combo("Shader assets", ref currentItem, names);

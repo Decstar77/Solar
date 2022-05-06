@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
@@ -14,33 +16,29 @@ namespace SolarSharp.Rendering.Graph
 
     public abstract class Pin
     {
-        private static int IdCounter = 10000;
-
-        public int Id { get { return id; } }
-
-        private int id = -1;
-
-        public Node Node { get { return node; } }        
-        protected Node node = null;
-
-        public string Name { get; set; }
-        
+        public static int IdCounter = 10000;
+        public int Id { get; set; }
+        public string Name { get; set; }        
         public PinInputType PinType { get; set; }
+        public int SerializationConnectionId { get; set; }
 
-
+        public Node Node = null;
         protected Pin connectedTo = null;
 
         public Pin(string name, Node node, PinInputType pinType)
         {
-            id = IdCounter++;
+            Id = IdCounter++;
             Name = name;
-            this.node = node;
+            Node = node;
+            SerializationConnectionId = -1;
             PinType = pinType;
-
-            if (pinType == PinInputType.INPUT)
-                node.InputPins.Add(this);
-            if (pinType == PinInputType.OUTPUT)
-                node.OutputPins.Add(this);
+            if (node != null)
+            {
+                if (pinType == PinInputType.INPUT)
+                    node.InputPins.Add(this);
+                if (pinType == PinInputType.OUTPUT)
+                    node.OutputPins.Add(this);
+            }
         }
 
         public abstract void DrawUI();
@@ -69,6 +67,8 @@ namespace SolarSharp.Rendering.Graph
                 pin.Disconnect();
                 connectedTo = pin;
                 pin.connectedTo = this;
+
+                SerializationConnectionId = connectedTo.Id;
             }
         }
 
@@ -77,6 +77,13 @@ namespace SolarSharp.Rendering.Graph
             if (connectedTo != null)
                 connectedTo.connectedTo = null;
             connectedTo = null;
+            SerializationConnectionId = -1;
+        }
+
+        public void SerializeConnections(RenderGraph renderGraph)
+        {
+            if (SerializationConnectionId >= 0)
+                renderGraph.FindPin(SerializationConnectionId)?.Connect(this);
         }
 
         public bool IsConnected() => connectedTo != null;

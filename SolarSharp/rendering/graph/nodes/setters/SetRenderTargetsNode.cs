@@ -8,15 +8,15 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetRenderTargetsNode : Node
     {
-        public ColourTargetPin renderTargetPin = null;
-        public DepthTargetPin depthTargetPin = null;
+        public ColourTargetPin RenderTargetPin { get; set; }
+        public DepthTargetPin DepthTargetPin { get; set; }
 
         public SetRenderTargetsNode() : base("Set Render Targets")
         {
             AddFlowPins();
 
-            renderTargetPin = new ColourTargetPin("Colour 0", this, PinInputType.INPUT);
-            depthTargetPin = new DepthTargetPin("Depth", this, PinInputType.INPUT);
+            RenderTargetPin = new ColourTargetPin("Colour 0", this, PinInputType.INPUT);
+            DepthTargetPin = new DepthTargetPin("Depth", this, PinInputType.INPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -27,16 +27,16 @@ namespace SolarSharp.Rendering.Graph
         public override void DrawUI()
         {
             DrawFlowPins();
-            depthTargetPin.DrawUI();
-            renderTargetPin.DrawUI();
+            DepthTargetPin.DrawUI();
+            RenderTargetPin.DrawUI();
         }
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            DepthStencilView depthStencilView = depthTargetPin.GetValue();
-            RenderTargetView renderTargetView = renderTargetPin.GetValue();
+            DepthStencilView depthStencilView = DepthTargetPin.GetValue();
+            RenderTargetView renderTargetView = RenderTargetPin.GetValue();
             if (depthStencilView != null && renderTargetView != null) {
-                context.SetRenderTargets(depthTargetPin.GetValue(), renderTargetPin.GetValue());
+                context.SetRenderTargets(DepthTargetPin.GetValue(), RenderTargetPin.GetValue());
                 return outFlowPin?.GetConnectedPin()?.Node;
             }
             return null;

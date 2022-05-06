@@ -8,6 +8,10 @@ namespace SolarSharp.Rendering.Graph
 {
     public class DepthTargetPin : ValuePin<DepthStencilView>
     {
+        public DepthTargetPin() : base("INVALID", null, PinInputType.INPUT)
+        {
+        }
+
         public DepthTargetPin(string name, Node node, PinInputType pinType) : base(name, node, pinType)
         {
         }

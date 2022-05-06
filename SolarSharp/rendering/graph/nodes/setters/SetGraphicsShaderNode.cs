@@ -8,12 +8,12 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetGraphicsShaderNode : Node
     {
-        public GraphicsShaderPin shaderPin = null;
+        public GraphicsShaderPin ShaderPin { get; set; }
 
         public SetGraphicsShaderNode() : base("Set Graphics Shader")
         {
             AddFlowPins();
-            shaderPin = new GraphicsShaderPin("Shader", this, PinInputType.INPUT);
+            ShaderPin = new GraphicsShaderPin("Shader", this, PinInputType.INPUT);
         }
 
         public override bool CreateResources(RenderGraph renderGraph)
@@ -24,12 +24,12 @@ namespace SolarSharp.Rendering.Graph
         public override void DrawUI()
         {
             DrawFlowPins();
-            shaderPin.DrawUI();
+            ShaderPin.DrawUI();
         }
 
         public override Node Run(RenderGraph graph, Context context)
         {
-            GraphicsShader graphicsShader = shaderPin.GetValue();
+            GraphicsShader graphicsShader = ShaderPin.GetValue();
 
             if (graphicsShader != null) {
                 if (graphicsShader.IsValid()) {
