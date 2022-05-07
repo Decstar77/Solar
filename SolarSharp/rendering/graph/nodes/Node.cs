@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolarSharp.Assets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,17 +9,6 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering.Graph
 {
-    public struct SerNode
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public IDictionary<string, object> Pins { get; set; }
-        public string ClassName { get; set; }
-        public IDictionary<string, object> ClassData { get; set; }
-        public float PositionEditorSpaceX { get; set; }
-        public float PositionEditorSpaceY { get; set; }
-    }
-
     public class RenderGraphSerializable : System.Attribute
     {    
     }
@@ -44,8 +34,8 @@ namespace SolarSharp.Rendering.Graph
         }
 
         public abstract void DrawUI();
-        public abstract bool CreateResources(RenderGraph renderGraph);
-        public abstract Node Run(RenderGraph graph, Context context);
+        public abstract bool CreateResources(RenderGraph renderGraph, DXDevice device);
+        public abstract Node Run(RenderGraph graph, DXContext context);
 
         public SerNode CreateSerNode()
         {

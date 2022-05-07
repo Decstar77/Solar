@@ -10,3 +10,15 @@ F:\codes\Learning\SolarSharp\x64\Release\SolarSharp.dll
 F:\codes\Learning\SolarSharp\x64\Release\SolarSharp.pdb
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Release\SolarSharp.csproj.AssemblyReference.cache
 F:\codes\Learning\SolarSharp\SolarSharp\obj\x64\Release\refint\SolarSharp.dll
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\x64\Release\SolarSharp.deps.json
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\x64\Release\SolarSharp.dll
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\x64\Release\SolarSharp.pdb
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.csproj.AssemblyReference.cache
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.AssemblyInfoInputs.cache
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.AssemblyInfo.cs
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.csproj.CoreCompileInputs.cache
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.dll
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\refint\SolarSharp.dll
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\SolarSharp.pdb
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarSharp\obj\x64\Release\ref\SolarSharp.dll

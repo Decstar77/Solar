@@ -17,9 +17,9 @@ namespace SolarEditor
 
         internal EditorState()
         {
-            AddWindow(new AssetSystemWindow());
-            AddWindow(new ShaderEditorWindow(AssetSystem.ShaderAssets[0]));
-            AddWindow(new RenderGraphWindow());
+            //AddWindow(new AssetSystemWindow());
+            //AddWindow(new ShaderEditorWindow(AssetSystem.ShaderAssets[0]));
+            //AddWindow(new RenderGraphWindow());
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; });
         }
 
@@ -32,30 +32,30 @@ namespace SolarEditor
             ImGui.BeginFrame();
             DrawGlobalMenu();            
 
-            if (open)
-            {
-                open = false;
-                ImGui.OpenPopup("Create Shader");
-            }
+            //if (open)
+            //{
+            //    open = false;
+            //    ImGui.OpenPopup("Create Shader");
+            //}
 
-            if (ImGui.BeginPopupModal("Create Shader", ImGuiWindowFlags.NoResize))
-            {
-                ImGui.InputText("Name", ref name);
-                ImGui.InputText("Path", ref path);
+            //if (ImGui.BeginPopupModal("Create Shader", ImGuiWindowFlags.NoResize))
+            //{
+            //    ImGui.InputText("Name", ref name);
+            //    ImGui.InputText("Path", ref path);
 
-                if (ImGui.Button("Create", 80, 0))
-                {
-                    RenderSystem.graphicsShaders.Add(ShaderFactory.CreateGraphicsShader(name, path));
-                    ImGui.CloseCurrentPopup();
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("Cancel", 80, 0))
-                {
-                    ImGui.CloseCurrentPopup();
-                }
+            //    if (ImGui.Button("Create", 80, 0))
+            //    {
+            //        RenderSystem.graphicsShaders.Add(ShaderFactory.CreateGraphicsShader(name, path));
+            //        ImGui.CloseCurrentPopup();
+            //    }
+            //    ImGui.SameLine();
+            //    if (ImGui.Button("Cancel", 80, 0))
+            //    {
+            //        ImGui.CloseCurrentPopup();
+            //    }
 
-                ImGui.EndPopup();
-            }
+            //    ImGui.EndPopup();
+            //}
 
             ShowWindows();
             ImGui.EndFrame();
@@ -71,14 +71,14 @@ namespace SolarEditor
           
         }
 
-        internal bool AddWindow(Window window)
+        internal T AddWindow <T> (T window) where T : Window
         {
             foreach (Window w in windows)
                 if (w.GetType() == window.GetType())
-                    return false;
+                    return (T)w;
 
             newWindows.Add(window);
-            return true;
+            return window;
         }
 
         internal void ShowWindows()
@@ -99,7 +99,7 @@ namespace SolarEditor
                     {
                         if (ImGui.MenuItem("Graphics"))
                         {
-                            open = true;
+                            //open = true;
                         }
                         if (ImGui.MenuItem("Compute"))
                         {
@@ -131,6 +131,9 @@ namespace SolarEditor
                         AddWindow(new RenderGraphWindow());
                     }
 
+                    if (ImGui.MenuItem("Scene ")) {
+                        AddWindow(new GameSceneWindow());
+                    }                    
 
                     ImGui.EndMenu();
                 }

@@ -256,6 +256,7 @@ namespace ImGuiAPI
 	EDITOR_INTERFACE(bool) ImGuiComboStringArr(const char* label, int *currentItem, const char *items[], int count, int heightInItems)
 	{
 		bool result = ImGui::Combo(label, currentItem, items, count, heightInItems);
+
 		return result;
 	}
 

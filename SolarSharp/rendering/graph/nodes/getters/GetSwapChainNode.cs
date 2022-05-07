@@ -17,7 +17,7 @@ namespace SolarSharp.Rendering.Graph
             DepthPin = new DepthTargetPin("Depth", this, PinInputType.OUTPUT);
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             ColourPin.SetValue(RenderSystem.swapchain.renderTargetView);
             DepthPin.SetValue(RenderSystem.swapchain.depthStencilView);
@@ -31,7 +31,7 @@ namespace SolarSharp.Rendering.Graph
             ColourPin.DrawUI();
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             return null;
         }

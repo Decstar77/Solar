@@ -10,51 +10,83 @@ using System.Xml;
 
 namespace SolarSharp.Rendering.Graph
 {
-
     public class RenderGraph
     {
         public List<Node> Nodes { get; set; }
         public string Name { get; set; }
+        public string Path { get; set; }
+        public bool Valid { get { return created;  } }
 
-        private List<DepthStencilState> depthStencilStates;
-        private List<RasterizerState> rasterizerStates;
+        private bool created = false;
+
+        private List<DXDepthStencilState> depthStencilStates;
+        private List<DXRasterizerState> rasterizerStates;
         public List<GraphicsShader> graphicsShaders;
-
-        private Device device;
-        private Context context;
 
         private Node root = null;
 
-        public RenderGraph(string name, Device device, Context context)
+        public RenderGraph(string name)
         {
             Name = name;
-            this.device = device;
-            this.context = context;
 
             Nodes = new List<Node>();
-            rasterizerStates = new List<RasterizerState>();
-            depthStencilStates = new List<DepthStencilState>();
-            graphicsShaders = new List<GraphicsShader>();
-
-            CreateDummy();
+            rasterizerStates = new List<DXRasterizerState>();
+            depthStencilStates = new List<DXDepthStencilState>();
+            graphicsShaders = new List<GraphicsShader>();            
         }
 
-        public bool Create()
+        public RenderGraph(RenderGraphAsset renderGraphAsset)
         {
+            Nodes = new List<Node>();
+            rasterizerStates = new List<DXRasterizerState>();
+            depthStencilStates = new List<DXDepthStencilState>();
+            graphicsShaders = new List<GraphicsShader>();
+
+            Nodes = renderGraphAsset.Nodes.Select(x => Node.CreateFromSerNode(x)).ToList();
+            Nodes.ForEach(x => x.SerializeConnections(this));
+
+            root = Nodes.Find(x => renderGraphAsset.RootId == x.Id);
+            Name = renderGraphAsset.Name;
+            Path = renderGraphAsset.Path;
+        }
+
+        public void Shutdown()
+        {
+            Logger.Info("Shutting down render graph: " + Name);
+
+            rasterizerStates.ForEach(x => x.Release());
+            depthStencilStates.ForEach(x => x.Release());
+            graphicsShaders.ForEach(x => x.Release());
+
+            rasterizerStates.Clear();
+            depthStencilStates.Clear();
+            graphicsShaders.Clear();
+
+            created = false;
+        }
+
+        public bool Create(DXDevice device)
+        {
+            Logger.Info("Creating render graph: " + Name);
+
             foreach (Node node in Nodes) {
-                if (!node.CreateResources(this))
+                if (!node.CreateResources(this, device))
                     return false;
             }
 
+            created = true;
             return true;
         }
 
-        public void Run() 
+        public void Run(DXContext context) 
         {
-            Node node = root;
+            if (created) {
+                Node node = root;
 
-            while (node != null) {
-                node = node.Run(this, context);
+                while (node != null)
+                {
+                    node = node.Run(this, context);
+                }
             }
         }
 
@@ -85,40 +117,41 @@ namespace SolarSharp.Rendering.Graph
             Console.WriteLine();
         }
 
-        class RenderGraphSaveData
+        public void Save()
         {
-            public string GraphName { get; set; }
-            public int RootId { get; set; }
-            public List<SerNode> Nodes { get; set; }
+            Save(Path);
         }
 
         public void Save(string path)
         {
             Logger.Info("Saving: " + path);
 
-            RenderGraphSaveData renderGraphSaveData = new RenderGraphSaveData();
+            RenderGraphAsset renderGraphSaveData = new RenderGraphAsset();
             renderGraphSaveData.Nodes = Nodes.Select(x => { return x.CreateSerNode(); }).ToList();
             renderGraphSaveData.RootId = root.Id;
-            renderGraphSaveData.GraphName = "A name";
+            renderGraphSaveData.Name = "A name";
 
-            string json = JsonSerializer.Serialize<RenderGraphSaveData>(renderGraphSaveData);            
+            string json = JsonSerializer.Serialize<RenderGraphAsset>(renderGraphSaveData);            
             File.WriteAllText(path, json);
         }
 
         public void Load(string path)
         {
+            Path = path;
+
             string json = File.ReadAllText(path);
-            RenderGraphSaveData renderGraphSaveData = JsonSerializer.Deserialize<RenderGraphSaveData>(json);
+            RenderGraphAsset renderGraphSaveData = JsonSerializer.Deserialize<RenderGraphAsset>(json);
 
             Nodes = renderGraphSaveData.Nodes.Select(x => Node.CreateFromSerNode(x)).ToList();
             Nodes.ForEach(x => x.SerializeConnections(this));
 
             root = Nodes.Find(x => renderGraphSaveData.RootId == x.Id);
+            Name = renderGraphSaveData.Name;
         }
 
-        public DepthStencilState CreateOrGetDepthStencilState(DepthStencilDesc desc)
+        public DXDepthStencilState CreateOrGetDepthStencilState(DepthStencilDesc desc, DXDevice device)
         {
-            DepthStencilState state = depthStencilStates.Find(x => { return x.Description == desc; });
+            DXDepthStencilState state = depthStencilStates.Find(x => { return x.Description == desc; });
 
             if (state == null) {
                 Logger.Trace("Creating new depth stencil state");
@@ -129,9 +162,9 @@ namespace SolarSharp.Rendering.Graph
             return state;            
         }
 
-        public RasterizerState CreateOrGetRasterizerState(RasterizerDesc desc)
+        public DXRasterizerState CreateOrGetRasterizerState(RasterizerDesc desc, DXDevice device)
         {
-            RasterizerState state = rasterizerStates.Find(x => { return x.Description == desc; });
+            DXRasterizerState state = rasterizerStates.Find(x => { return x.Description == desc; });
 
             if (state == null) {
                 Logger.Trace("Creating new rasterizer state");
@@ -142,7 +175,8 @@ namespace SolarSharp.Rendering.Graph
             return state;
         }
 
-        public GraphicsShader CreateOrGetGraphicsShader(ShaderAsset shaderAsset) {
+        public GraphicsShader CreateOrGetGraphicsShader(ShaderAsset shaderAsset, DXDevice device) 
+        {
             GraphicsShader shader = graphicsShaders.Find(x => { return x.Name == shaderAsset.Name; });
 
             if (shader == null) {
@@ -203,7 +237,7 @@ namespace SolarSharp.Rendering.Graph
             setGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 150)).outFlowPin.Connect(setRenderTargetsNode.inFlowPin);
             getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 450));
             getGraphicsShaderNode.ShaderPin.Connect(setGraphicsShaderNode.ShaderPin);
-            getGraphicsShaderNode.ShaderName = AssetSystem.shaderAssets[0].Name;
+            getGraphicsShaderNode.ShaderName = AssetSystem.ShaderAssets[0].Name;
 
             getSwapChainNode2.SetPositionScreenSpace(new Vector2(870, 0));
             getSwapChainNode2.ColourPin.Connect(setRenderTargetsNode.RenderTargetPin);

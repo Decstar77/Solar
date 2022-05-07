@@ -16,7 +16,7 @@ namespace SolarSharp.Rendering.Graph
             ShaderPin = new GraphicsShaderPin("Shader", this, PinInputType.INPUT);
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             return true;
         }
@@ -27,7 +27,7 @@ namespace SolarSharp.Rendering.Graph
             ShaderPin.DrawUI();
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             GraphicsShader graphicsShader = graph.graphicsShaders.Find(x => x.Name == ShaderPin.GetValue());
 

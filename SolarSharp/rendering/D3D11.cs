@@ -76,10 +76,10 @@ namespace SolarSharp.Rendering
         }
     }
 
-    public class DepthStencilState : DirectXObject
+    public class DXDepthStencilState : DirectXObject
     {
         public DepthStencilDesc Description { get; }
-        public DepthStencilState(IntPtr ptr, DepthStencilDesc desc) : base(ptr)
+        public DXDepthStencilState(IntPtr ptr, DepthStencilDesc desc) : base(ptr)
         {
             Description = desc;
         }
@@ -140,10 +140,10 @@ namespace SolarSharp.Rendering
         }
     }
 
-    public class RasterizerState : DirectXObject
+    public class DXRasterizerState : DirectXObject
     {
         public RasterizerDesc Description { get; }
-        public RasterizerState(IntPtr ptr, RasterizerDesc desc) : base(ptr)
+        public DXRasterizerState(IntPtr ptr, RasterizerDesc desc) : base(ptr)
         {
             Description = desc;
         }
@@ -222,9 +222,9 @@ namespace SolarSharp.Rendering
         }
     }
 
-    public class BlendState : DirectXObject
+    public class DXBlendState : DirectXObject
     {
-        public BlendState(IntPtr ptr) : base(ptr)
+        public DXBlendState(IntPtr ptr) : base(ptr)
         {
         }
     }
@@ -315,9 +315,9 @@ namespace SolarSharp.Rendering
         }
     }
 
-    public class SamplerState : DirectXObject
+    public class DXSamplerState : DirectXObject
     {
-        public SamplerState(IntPtr ptr) : base(ptr)
+        public DXSamplerState(IntPtr ptr) : base(ptr)
         {
         }
     }
@@ -409,30 +409,30 @@ namespace SolarSharp.Rendering
         }
     }
 
-    public class DirectXBuffer : DirectXObject
+    public class DXBuffer : DirectXObject
     {
-        public DirectXBuffer(IntPtr ptr) : base(ptr)
+        public DXBuffer(IntPtr ptr) : base(ptr)
         {
         }
     }
 
-    public class Blob : DirectXObject
+    public class DXBlob : DirectXObject
     {
-        public Blob(IntPtr ptr) : base(ptr)
+        public DXBlob(IntPtr ptr) : base(ptr)
         {
         }
     }
 
-    public class VertexShader : DirectXObject
+    public class DXVertexShader : DirectXObject
     {
-        public VertexShader(IntPtr ptr) : base(ptr)
+        public DXVertexShader(IntPtr ptr) : base(ptr)
         {
         }
     }
 
-    public class PixelShader : DirectXObject
+    public class DXPixelShader : DirectXObject
     {
-        public PixelShader(IntPtr ptr) : base(ptr)
+        public DXPixelShader(IntPtr ptr) : base(ptr)
         {
         }
     }
@@ -581,9 +581,9 @@ namespace SolarSharp.Rendering
         [MarshalAs(UnmanagedType.U4)] public uint InstanceDataStepRate;
     }
 
-    public class InputLayout : DirectXObject
+    public class DXInputLayout : DirectXObject
     {
-        public InputLayout(IntPtr ptr) : base(ptr)
+        public DXInputLayout(IntPtr ptr) : base(ptr)
         {
         }
     }
@@ -612,69 +612,7 @@ namespace SolarSharp.Rendering
             return 0;
         }
     }
-    public class StaticMesh
-    {
-        public uint StrideBytes { get; set; }
-        public uint IndexCount { get; set; }
-        public uint VertexCount { get; set; }
-        public DirectXBuffer VertexBuffer { get; set; }
-        public DirectXBuffer IndexBuffer { get; set; }
-
-        public StaticMesh(Device device, float[] vertices, uint[] indices, VertexLayout layout)
-        {
-            uint vertexStrideBytes = layout.GetStrideBytes();
-            uint indicesStrideBytes = sizeof(uint);
-
-            BufferDesc vertexDesc = new BufferDesc();
-            vertexDesc.BindFlags = (uint)(BufferBindFlag.VERTEX_BUFFER);
-            vertexDesc.Usage = BufferUsage.DEFAULT;
-            vertexDesc.CPUAccessFlags = 0;
-            vertexDesc.MiscFlags = 0;
-            vertexDesc.ByteWidth = (uint)(vertices.Length * sizeof(float));
-            vertexDesc.StructureByteStride = vertexStrideBytes;
-
-            SubResourceData vertexSubResourceData = new SubResourceData();
-            GCHandle vertexHandle = GCHandle.Alloc(vertices, GCHandleType.Pinned);
-            vertexSubResourceData.pSysMem = vertexHandle.AddrOfPinnedObject();
-
-            BufferDesc indexDesc = new BufferDesc();
-            indexDesc.BindFlags = (uint)(BufferBindFlag.INDEX_BUFFER);
-            indexDesc.Usage = BufferUsage.DEFAULT;
-            indexDesc.CPUAccessFlags = 0;
-            indexDesc.MiscFlags = 0;
-            indexDesc.ByteWidth = (uint)(indices.Length * sizeof(float));
-            indexDesc.StructureByteStride = indicesStrideBytes;
-
-            SubResourceData indexSubResourceData = new SubResourceData();
-            GCHandle indexHandle = GCHandle.Alloc(indices, GCHandleType.Pinned);
-            indexSubResourceData.pSysMem = indexHandle.AddrOfPinnedObject();
-
-            VertexBuffer = device.CreateBuffer(vertexDesc, vertexSubResourceData);
-            IndexBuffer = device.CreateBuffer(indexDesc, indexSubResourceData);
-            StrideBytes = vertexStrideBytes;
-            VertexCount = (uint)vertices.Length / layout.GetStride();
-            IndexCount = (uint)indices.Length;
-
-            vertexHandle.Free();
-            indexHandle.Free();
-        }
-
-        public static StaticMesh CreateScreenSpaceQuad(Device device)
-        {
-            float[] vertexData = {
-            -1, 1, 0,   0, 0, -1,   0, 0,
-            1, -1, 0,   0, 0, -1,   1, 1,
-            -1, -1, 0,  0, 0, -1,   0, 1,
-            1, 1, 0,    0, 0, -1,   1, 0
-            };
-
-            uint[] indexData = {
-            0, 1, 2, 0, 3, 1
-            };
-
-            return new StaticMesh(device, vertexData, indexData, VertexLayout.PNT);
-        }
-    }
+   
 
     public enum PrimitiveTopology
     {
@@ -709,66 +647,66 @@ namespace SolarSharp.Rendering
         [MarshalAs(UnmanagedType.U4)] public uint back;
     }
 
-    public class Device : DirectXObject
+    public class DXDevice : DirectXObject
     {
-        public Device(IntPtr ptr) : base(ptr)
+        public DXDevice(IntPtr ptr) : base(ptr)
         {
         }
 
-        public DepthStencilState CreateDepthStencilState(DepthStencilDesc desc)
+        public DXDepthStencilState CreateDepthStencilState(DepthStencilDesc desc)
         {
-           return new DepthStencilState(D3D11API.DeviceCreateDepthStencilState(ref desc), desc);
+           return new DXDepthStencilState(D3D11API.DeviceCreateDepthStencilState(ref desc), desc);
         }
 
-        public RasterizerState CreateRasterizerState(RasterizerDesc desc)
+        public DXRasterizerState CreateRasterizerState(RasterizerDesc desc)
         {
-            return new RasterizerState(D3D11API.DeviceCreateRasterizerState(ref desc), desc);
+            return new DXRasterizerState(D3D11API.DeviceCreateRasterizerState(ref desc), desc);
         }
 
-        public BlendState CreateBlendState(BlendDesc desc)
+        public DXBlendState CreateBlendState(BlendDesc desc)
         {
-            return new BlendState(D3D11API.DeviceCreateBlendState(ref desc));
+            return new DXBlendState(D3D11API.DeviceCreateBlendState(ref desc));
         }
 
-        public SamplerState CreateSamplerState(SamplerDesc desc)
+        public DXSamplerState CreateSamplerState(SamplerDesc desc)
         {
-            return new SamplerState(D3D11API.DeviceCreateSamplerState(ref desc));
+            return new DXSamplerState(D3D11API.DeviceCreateSamplerState(ref desc));
         }
 
-        public DirectXBuffer CreateBuffer(BufferDesc desc)
+        public DXBuffer CreateBuffer(BufferDesc desc)
         {
-            return new DirectXBuffer(D3D11API.DeviceCreateBufferNoSub(ref desc));
+            return new DXBuffer(D3D11API.DeviceCreateBufferNoSub(ref desc));
         }
 
-        public DirectXBuffer CreateBuffer(BufferDesc desc, SubResourceData subResource)
+        public DXBuffer CreateBuffer(BufferDesc desc, SubResourceData subResource)
         {
-            return new DirectXBuffer(D3D11API.DeviceCreateBuffer(ref desc, ref subResource));
+            return new DXBuffer(D3D11API.DeviceCreateBuffer(ref desc, ref subResource));
         }
 
-        public Blob CompileShader(string shaderCode, string entry, string target)
+        public DXBlob CompileShader(string shaderCode, string entry, string target)
         {
-            return new Blob(D3D11API.DeviceCompileShader(shaderCode, entry, target));
+            return new DXBlob(D3D11API.DeviceCompileShader(shaderCode, entry, target));
         }
 
-        public InputLayout CreateInputLayout(Blob vertexBlob, params InputElementDesc[] inputElementDescs)
+        public DXInputLayout CreateInputLayout(DXBlob vertexBlob, params InputElementDesc[] inputElementDescs)
         {
-            return new InputLayout(D3D11API.DeviceCreateInputLayout(inputElementDescs, inputElementDescs.Length, vertexBlob.Ptr));
+            return new DXInputLayout(D3D11API.DeviceCreateInputLayout(inputElementDescs, inputElementDescs.Length, vertexBlob.Ptr));
         }
 
-        public VertexShader CreateVertexShader(Blob vertexBlob)
+        public DXVertexShader CreateVertexShader(DXBlob vertexBlob)
         {
-            return new VertexShader(D3D11API.DeviceCreateVertexShader(vertexBlob.Ptr));
+            return new DXVertexShader(D3D11API.DeviceCreateVertexShader(vertexBlob.Ptr));
         }
 
-        public PixelShader CreatePixelShader(Blob pixelBlob)
+        public DXPixelShader CreatePixelShader(DXBlob pixelBlob)
         {
-            return new PixelShader(D3D11API.DeviceCreatePixelShader(pixelBlob.Ptr));
+            return new DXPixelShader(D3D11API.DeviceCreatePixelShader(pixelBlob.Ptr));
         }
     }
 
-    public class Context : DirectXObject
+    public class DXContext : DirectXObject
     {
-        public Context(IntPtr ptr) : base(ptr)
+        public DXContext(IntPtr ptr) : base(ptr)
         {
         }
 
@@ -797,42 +735,42 @@ namespace SolarSharp.Rendering
             D3D11API.ContextSetPrimitiveTopology(primitiveTopology);
         }
 
-        public void SetDepthStencilState(DepthStencilState depthStencilState, uint stencilRef = 1)
+        public void SetDepthStencilState(DXDepthStencilState depthStencilState, uint stencilRef = 1)
         {
             D3D11API.ContextSetDepthStencilState(depthStencilState.Ptr, stencilRef);
         }
 
-        public void SetRasterizerState(RasterizerState rasterizerState)
+        public void SetRasterizerState(DXRasterizerState rasterizerState)
         {
             D3D11API.ContextSetRasterizerState(rasterizerState.Ptr);
         }
 
-        public void SetBlendState(BlendState blendState)
+        public void SetBlendState(DXBlendState blendState)
         {
             D3D11API.ContextSetBlendState(blendState.Ptr, 0, 0, 0, 0, 0xffffffff);
         }
 
-        public void SetInputLayout(InputLayout inputLayout)
+        public void SetInputLayout(DXInputLayout inputLayout)
         {
             D3D11API.ContextSetInputLayout(inputLayout.Ptr);
         }
 
-        public void SetVertexShader(VertexShader vertexShader)
+        public void SetVertexShader(DXVertexShader vertexShader)
         {
             D3D11API.ContextSetVertexShader(vertexShader.Ptr);
         }
 
-        public void SetPixelShader(PixelShader pixelShader)
+        public void SetPixelShader(DXPixelShader pixelShader)
         {
             D3D11API.ContextSetPixelShader(pixelShader.Ptr);
         }
 
-        public void SetVertexBuffers(DirectXBuffer vertexBuffer, uint stride)
+        public void SetVertexBuffers(DXBuffer vertexBuffer, uint stride)
         {
             D3D11API.ContextSetVertexBuffers(vertexBuffer.Ptr, stride);
         }
 
-        public void SetIndexBuffer(DirectXBuffer indexBuffer, DXGIFormat format, uint offset)
+        public void SetIndexBuffer(DXBuffer indexBuffer, DXGIFormat format, uint offset)
         {
             D3D11API.ContextSetIndexBuffer(indexBuffer.Ptr, format, offset);
         }
@@ -842,11 +780,11 @@ namespace SolarSharp.Rendering
             D3D11API.ContextDrawIndexed(indexCount, startLocation, baseVertexLocation);
         }
 
-        public void SetVSConstBuffer(DirectXBuffer constBuffer, uint slot) => D3D11API.ContextSetVSConstBuffer(constBuffer.Ptr, slot);
-        public void SetPSConstBuffer(DirectXBuffer constBuffer, uint slot) => D3D11API.ContextSetPSConstBuffer(constBuffer.Ptr, slot);
-        public void SetCSConstBuffer(DirectXBuffer constBuffer, uint slot) => D3D11API.ContextSetCSConstBuffer(constBuffer.Ptr, slot);
+        public void SetVSConstBuffer(DXBuffer constBuffer, uint slot) => D3D11API.ContextSetVSConstBuffer(constBuffer.Ptr, slot);
+        public void SetPSConstBuffer(DXBuffer constBuffer, uint slot) => D3D11API.ContextSetPSConstBuffer(constBuffer.Ptr, slot);
+        public void SetCSConstBuffer(DXBuffer constBuffer, uint slot) => D3D11API.ContextSetCSConstBuffer(constBuffer.Ptr, slot);
 
-        public void UpdateSubresource(DirectXBuffer buffer, float[] data)
+        public void UpdateSubresource(DXBuffer buffer, float[] data)
         {
             GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
             D3D11API.ContextUpdateSubresource(buffer.Ptr, 0, IntPtr.Zero, handle.AddrOfPinnedObject(), 0, 0);
@@ -870,8 +808,8 @@ namespace SolarSharp.Rendering
 
     public class DeviceContext 
     {
-        public Device Device { get; set; }
-        public Context Context { get; set; }
+        public DXDevice Device { get; set; }
+        public DXContext Context { get; set; }
 
         private bool created = false;
         public bool Create()
@@ -882,15 +820,15 @@ namespace SolarSharp.Rendering
 
             if (created)
             {
-                Device = new Device(devicePtr);
-                Context = new Context(contextPtr);
+                Device = new DXDevice(devicePtr);
+                Context = new DXContext(contextPtr);
             }
 
             return created;
         }
     }
 
-    public class Swapchain
+    public class DXSwapchain
     {
         public RenderTargetView renderTargetView;
         public DepthStencilView depthStencilView;

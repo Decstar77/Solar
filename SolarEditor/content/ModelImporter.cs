@@ -11,7 +11,7 @@ namespace SolarEditor
 {
     internal class ModelImporter
     {
-        internal static ModelResource? LoadFromFile(string filePath)
+        internal static ModelAsset? LoadFromFile(string filePath)
         {
             if (!File.Exists(filePath)) { Logger.Error("File path does not exist + " + filePath); return null; }
 
@@ -22,21 +22,21 @@ namespace SolarEditor
             if (scene == null) { Logger.Error("Assimp scene is null"); return null; }
 
             Logger.Trace("Loading model " + filePath);
-            ModelResource model = LoadModel(scene);
+            ModelAsset model = LoadModel(scene);
             
             importer.Dispose();            
 
             return model;
         }
         
-        private static ModelResource LoadModel(Scene scene)
+        private static ModelAsset LoadModel(Scene scene)
         {
-            ModelResource model = new ModelResource();            
-            model.meshes = new List<MeshResource>(scene.MeshCount);
+            ModelAsset model = new ModelAsset();            
+            model.meshes = new List<MeshAsset>(scene.MeshCount);
 
             foreach (Mesh m in scene.Meshes)
             {
-                MeshResource mesh = new MeshResource();
+                MeshAsset mesh = new MeshAsset();
                 mesh.vertices = new List<float>(m.VertexCount);
                 mesh.indices = new List<uint>(3 * m.FaceCount);
 

@@ -18,7 +18,7 @@ namespace SolarSharp.Rendering.Graph
             Topology = PrimitiveTopology.TRIANGLELIST;
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             return true;
         }
@@ -42,7 +42,7 @@ namespace SolarSharp.Rendering.Graph
             Topology = (PrimitiveTopology)Enum.ToObject(type, values.GetValue(index));
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             context.SetPrimitiveTopology(Topology);
             return outFlowPin?.GetConnectedPin()?.Node;

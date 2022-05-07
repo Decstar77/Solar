@@ -20,10 +20,10 @@ namespace SolarSharp.Rendering.Graph
             ShaderName = "";
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             if (ShaderName != "") {
-                GraphicsShader graphicsShader = renderGraph.CreateOrGetGraphicsShader( AssetSystem.ShaderAssets.Find(x => x.Name == ShaderName));
+                GraphicsShader graphicsShader = renderGraph.CreateOrGetGraphicsShader(AssetSystem.ShaderAssets.Find(x => x.Name == ShaderName), device);
                 if (graphicsShader.IsValid()) {
                     ShaderPin.SetValue(graphicsShader.Name);
                     return true;
@@ -51,7 +51,7 @@ namespace SolarSharp.Rendering.Graph
 
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             return null;
         }

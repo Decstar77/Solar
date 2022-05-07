@@ -7,6 +7,7 @@ using SolarSharp;
 
 using SolarSharp.Rendering;
 using SolarSharp.Assets;
+using SolarSharp.Rendering.Graph;
 
 namespace SolarEditor
 {
@@ -149,18 +150,22 @@ namespace SolarEditor
                         ImGui.Text("Path"); ImGui.NextColumn();
                         ImGui.Text("Actions"); ImGui.NextColumn();
 
+                        int idCounter = 0;
                         AssetSystem.ShaderAssets.ForEach(x => {
                             ImGui.Separator();
                             ImGui.Text(x.Name); ImGui.NextColumn();
                             ImGui.Text(x.Path); ImGui.NextColumn();
+                            ImGui.PushId(idCounter++);
                             if (ImGui.Button("Edit")) {
                                 editorState.AddWindow(new ShaderEditorWindow(x));
                             }
+                            ImGui.PopId();
                             ImGui.SameLine();
+                            ImGui.PushId(idCounter++);
                             if (ImGui.Button("Delete")) {
                                 
                             }
-
+                            ImGui.PopId();
                             ImGui.NextColumn();
                         });
 
@@ -173,7 +178,41 @@ namespace SolarEditor
                     {
                         ImGui.EndTabItem();
                     }
+                    if (ImGui.BeginTabItem("Render Graphs"))
+                    {
+                        ImGui.Columns(3, "RenderColumns", true);
+                        ImGui.Separator();
 
+                        ImGui.Text("Name"); ImGui.NextColumn();
+                        ImGui.Text("Path"); ImGui.NextColumn();
+                        ImGui.Text("Actions"); ImGui.NextColumn();
+
+                        int idCounter = 0;
+                        AssetSystem.RenderGraphs.ForEach(x => {
+                            ImGui.Separator();
+                            ImGui.Text(x.Name); ImGui.NextColumn();
+                            ImGui.Text(x.Path); ImGui.NextColumn();
+                            ImGui.PushId(idCounter++);
+                            if (ImGui.Button("Edit"))
+                            {
+                                editorState.AddWindow(new RenderGraphWindow()).RenderGraph = x;
+                            }
+                            ImGui.PopId();
+                            ImGui.SameLine();
+                            ImGui.PushId(idCounter++);
+                            if (ImGui.Button("Delete"))
+                            {
+
+                            }
+                            ImGui.PopId();
+                            ImGui.NextColumn();
+                        });
+
+                        ImGui.Columns(1);
+                        ImGui.Separator();
+
+                        ImGui.EndTabItem();
+                    }
                     ImGui.EndTabBar();
                 }
             }           

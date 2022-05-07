@@ -16,7 +16,7 @@ namespace SolarSharp.Rendering.Graph
             ColourTargetPin = new ColourTargetPin("Colour target", this, PinInputType.INPUT);
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             return true;
         }
@@ -27,7 +27,7 @@ namespace SolarSharp.Rendering.Graph
             ColourTargetPin.DrawUI();
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             RenderTargetView renderTargetView = ColourTargetPin.GetValue();
             if (renderTargetView != null) {

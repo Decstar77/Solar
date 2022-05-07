@@ -14,6 +14,12 @@ namespace SolarSharp
             Console.WriteLine("ERROR: " + message);
         }
 
+        public static void Warn(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("WARN:  " + message);
+        }
+
         public static void Info(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;

@@ -24,12 +24,14 @@ namespace SolarSharp.EngineAPI
         public static extern void ImGuiTextGetText(byte[] buf, int bufSize);
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool ImGuiTextIsShowingWhitespaces();
         
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         public static extern void ImGuiTextSetShowWhitespaces([MarshalAs(UnmanagedType.Bool)] bool v);
         
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool ImGuiTextIsReadOnly();
         
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]

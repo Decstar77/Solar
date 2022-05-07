@@ -108,9 +108,10 @@ namespace SolarSharp
 		MOUSE3,
 	}
 
-
     public static class Input
     {
+		public static Vector2 MousePositionPixelCoords => Application.Input.mousePositionPixelCoords;
+
 		public static bool IsMouseButtonJustDown(MouseButton mouse)
         {
             switch (mouse)

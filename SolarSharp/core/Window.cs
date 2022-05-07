@@ -8,36 +8,31 @@ using SolarSharp.EngineAPI;
 
 namespace SolarSharp.Core
 {
-    public class Window
+    public static class Window
     {
-        public int SurfaceWidth { get { return surfaceWidth; } }
-        private int surfaceWidth;
+        public static int SurfaceWidth { get { return surfaceWidth; } }
+        private static int surfaceWidth;
 
-        public int SurfaceHeight { get { return surfaceHeight; } }
-        private int surfaceHeight;
+        public static int SurfaceHeight { get { return surfaceHeight; } }
+        private static int surfaceHeight;
 
-        public float WindowAspect { get { return windowAspect; } }
-        private float windowAspect;
+        public static float WindowAspect { get { return windowAspect; } }
+        private static float windowAspect;
 
-        public string WindowTitle { get { return windowTitle; } }
-        private string windowTitle;
+        public static string WindowTitle { get { return windowTitle; } }
+        private static string windowTitle;
 
-        public Window()
-        {
-
-        }
-
-        public bool Open(string title, int surfaceWidth, int surfaceHeight, int startX, int startY)
+        public static bool Initialize(string title, int surfaceWidth_, int surfaceHeight_, int startX, int startY)
         {            
             windowTitle = title; ;
-            this.surfaceWidth = surfaceWidth;
-            this.surfaceHeight = surfaceHeight; 
-            this.windowAspect = (float)surfaceWidth / (float)surfaceHeight;
+            surfaceWidth = surfaceWidth_;
+            surfaceHeight = surfaceHeight_; 
+            windowAspect = (float)surfaceWidth / (float)surfaceHeight;
 
             return Win32API.CreateWindow_(windowTitle, surfaceWidth, surfaceHeight, startX, startY);
         }
 
-        public bool Running(ref FrameInput input)
+        public static bool Running(ref FrameInput input)
         {
             return Win32API.PumpMessages_(ref input);
         }

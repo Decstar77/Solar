@@ -8,7 +8,7 @@ namespace SolarSharp.Rendering.Graph
 {
     public class SetRasterizerStateNode : Node
     {
-        private RasterizerState rasterizerState = null;
+        private DXRasterizerState rasterizerState = null;
 
         
         public RasterizerDesc CreateDesc { get; set; }
@@ -19,9 +19,9 @@ namespace SolarSharp.Rendering.Graph
             CreateDesc = new RasterizerDesc();
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
-            rasterizerState = renderGraph.CreateOrGetRasterizerState(CreateDesc);
+            rasterizerState = renderGraph.CreateOrGetRasterizerState(CreateDesc, device);
             return rasterizerState != null;
         }
 
@@ -31,7 +31,7 @@ namespace SolarSharp.Rendering.Graph
            CreateDesc = DrawStruct<RasterizerDesc>(CreateDesc);
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             context.SetRasterizerState(rasterizerState);
             return outFlowPin?.GetConnectedPin()?.Node;

@@ -45,5 +45,20 @@ namespace SolarSharp
 
             return col;
         }
+
+        public static float DegToRad(float deg)
+        {
+            return (MathF.PI / 180) * deg;
+        }
+
+        public static float RadToDeg(float rad)
+        {
+            return (180 / MathF.PI) * rad;
+        }
+
+        public static float Lerp(float a, float b, float t)
+        {
+            return a + (b - a) * t;
+        }
     }
 }

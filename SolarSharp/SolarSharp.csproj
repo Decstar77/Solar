@@ -25,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="assets\RenderGraphAsset.cs" />
+    <Compile Include="collision\Primitives.cs" />
+    <Compile Include="collision\Raycast.cs" />
     <Compile Include="core\Application.cs" />
     <Compile Include="core\ApplicationConfig.cs" />
     <Compile Include="core\EventSystem.cs" />
@@ -47,6 +50,7 @@
     <Compile Include="math\Vector2.cs" />
     <Compile Include="math\Vector3.cs" />
     <Compile Include="math\Vector4.cs" />
+    <Compile Include="rendering\ConstBuffer.cs" />
     <Compile Include="rendering\D3D11.cs" />
     <Compile Include="rendering\GraphicsShader.cs" />
     <Compile Include="rendering\graph\nodes\cmds\CMDClearDepthTarget.cs" />
@@ -68,13 +72,16 @@
     <Compile Include="rendering\graph\nodes\setters\SetRenderTargetsNode.cs" />
     <Compile Include="rendering\graph\nodes\setters\SetTopologyNode.cs" />
     <Compile Include="rendering\graph\nodes\setters\SetViewPortNode.cs" />
-    <Compile Include="rendering\ImGui.cs" />
-    <Compile Include="rendering\ImNodes.cs" />
-    <Compile Include="rendering\ImGuiTextEditor.cs" />
+    <Compile Include="rendering\imgui\ImGui.cs" />
+    <Compile Include="rendering\imgui\ImNodes.cs" />
+    <Compile Include="rendering\imgui\ImGuiTextEditor.cs" />
     <Compile Include="assets\AssetSystem.cs" />
     <Compile Include="assets\ShaderAsset.cs" />
     <Compile Include="rendering\RenderSystem.cs" />
-    <Compile Include="rendering\ShaderFactory.cs" />
+    <Compile Include="rendering\StaticMesh.cs" />
+    <Compile Include="scene\Camera.cs" />
+    <Compile Include="scene\GameSystem.cs" />
+    <Compile Include="scene\Scene.cs" />
   </ItemGroup>
 
   <ItemGroup>

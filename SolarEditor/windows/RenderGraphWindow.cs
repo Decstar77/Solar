@@ -11,17 +11,53 @@ namespace SolarEditor
 {
     internal class RenderGraphWindow : Window
     {
+        private bool compileOnSave = false;
+        public RenderGraph RenderGraph { get; set; }
+
         public override void Show(EditorState editorState)
         {
-            RenderGraph renderGraph = Application.renderGraph;
-
-            
-
-            if (ImGui.Begin(renderGraph.Name))
+            if (ImGui.Begin("Render Graph", ref show, (int)ImGuiWindowFlags.MenuBar) && RenderGraph != null)
             {
+                if (ImGui.BeginMenuBar())
+                {
+                    if (ImGui.BeginMenu("File"))
+                    {
+                        if (ImGui.MenuItem("Open", "Ctrl+O"))
+                        {
+                        }
+                        if (ImGui.MenuItem("Save", "Ctrl+S"))
+                        {
+                            Save();
+                        }
+
+                        ImGui.EndMenu();
+                    }
+
+                    if (ImGui.BeginMenu("Edit"))
+                    {
+                        if (ImGui.MenuItem("Compile", "F5"))
+                        {
+                            Save();
+                            Compile();
+                        }
+
+                        if (ImGui.MenuItem("Compile on save", "", compileOnSave))
+                        {
+                            compileOnSave = !compileOnSave;
+                        }
+
+                        ImGui.EndMenu();
+                    }
+
+                    ImGui.EndMenuBar();
+                }
+
+                if (!RenderGraph.Valid)
+                    ImGui.Text("Error !!");
+
                 ImNodes.BeginNodeEditor();
-                
-                renderGraph.Nodes.ForEach(node =>
+
+                RenderGraph.Nodes.ForEach(node =>
                 {
                     ImNodes.BeginNode(node.Id);
                     ImNodes.BeginNodeTitleBar();
@@ -34,7 +70,7 @@ namespace SolarEditor
                 });
 
                 int linkId = 0;
-                renderGraph.Nodes.ForEach(node =>
+                RenderGraph.Nodes.ForEach(node =>
                 {
                     node.OutputPins.ForEach(pin =>
                     {
@@ -55,9 +91,9 @@ namespace SolarEditor
                 int ignore = -1;
                 if (ImNodes.IsLinkCreated(ref startedAtPin, ref endedAtPin, ref ignore))
                 {
-                    Pin startPin = renderGraph.FindPin(startedAtPin);
-                    Pin endPin = renderGraph.FindPin(endedAtPin);
-                    
+                    Pin startPin = RenderGraph.FindPin(startedAtPin);
+                    Pin endPin = RenderGraph.FindPin(endedAtPin);
+
                     if (startPin != null && endPin != null)
                     {
                         startPin.Connect(endPin);
@@ -67,7 +103,7 @@ namespace SolarEditor
                 int killedPin = -1;
                 if (ImNodes.IsLinkDropped(ref killedPin, true))
                 {
-                    renderGraph.FindPin(killedPin)?.Disconnect();
+                    RenderGraph.FindPin(killedPin)?.Disconnect();
                 }
 
                 if (Input.IsMouseButtonJustDown(MouseButton.MOUSE2) && isEditorHovered)
@@ -81,32 +117,32 @@ namespace SolarEditor
                     {
                         if (ImGui.MenuItem("Graphics Shader"))
                         {
-                            renderGraph.Nodes.Add(new SetGraphicsShaderNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new SetGraphicsShaderNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Depth"))
                         {
-                            renderGraph.Nodes.Add(new SetDepthStateNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new SetDepthStateNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Topology"))
                         {
-                            renderGraph.Nodes.Add(new SetTopologyNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new SetTopologyNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Rasterizer"))
                         {
-                            renderGraph.Nodes.Add(new SetRasterizerStateNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new SetRasterizerStateNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Viewport"))
                         {
-                            renderGraph.Nodes.Add(new SetViewPortNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new SetViewPortNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Render Targets"))
                         {
-                            renderGraph.Nodes.Add(new SetRenderTargetsNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new SetRenderTargetsNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Blend"))
@@ -120,12 +156,12 @@ namespace SolarEditor
                     {
                         if (ImGui.MenuItem("Swap chain"))
                         {
-                            renderGraph.Nodes.Add(new GetSwapChainNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new GetSwapChainNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Graphics Shader"))
                         {
-                            renderGraph.Nodes.Add(new GetGraphicsShaderNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new GetGraphicsShaderNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         ImGui.EndMenu();
@@ -135,17 +171,17 @@ namespace SolarEditor
                     {
                         if (ImGui.MenuItem("Clear Colour Target"))
                         {
-                            renderGraph.Nodes.Add(new CMDClearColourTargetNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new CMDClearColourTargetNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Clear Depth Target"))
                         {
-                            renderGraph.Nodes.Add(new CMDClearDepthTargetNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new CMDClearDepthTargetNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         if (ImGui.MenuItem("Draw Scene"))
                         {
-                            renderGraph.Nodes.Add(new CMDDrawSceneNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
+                            RenderGraph.Nodes.Add(new CMDDrawSceneNode().SetPositionScreenSpace(Application.Input.mousePositionPixelCoords));
                         }
 
                         ImGui.EndMenu();
@@ -156,12 +192,35 @@ namespace SolarEditor
             }
             ImGui.End();
 
-
-            if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
-            {                
-                renderGraph.Save("render.json");
+            if (Input.IskeyJustDown(KeyCode.F5))
+            {
+                Compile();
             }
 
+            if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
+            {
+                Save();
+            }
+        }
+
+        private void Compile()
+        {
+            if (GameSystem.CurrentScene.RenderGraph == RenderGraph)
+            {
+                RenderGraph.Shutdown();
+                RenderGraph.Create(RenderSystem.device);
+            }
+            else
+            {
+                Logger.Warn($"Did not compile render graph, {RenderGraph.Name}, as it is not currently the active graph in the open scene");
+            }
+        }
+
+        private void Save()
+        {
+            RenderGraph.Save();
+            if (compileOnSave)
+                Compile();
         }
     }
 }

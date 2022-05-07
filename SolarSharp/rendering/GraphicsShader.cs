@@ -11,16 +11,16 @@ namespace SolarSharp.Rendering
     public class GraphicsShader
     {
         public string Name { get; set; }
-        public VertexShader vertexShader;
-        public PixelShader pixelShader;
-        public InputLayout inputLayout;
-        private Device device = null;
+        public DXVertexShader vertexShader;
+        public DXPixelShader pixelShader;
+        public DXInputLayout inputLayout;
+        private DXDevice device = null;
 
         public GraphicsShader() {
 
         }
 
-        public GraphicsShader(Device device)
+        public GraphicsShader(DXDevice device)
         {
             this.device = device;
         }
@@ -29,8 +29,8 @@ namespace SolarSharp.Rendering
         {
             Name = shaderAsset.Name;
 
-            Blob vertexBlob = device.CompileShader(shaderAsset.Src, "VSmain", "vs_5_0");
-            Blob pixelBlob = device.CompileShader(shaderAsset.Src, "PSmain", "ps_5_0");
+            DXBlob vertexBlob = device.CompileShader(shaderAsset.Src, "VSmain", "vs_5_0");
+            DXBlob pixelBlob = device.CompileShader(shaderAsset.Src, "PSmain", "ps_5_0");
 
             if (vertexBlob.Ptr != IntPtr.Zero && pixelBlob.Ptr != IntPtr.Zero)
             {

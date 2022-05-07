@@ -51,9 +51,11 @@ namespace SolarSharp.EngineAPI
 		public static extern void ImNodesLink(int id, int startAttrId, int endAttrId);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool ImNodesIsLinkCreated(ref int startedAtPinId, ref int endedAtPinId, ref int createdFromSnap);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool ImNodesIsLinkDropped(ref int started_at_pin_id, [MarshalAs(UnmanagedType.Bool)] bool including_detached_links);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
@@ -63,6 +65,7 @@ namespace SolarSharp.EngineAPI
 		public static extern void ImNodesPopColorStyle();
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool ImNodesIsEditorHovered();
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]

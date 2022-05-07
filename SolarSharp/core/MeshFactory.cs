@@ -34,7 +34,7 @@ namespace SolarSharp.Tools
 
     public static class MeshFactory
     {
-		public static MeshResource CreateQuad(float x, float y, float w, float h, float depth)
+		public static MeshAsset CreateQuad(float x, float y, float w, float h, float depth)
         {
 			MeshData meshData = new MeshData();
 			meshData.vertices = new List<Vertex>(4);
@@ -55,7 +55,7 @@ namespace SolarSharp.Tools
 			return ConvertMeshDataIntoMeshResource(meshData, VertexLayout.PNT);
 		}
 
-		public static MeshResource CreateBox(float width, float height, float depth, float numSubdivisions)
+		public static MeshAsset CreateBox(float width, float height, float depth, float numSubdivisions)
         {
 			MeshData meshData = new MeshData();
 			meshData.vertices = new List<Vertex>();
@@ -111,9 +111,9 @@ namespace SolarSharp.Tools
 			return ConvertMeshDataIntoMeshResource(meshData, VertexLayout.PNT);
 		}
 
-		private static MeshResource ConvertMeshDataIntoMeshResource(MeshData meshData, VertexLayout layout)
+		private static MeshAsset ConvertMeshDataIntoMeshResource(MeshData meshData, VertexLayout layout)
         {
-			MeshResource meshResource = new MeshResource();
+			MeshAsset meshResource = new MeshAsset();
 			meshResource.vertices = new List<float>();
 			meshResource.indices = new List<uint>();
 

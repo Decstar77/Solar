@@ -19,16 +19,16 @@ namespace SolarSharp
         COUNT,
     }
 
-    public class MeshResource
+    public class MeshAsset
     {
         public List<float> vertices;
         public List<uint> indices;
         public VertexLayout layout;
     }
 
-    public class ModelResource
+    public class ModelAsset
     {
-        public List<MeshResource> meshes;
+        public List<MeshAsset> meshes;
     }
 
 

@@ -13,7 +13,7 @@ namespace SolarSharp.Rendering.Graph
             AddFlowPins();
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             return true;
         }
@@ -23,7 +23,7 @@ namespace SolarSharp.Rendering.Graph
             DrawFlowPins();
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             return null;
         }

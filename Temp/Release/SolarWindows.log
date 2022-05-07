@@ -1,11 +1,1 @@
-﻿  ImGuiAPI.cpp
-  ImGuiTextAPI.cpp
-  TextEditor.cpp
-  imnodes.cpp
-     Creating library F:\codes\Learning\SolarSharp\x64\Release\SolarWindows.lib and object F:\codes\Learning\SolarSharp\x64\Release\SolarWindows.exp
-  Generating code
-  2022 of 3731 functions (54.2%) were compiled, the rest were copied from previous compilation.
-    1972 functions were new in current compilation
-    436 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  SolarWindows.vcxproj -> F:\codes\Learning\SolarSharp\x64\Release\SolarWindows.dll
+﻿  SolarWindows.vcxproj -> C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\x64\Release\SolarWindows.dll

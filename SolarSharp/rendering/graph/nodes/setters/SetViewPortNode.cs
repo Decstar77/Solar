@@ -23,7 +23,7 @@ namespace SolarSharp.Rendering.Graph
             HeightPin = new IntPin("Height", this, PinInputType.INPUT);
         }
 
-        public override bool CreateResources(RenderGraph renderGraph)
+        public override bool CreateResources(RenderGraph renderGraph, DXDevice device)
         {
             return true;
         }
@@ -36,7 +36,7 @@ namespace SolarSharp.Rendering.Graph
             HeightPin.DrawUI();
         }
 
-        public override Node Run(RenderGraph graph, Context context)
+        public override Node Run(RenderGraph graph, DXContext context)
         {
             context.SetViewPortState(WidthPin.GetValue(), HeightPin.GetValue());
             return outFlowPin?.GetConnectedPin()?.Node;
