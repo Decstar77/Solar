@@ -9,7 +9,7 @@ using SolarSharp.Rendering.Graph;
 
 namespace SolarEditor
 {
-    internal class RenderGraphWindow : Window
+    internal class RenderGraphWindow : EditorWindow
     {
         private bool compileOnSave = false;
         public RenderGraph RenderGraph { get; set; }

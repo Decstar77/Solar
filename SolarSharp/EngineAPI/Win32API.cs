@@ -21,5 +21,8 @@ namespace SolarSharp.EngineAPI
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         public static extern void DestroyWindow_();
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void OpenNativeFileDialog(byte[] output);
     }
 }

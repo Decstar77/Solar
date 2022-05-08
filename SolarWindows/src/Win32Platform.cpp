@@ -1,8 +1,11 @@
 #include "Core.h"
 #include "Win32Platform.h"
+#include <ole2.h>
+#include <shobjidl_core.h>
 
 #include "SolarMath.h"
 #include <vector>
+#include <stdio.h>
 
 BOOL APIENTRY DllMain(HMODULE hModule,	DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -47,6 +50,49 @@ static void InitializeRawInput()
 	}
 }
 
+EDITOR_INTERFACE(void) OpenNativeFileDialog(char* output)
+{
+	HRESULT hr = CoInitializeEx(NULL,  COINIT_DISABLE_OLE1DDE);
+	char st[256];
+	if (SUCCEEDED(hr))
+	{
+		IFileOpenDialog* pFileOpen;
+
+		// Create the FileOpenDialog object.
+		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+			IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+
+		if (SUCCEEDED(hr))
+		{
+			// Show the Open dialog box.
+			hr = pFileOpen->Show(NULL);
+
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr))
+			{
+				IShellItem* pItem;
+				hr = pFileOpen->GetResult(&pItem);
+				if (SUCCEEDED(hr))
+				{
+					PWSTR pszFilePath;
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+					// Display the file name to the user.
+					if (SUCCEEDED(hr))
+					{
+						sprintf_s(st, "%ws", pszFilePath);
+						memcpy(output, st, 255);
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+				}
+			}
+			pFileOpen->Release();
+		}
+
+		CoUninitialize();
+	}
+}
 
 LRESULT CALLBACK WindProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 EDITOR_INTERFACE(bool) CreateWindow_(char* title, int width, int height, int xPos, int yPos)
@@ -117,7 +163,6 @@ EDITOR_INTERFACE(bool) CreateWindow_(char* title, int width, int height, int xPo
 			winState.surfaceHeight = cleintRect.bottom - cleintRect.top;
 
 			InitializeRawInput();
-			//InitializeClock();
 		}
 		else
 		{
@@ -206,9 +251,10 @@ LRESULT CALLBACK WindProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		bool32 isDown = ((lparam & ((int64)1 << (int64)31)) == 0);
 		ProcessKeyboardInput(vkCode, isDown);
 	}break;
+
 	default: { result = DefWindowProcA(hwnd, msg, wparam, lparam);	}
 	}
-
+	
 	return result;
 }
 
@@ -324,6 +370,7 @@ EDITOR_INTERFACE(bool) PumpMessages_(Input& appInput)
 	{
 		oldInput = input;
 		input.mouseDelta = Vec2f(0);
+		input.mouseLocked = appInput.mouseLocked;
 
 		winState.active = (bool8)GetFocus();
 

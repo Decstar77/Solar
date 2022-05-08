@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 
 using SolarSharp.EngineAPI;
 using System.Diagnostics.CodeAnalysis;
+using SolarSharp.Assets;
 
 namespace SolarSharp.Rendering
 {

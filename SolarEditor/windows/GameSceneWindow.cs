@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SolarEditor
 {
-    internal class GameSceneWindow : Window
+    internal class GameSceneWindow : EditorWindow
     {
         public override void Show(EditorState editorState)
         {

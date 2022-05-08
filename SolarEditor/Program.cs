@@ -16,6 +16,7 @@ namespace SolarEditor
         public static bool OnInitialize()
         {
             editorState = new EditorState();           
+
             return true;
         }
 

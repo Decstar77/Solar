@@ -5,10 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SolarSharp.Assets
 {
+    public class EngineAsset
+    {
+        public Guid Guid = Guid.NewGuid();
+    }
+
     public static class AssetSystem
     {
         public static List<ShaderAsset> ShaderAssets { get { return shaderAssets; } }
@@ -16,6 +20,43 @@ namespace SolarSharp.Assets
 
         public static List<RenderGraph> RenderGraphs { get { return renderGraphs; } }
         private static List<RenderGraph> renderGraphs = new List<RenderGraph>();
+        
+        private static List<GameScene> gameScenes = new List<GameScene>();
+        
+        private static List<ModelAsset> modelAssets = new List<ModelAsset>();
+
+        public static ModelAsset? GetModelAsset(string name)
+        {
+            ModelAsset? model = null;
+
+            lock (modelAssets)
+            {
+                model = modelAssets.Find(x => x.Name == name);
+            }
+
+            return model;
+        }
+
+        public static ModelAsset? GetModelAsset(Guid id)
+        {
+            ModelAsset? model = null;
+
+            lock (modelAssets)
+            {
+                model = modelAssets.Find(x => x.Guid == id);
+            }
+
+            return model;
+        }
+
+        public static void AddModelAsset(ModelAsset model)
+        {
+            lock (modelAssets)
+            {                
+                Logger.Info($"Placing {model.Name}");
+                modelAssets.Add(model);
+            }
+        }
 
         public static bool Initialize()
         {
@@ -34,6 +75,42 @@ namespace SolarSharp.Assets
             return true;
         }
 
+        public static void SaveGameSceneAsset(string path, GameScene gameScene)
+        {
+            string json = JsonSerializer.Serialize(gameScene);
+            File.WriteAllText(path + gameScene.Name + ".json", json);
+        }
+
+        public static GameScene LoadGameSceneAsset(string path)
+        {
+            if (File.Exists(path))
+            {
+                try
+                {
+                    string json = File.ReadAllText(path);
+                    GameScene gameScene = JsonSerializer.Deserialize<GameScene>(json);
+                    gameScene.Name = Path.GetFileNameWithoutExtension(path);
+
+                    lock(gameScenes)
+                    {
+                        gameScenes.Add(gameScene);
+                    }
+
+                    return gameScene;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
+            }
+            else
+            {
+                Logger.Error("LoadGameSceneAsset, File does not exist: " + path);
+            }
+
+            return null;
+        }
+
         public static RenderGraphAsset LoadRenderGraphAsset(string path)
         {
             if (File.Exists(path))
@@ -42,8 +119,13 @@ namespace SolarSharp.Assets
                 {
                     string json = File.ReadAllText(path);
                     RenderGraphAsset renderGraphSaveData = JsonSerializer.Deserialize<RenderGraphAsset>(json);
-                    renderGraphSaveData.Path = path;                    
-                    renderGraphs.Add( new RenderGraph(renderGraphSaveData) );
+                    renderGraphSaveData.Path = path;
+
+                    lock (renderGraphs)
+                    {
+                        renderGraphs.Add(new RenderGraph(renderGraphSaveData));
+                    }
+
                     return renderGraphSaveData;
                 }
                 catch (Exception ex)
@@ -73,7 +155,10 @@ namespace SolarSharp.Assets
                     shaderAsset.Src = file.ReadToEnd();
                     file.Close();
 
-                    ShaderAssets.Add(shaderAsset);
+                    lock (shaderAssets)
+                    {
+                        shaderAssets.Add(shaderAsset);
+                    }                   
 
                     return shaderAsset;
                 }

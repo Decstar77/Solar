@@ -9,8 +9,9 @@ namespace SolarSharp
 {
 	public class Camera
 	{
-		public Vector3 Position = Vector3.Zero;
-		public Quaternion Orientation = Quaternion.Identity;
+		public Vector3 Position { get; set; }
+		public Quaternion Orientation { get { return orientation; } set { orientation = value; } }
+		private Quaternion orientation = Quaternion.Identity;
 
 		protected float far = 100.0f;
 		public float Far { get { return far; } }
@@ -50,7 +51,7 @@ namespace SolarSharp
             return ray;
         }
 
-        public Matrix4 GetViewMatrix() { return Matrix4.TranslateLH(Quaternion.ToMatrix4(Orientation), Position).Inverse; }
-		public Matrix4 GetProjectionMatrix() { return Matrix4.CreatePerspectiveLH(yfov, Window.WindowAspect, near, far); }
+        public Matrix4 GetViewMatrix() { return Matrix4.TranslateRH(Quaternion.ToMatrix4(Orientation), Position).Inverse; }
+		public Matrix4 GetProjectionMatrix() { return Matrix4.CreatePerspectiveRH(yfov, Window.WindowAspect, near, far); }
 	}
 }

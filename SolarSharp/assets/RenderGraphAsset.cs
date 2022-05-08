@@ -17,7 +17,7 @@ namespace SolarSharp.Assets
         public float PositionEditorSpaceY { get; set; }
     }
 
-    public class RenderGraphAsset
+    public class RenderGraphAsset : EngineAsset
     {
         public string Name { get; set; }
         public string Path { get; set; }

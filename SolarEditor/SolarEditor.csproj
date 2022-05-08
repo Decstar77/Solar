@@ -21,13 +21,14 @@
 
   <ItemGroup>
     <Compile Include="content\ContentProcessor.cs" />
-    <Compile Include="content\MetaFile.cs" />
+    <Compile Include="content\MetaFileAsset.cs" />
     <Compile Include="content\ModelImporter.cs" />
     <Compile Include="EditorState.cs" />
+    <Compile Include="FlyCamera.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="windows\GameSceneWindow.cs" />
     <Compile Include="windows\RenderGraphWindow.cs" />
-    <Compile Include="windows\Window.cs" />
+    <Compile Include="windows\EditorWindow.cs" />
   </ItemGroup>
 
   <ItemGroup>

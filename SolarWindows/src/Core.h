@@ -22,7 +22,7 @@ typedef bool bool8;
 
 #define EDITOR_INTERFACE(type) extern "C" __declspec(dllexport) type __stdcall
 
-#define SOL_DEBUG_RENDERING 1
+#define SOL_DEBUG_RENDERING _DEBUG
 
 #define SOLFATAL(message)	std::cout << "INTERNAL FATAL: " << message << std::endl;
 #define SOLERROR(message)	std::cout << "INTERNAL ERROR: " << message << std::endl;

@@ -25,16 +25,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="assets\ModelAsset.cs" />
     <Compile Include="assets\RenderGraphAsset.cs" />
     <Compile Include="collision\Primitives.cs" />
     <Compile Include="collision\Raycast.cs" />
     <Compile Include="core\Application.cs" />
     <Compile Include="core\ApplicationConfig.cs" />
+    <Compile Include="core\Clock.cs" />
     <Compile Include="core\EventSystem.cs" />
     <Compile Include="core\Input.cs" />
-    <Compile Include="core\MeshFactory.cs" />
+    <Compile Include="tools\MeshFactory.cs" />
     <Compile Include="core\RenderPacket.cs" />
-    <Compile Include="core\Resources.cs" />
     <Compile Include="core\Util.cs" />
     <Compile Include="core\Window.cs" />
     <Compile Include="EngineAPI\ImGuiAPI.cs" />

@@ -119,26 +119,23 @@ EDITOR_INTERFACE(void*) CreateSwapchain()
 		swapChainDesc.Width = 0;
 		swapChainDesc.Height = 0;
 		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		swapChainDesc.Stereo = FALSE;
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = 3;
-		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		swapChainDesc.BufferCount = 1;
+		//swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		swapChainDesc.Flags = 0;
 
 		HWND window = winState.window;
-		hr = dxgiFactory->CreateSwapChainForHwnd(renderState.device, window,
-			&swapChainDesc, NULL, NULL, &renderState.swapChain.swapChain);
+		DXCHECK(dxgiFactory->CreateSwapChainForHwnd(renderState.device, window,
+			&swapChainDesc, NULL, NULL, &renderState.swapChain.swapChain));
 
-		DXRELEASE(dxgiFactory);
-		if (SUCCEEDED(hr))
-		{
-			SOLINFO("INTERNAL: Created swapchain");
+		//DXRELEASE(dxgiFactory);
+		//if (SUCCEEDED(hr))
+		//{
+		//	SOLINFO("INTERNAL: Created swapchain");
 			return renderState.swapChain.swapChain;
-		}		
+		//}	
 	}
 
 	return nullptr;
@@ -184,6 +181,8 @@ EDITOR_INTERFACE(void*) CreateSwapchainDepthStencilView()
 EDITOR_INTERFACE(void) SwapchainPresent(int vsync)
 {
 	DXGI_PRESENT_PARAMETERS parameters = { 0 };
+	//DXCHECK(renderState.swapChain.swapChain->Present(0, 0));
+	//XCHECK(renderState.swapChain.swapChain->Present1(0, DXGI_PRESENT_RESTART, &parameters));
 	DXCHECK(renderState.swapChain.swapChain->Present1(vsync, 0, &parameters));
 	//DXCHECK(renderState.swapChain.swapChain->Present1(0, DXGI_PRESENT_DO_NOT_WAIT, &parameters));
 }
@@ -209,7 +208,7 @@ EDITOR_INTERFACE(void*) DeviceCreateDepthStencilState(DepthStencilDesc *desc)
 	ds.StencilWriteMask = desc->StencilWriteMask;
 
 	ID3D11DepthStencilState* d = nullptr;
-	renderState.device->CreateDepthStencilState(&ds, &d);
+	DXCHECK(renderState.device->CreateDepthStencilState(&ds, &d));
 
 	return d;
 }

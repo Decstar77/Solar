@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolarSharp.Assets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,6 +15,11 @@ namespace SolarSharp.Rendering
         public uint VertexCount { get; set; }
         public DXBuffer VertexBuffer { get; set; }
         public DXBuffer IndexBuffer { get; set; }
+
+        public StaticMesh(DXDevice device, MeshAsset mesh) : this(device, mesh.vertices.ToArray(), mesh.indices.ToArray(), mesh.layout)
+        {
+            
+        }
 
         public StaticMesh(DXDevice device, float[] vertices, uint[] indices, VertexLayout layout)
         {

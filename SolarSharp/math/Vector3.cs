@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace SolarSharp
 {
@@ -39,7 +40,9 @@ namespace SolarSharp
             return string.Format("x={0} y={1} z={2}", x, y, z);
         }
 
+        [JsonIgnore]
         public float Mag { get { return MathF.Sqrt(x * x + y * y + z * z); } }
+        [JsonIgnore]
         public float MagSqrd { get { return (x * x + y * y + z * z); } }
 
         public static Vector3 Normalize(Vector3 value)

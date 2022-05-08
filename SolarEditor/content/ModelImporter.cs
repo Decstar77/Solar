@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 using Assimp;
 using SolarSharp;
+using SolarSharp.Assets;
 
 namespace SolarEditor
 {
     internal class ModelImporter
     {
-        internal static ModelAsset? LoadFromFile(string filePath)
+        internal static ModelAsset? LoadFromFile(string filePath, MetaFileAsset metaFile)
         {
             if (!File.Exists(filePath)) { Logger.Error("File path does not exist + " + filePath); return null; }
 
@@ -23,6 +24,9 @@ namespace SolarEditor
 
             Logger.Trace("Loading model " + filePath);
             ModelAsset model = LoadModel(scene);
+            model.Name = Path.GetFileName(filePath);
+            model.Path = filePath;
+            model.Guid = metaFile.Guid;
             
             importer.Dispose();            
 

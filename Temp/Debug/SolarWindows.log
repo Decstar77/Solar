@@ -1,2 +1,8 @@
-﻿  ImGuiAPI.cpp
+﻿  DX11Renderer.cpp
+  ImGuiAPI.cpp
+  ImGuiTextAPI.cpp
+  ImNodesAPI.cpp
+  SolarMath.cpp
+  Win32Platform.cpp
+C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\SolarWindows\src\Win32Platform.cpp(47,4): warning C4353: nonstandard extension used: constant 0 as function expression.  Use '__noop' function intrinsic instead
   SolarWindows.vcxproj -> C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\x64\Debug\SolarWindows.dll

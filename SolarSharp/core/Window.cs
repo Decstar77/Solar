@@ -36,5 +36,12 @@ namespace SolarSharp.Core
         {
             return Win32API.PumpMessages_(ref input);
         }
+
+        public static string OpenNativeFileDialog()
+        {
+            byte[] input = new byte[256];
+            Win32API.OpenNativeFileDialog(input);
+            return Util.AsciiBytesToString(input, 0);
+        }
     }
 }

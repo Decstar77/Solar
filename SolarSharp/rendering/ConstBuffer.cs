@@ -43,7 +43,6 @@ namespace SolarSharp.Rendering
 
         public ConstBuffer Prepare(Matrix4 m)
         {
-            m = m.Transpose;
             buffer[index++] = m.m11; buffer[index++] = m.m12; buffer[index++] = m.m13; buffer[index++] = m.m14;
             buffer[index++] = m.m21; buffer[index++] = m.m22; buffer[index++] = m.m23; buffer[index++] = m.m24;
             buffer[index++] = m.m31; buffer[index++] = m.m32; buffer[index++] = m.m33; buffer[index++] = m.m34;

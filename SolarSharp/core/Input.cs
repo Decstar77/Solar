@@ -111,6 +111,24 @@ namespace SolarSharp
     public static class Input
     {
 		public static Vector2 MousePositionPixelCoords => Application.Input.mousePositionPixelCoords;
+		public static Vector2 MouseDelta => Application.Input.mouseDelta;
+
+		public static void DisableMouse() => Application.Input.mouseLocked = true;
+		public static void EnableMouse() => Application.Input.mouseLocked = false;
+
+		public static bool IsMouseDown(MouseButton mouse)
+        {
+			switch (mouse)
+			{
+				case MouseButton.MOUSE1:
+					return Application.Input.mb1;
+				case MouseButton.MOUSE2:
+					return Application.Input.mb2;
+				case MouseButton.MOUSE3:
+					return Application.Input.mb3;
+			}
+			return false;
+		}			
 
 		public static bool IsMouseButtonJustDown(MouseButton mouse)
         {

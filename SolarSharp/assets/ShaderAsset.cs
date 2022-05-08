@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Assets
 {
-    public class ShaderAsset
+    public class ShaderAsset : EngineAsset
     {
         private static string VERTEX_BEGIN_TOKEN = "//VertexShaderBegin//";
         private static string VERTEX_END_TOKEN = "//VertexShaderEnd//";

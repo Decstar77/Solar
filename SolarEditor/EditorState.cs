@@ -10,10 +10,14 @@ using SolarSharp.Assets;
 
 namespace SolarEditor
 {
+
     internal class EditorState
     {
-        private List<Window> windows = new List<Window>();
-        private List<Window> newWindows = new List<Window>();
+        private List<EditorWindow> windows = new List<EditorWindow>();
+        private List<EditorWindow> newWindows = new List<EditorWindow>();
+        private FlyCamera camera = new FlyCamera();
+
+        
 
         internal EditorState()
         {
@@ -21,11 +25,46 @@ namespace SolarEditor
             //AddWindow(new ShaderEditorWindow(AssetSystem.ShaderAssets[0]));
             //AddWindow(new RenderGraphWindow());
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; });
+
+            Directory.GetFiles(Application.Config.AssetPath, "*.fbx", SearchOption.AllDirectories).ToList().ForEach(x => {
+                Task.Run(() =>
+                {
+                    Logger.Info($"Loading model {x}");
+                    MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x);
+                    ModelAsset? modelAsset = ModelImporter.LoadFromFile(x, metaFileAsset);
+                    if (modelAsset != null)
+                        AssetSystem.AddModelAsset(modelAsset);
+                });
+            });
+
+            GameScene gameScene = new GameScene();
+            gameScene.Camera = camera;
+            
+            Entity entity = new Entity();
+            entity.Name = "Bike";
+            entity.Material = new Material();
+            entity.Material.ModelId = Guid.Parse("e7cc1002-89d4-49dc-a2f2-3269afdfcefc");
+
+            gameScene.Entities.Add(entity);
+            GameSystem.CurrentScene = gameScene;
+
+            AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", gameScene);
+
+            Logger.Info("Editor startup complete");
+        }        
+
+        private bool newModelDialog = false;
+        private ModelAsset? newModelAsset = null;
+
+        internal void Update()
+        {
+            camera.Operate();
         }
 
-        private string path = "C:/Users/claud/OneDrive/Desktop/DeclanStuff/Solar/EngineAssets/";
-        private string name = "";
-        private bool open = false;
+        internal void Shutdown()
+        {
+
+        }
 
         internal void UIDraw()
         {
@@ -37,6 +76,41 @@ namespace SolarEditor
             //    open = false;
             //    ImGui.OpenPopup("Create Shader");
             //}
+
+            if (newModelDialog)
+            {
+                newModelDialog = false;
+                ImGui.OpenPopup("Create Model Asset");
+            }
+
+            
+            if (ImGui.BeginPopupModal("Create Model Asset"))
+            {
+                string path = Application.Config.AssetPath + newModelAsset.Name;
+
+                ImGui.InputText("Path", ref path);
+                if (ImGui.Button("Create", 200, 0))
+                { 
+                    File.Copy(newModelAsset.Path,  path);
+
+                    //MeshAsset mesh = newModelAsset.meshes[0];
+                    //StaticMesh newMesh = new StaticMesh(RenderSystem.device, mesh);
+                    //RenderSystem.cube = newMesh;
+
+                    newModelAsset = null;
+
+                    ImGui.CloseCurrentPopup();
+                }
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel", 200, 0))
+                {
+                    newModelAsset = null;
+                    ImGui.CloseCurrentPopup();
+                }
+
+                ImGui.EndPopup();
+            }
+      
 
             //if (ImGui.BeginPopupModal("Create Shader", ImGuiWindowFlags.NoResize))
             //{
@@ -59,21 +133,11 @@ namespace SolarEditor
 
             ShowWindows();
             ImGui.EndFrame();
-        }
+        }  
 
-        internal void Update()
+        internal T AddWindow <T> (T window) where T : EditorWindow
         {
-
-        }
-
-        internal void Shutdown()
-        {
-          
-        }
-
-        internal T AddWindow <T> (T window) where T : Window
-        {
-            foreach (Window w in windows)
+            foreach (EditorWindow w in windows)
                 if (w.GetType() == window.GetType())
                     return (T)w;
 
@@ -111,7 +175,32 @@ namespace SolarEditor
 
                     if (ImGui.MenuItem("Open"))
                     {
+                        string file = SolarSharp.Core.Window.OpenNativeFileDialog();
 
+                        if (file != null && file != "")
+                        {
+                            string ext = Path.GetExtension(file);
+                            if (ext == ".fbx" || ext == ".obj")
+                            {
+                                //Task.Run(() => {
+                                //    Logger.Info($"Loading model {file}");
+                                //    ModelAsset? modelAsset = ModelImporter.LoadFromFile(file);
+                                //    if (modelAsset != null)
+                                //    {
+                                //        newModelDialog = true;
+                                //        newModelAsset = modelAsset;
+                                //    }
+                                //});                             
+                            }
+                            else if (ext == ".png")
+                            {
+                                Logger.Error("We don't support textures... yet.");
+                            }
+                            else
+                            {
+                                Logger.Error("Unkown extension, " + ext);
+                            }
+                        }
                     }
 
                     ImGui.EndMenu();

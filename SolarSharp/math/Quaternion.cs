@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace SolarSharp
 {
@@ -49,7 +50,9 @@ namespace SolarSharp
             return String.Format("x={0} y={1} z={2} w={3}", x, y, z, w);
         }
 
+        [JsonIgnore]
         public float Mag { get { return MathF.Sqrt(x*x + y*y + z*z + w*w);} }
+        [JsonIgnore]
         public float MagSqrd { get { return x * x + y * y + z * z + w * w; } }
 
         public static Vector3 RotatePoint(Vector3 point, Quaternion delta)
