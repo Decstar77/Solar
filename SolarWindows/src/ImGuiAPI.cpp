@@ -285,4 +285,10 @@ namespace ImGuiAPI
 		ImGui::PopID();
 	}
 
+	EDITOR_INTERFACE(bool) ImGuiIsWindowFocused(int flags)
+	{
+		bool r =  ImGui::IsWindowFocused(flags);
+		return r;
+	}
+
 }

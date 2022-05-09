@@ -23,7 +23,7 @@ namespace SolarSharp.Rendering
 
         public StaticMesh(DXDevice device, float[] vertices, uint[] indices, VertexLayout layout)
         {
-            uint vertexStrideBytes = layout.GetStrideBytes();
+            uint vertexStrideBytes = (uint)layout.GetStrideBytes();
             uint indicesStrideBytes = sizeof(uint);
 
             BufferDesc vertexDesc = new BufferDesc();

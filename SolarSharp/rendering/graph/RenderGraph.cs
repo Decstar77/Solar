@@ -181,7 +181,7 @@ namespace SolarSharp.Rendering.Graph
 
             if (shader == null) {
                 Logger.Trace("Creating new graphics shader " + shaderAsset.Name);
-                shader = new GraphicsShader(device).Create(shaderAsset);
+                shader = new GraphicsShader().Create(device, shaderAsset);
                 graphicsShaders.Add(shader);
             }
 

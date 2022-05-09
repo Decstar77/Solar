@@ -17,9 +17,11 @@ namespace SolarSharp
         public static readonly Vector3 UnitY = new Vector3(0.0f, 1.0f, 0.0f);
         public static readonly Vector3 UnitZ = new Vector3(0.0f, 0.0f, 1.0f);
 
-        public float x;
-        public float y;
-        public float z;
+        [JsonInclude] public float x;
+        [JsonInclude] public float y;
+        [JsonInclude] public float z;
+
+        //public float X { get { return x; } set { x = value; } }
 
         public Vector3(float x, float y, float z)
         {

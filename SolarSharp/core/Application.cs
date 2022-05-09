@@ -10,6 +10,7 @@ using SolarSharp.Rendering;
 using SolarSharp.EngineAPI;
 using SolarSharp.Assets;
 using SolarSharp.Rendering.Graph;
+using SolarSharp.core;
 
 namespace SolarSharp
 {
@@ -60,6 +61,11 @@ namespace SolarSharp
             if (!GameSystem.Initialize()) {
                 Logger.Error("Could not initalize game systems");
             }
+
+            if (!DebugDraw.Initialize(RenderSystem.device)) {
+                Logger.Error("Could not initalize debug system");
+            }
+
 
             GameSystem.CurrentScene = new GameScene();
             GameSystem.CurrentScene.name = "Untitled";

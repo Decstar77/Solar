@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace SolarSharp
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector2
     {
-        public float x;
-        public float y;
+        [JsonInclude] public float x;
+        [JsonInclude] public float y;
 
         public Vector2(float x, float y) 
         {

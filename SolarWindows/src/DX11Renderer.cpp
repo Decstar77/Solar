@@ -497,3 +497,18 @@ EDITOR_INTERFACE(void) ContextSetCSShaderResources(void* srv, uint32 slot)
 	ID3D11ShaderResourceView* srvs[] = { (ID3D11ShaderResourceView*)srv };
 	DXINFO(renderState.context->CSSetShaderResources(slot, 1, srvs));
 }
+
+EDITOR_INTERFACE(void) ContextMap(void* res, uint32 subRes, uint32 mapType, uint32 mapFlags, void* map)
+{
+	DXINFO(renderState.context->Map((ID3D11Resource*)res, subRes, (D3D11_MAP)mapType, mapFlags, (D3D11_MAPPED_SUBRESOURCE*)map));
+}
+
+EDITOR_INTERFACE(void) ContextUnmap(void* res, uint32 subRes)
+{
+	DXINFO(renderState.context->Unmap((ID3D11Resource*)res, subRes));
+}
+
+EDITOR_INTERFACE(void) ContextDraw(uint32 vertexCount, uint32 vertexStartLocation)
+{
+	DXINFO(renderState.context->Draw(vertexCount, vertexStartLocation));
+}

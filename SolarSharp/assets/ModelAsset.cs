@@ -19,6 +19,47 @@ namespace SolarSharp.Assets
         COUNT,
     }
 
+    public static class VertexLayoutExtensions
+    {
+        public static uint GetStride(this VertexLayout layout)
+        {
+            switch (layout)
+            {
+                case VertexLayout.P: return 3;
+                case VertexLayout.PNT: return (3 + 3 + 2);
+            }
+
+            return 0;
+        }
+
+        public static int GetStrideBytes(this VertexLayout vertexLayout)
+        {
+            switch (vertexLayout)
+            {
+                case VertexLayout.INVALID:
+                    return -1;
+                case VertexLayout.P:
+                    return 4 * 3;
+                case VertexLayout.P_PAD:
+                    return -1;
+                case VertexLayout.PNT:
+                    return 4 * (3 + 3 + 2);
+                case VertexLayout.PNTC:
+                    return -1;
+                case VertexLayout.PNTM:
+                    return -1;
+                case VertexLayout.TEXT:
+                    return -1;
+                case VertexLayout.PC:
+                    return -1;
+                case VertexLayout.COUNT:
+                    return -1;
+            }
+            return -1;
+        }
+    }
+
+
     public class MeshAsset : EngineAsset
     {
         public List<float> vertices;

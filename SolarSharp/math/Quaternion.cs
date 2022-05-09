@@ -11,10 +11,10 @@ namespace SolarSharp
     [StructLayout(LayoutKind.Sequential)]    
     public struct Quaternion
     {
-        public float x;
-        public float y;
-        public float z;
-        public float w;
+        [JsonInclude] public float x;
+        [JsonInclude] public float y;
+        [JsonInclude] public float z;
+        [JsonInclude] public float w;
 
         public Quaternion(float x, float y, float z, float w)
         {

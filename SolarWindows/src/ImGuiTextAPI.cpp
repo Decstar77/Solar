@@ -48,7 +48,7 @@ EDITOR_INTERFACE(bool) ImGuiTextIsReadOnly()
 
 
 EDITOR_INTERFACE(void) ImGuiTextSetReadOnly(bool32 v)
-{
+{    
     editor->SetReadOnly(v);
 }
 

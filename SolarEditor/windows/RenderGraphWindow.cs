@@ -13,6 +13,13 @@ namespace SolarEditor
     {
         private bool compileOnSave = false;
         public RenderGraph RenderGraph { get; set; }
+        public override void Start()
+        {
+        }
+
+        public override void Shutdown()
+        {
+        }
 
         public override void Show(EditorState editorState)
         {

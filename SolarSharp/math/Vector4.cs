@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace SolarSharp
 {
@@ -15,10 +16,10 @@ namespace SolarSharp
         public static readonly Vector4 UnitY = new Vector4(0.0f, 1.0f, 0.0f, 0.0f);
         public static readonly Vector4 UnitZ = new Vector4(0.0f, 0.0f, 1.0f, 0.0f);
 
-        public float x;
-        public float y;
-        public float z;
-        public float w;
+        [JsonInclude] public float x;
+        [JsonInclude] public float y;
+        [JsonInclude] public float z;
+        [JsonInclude] public float w;
 
         public Vector4(float value)
         {
@@ -44,7 +45,9 @@ namespace SolarSharp
             this.w = w;
         }
 
+        [JsonIgnore]
         public float Mag { get { return MathF.Sqrt(x * x + y * y + z * z + w * w); } }
+        [JsonIgnore]
         public float MagSqrd { get { return (x * x + y * y + z * z + w * w); } }
 
         public override string ToString()

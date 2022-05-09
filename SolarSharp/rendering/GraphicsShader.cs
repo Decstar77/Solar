@@ -14,18 +14,12 @@ namespace SolarSharp.Rendering
         public DXVertexShader vertexShader;
         public DXPixelShader pixelShader;
         public DXInputLayout inputLayout;
-        private DXDevice device = null;
 
         public GraphicsShader() {
 
         }
 
-        public GraphicsShader(DXDevice device)
-        {
-            this.device = device;
-        }
-
-        public GraphicsShader Create(ShaderAsset shaderAsset)
+        public GraphicsShader Create(DXDevice device, ShaderAsset shaderAsset)
         {
             Name = shaderAsset.Name;
 
@@ -34,7 +28,7 @@ namespace SolarSharp.Rendering
 
             if (vertexBlob.Ptr != IntPtr.Zero && pixelBlob.Ptr != IntPtr.Zero)
             {
-                InputElementDesc[] inputElementDescs = GetInputElementDescs();
+                InputElementDesc[] inputElementDescs = GetInputElementDescs(VertexLayout.PNT);
 
                 inputLayout = device.CreateInputLayout(vertexBlob, inputElementDescs);
 
@@ -46,7 +40,33 @@ namespace SolarSharp.Rendering
             }
             else
             {
-                Logger.Error("Could not compile shader");
+                Logger.Error($"Could not compile {Name}");
+            }
+
+            return this;
+        }
+
+        public GraphicsShader Create(DXDevice device, string name, string src, VertexLayout vertexLayout)
+        {
+            Name = name;
+
+            DXBlob vertexBlob = device.CompileShader(src, "VSmain", "vs_5_0");
+            DXBlob pixelBlob = device.CompileShader(src, "PSmain", "ps_5_0");
+
+            if (vertexBlob.Ptr != IntPtr.Zero && pixelBlob.Ptr != IntPtr.Zero)
+            {
+                InputElementDesc[] inputElementDescs = GetInputElementDescs(vertexLayout);
+
+                inputLayout = device.CreateInputLayout(vertexBlob, inputElementDescs);
+                vertexShader = device.CreateVertexShader(vertexBlob);
+                pixelShader = device.CreatePixelShader(pixelBlob);
+
+                vertexBlob.Release();
+                pixelBlob.Release();
+            }
+            else
+            {
+                Logger.Error($"Could not compile {Name}");
             }
 
             return this;
@@ -67,7 +87,7 @@ namespace SolarSharp.Rendering
                 vertexShader.Ptr != IntPtr.Zero && pixelShader.Ptr != IntPtr.Zero && inputLayout.Ptr != IntPtr.Zero;
         }
 
-        private InputElementDesc[] GetInputElementDescs()
+        private InputElementDesc[] GetInputElementDescs(VertexLayout vertexLayout)
         {
             InputElementDesc pDesc = new InputElementDesc();
             pDesc.SemanticName = "Position";
@@ -96,7 +116,29 @@ namespace SolarSharp.Rendering
             tDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
             tDesc.InstanceDataStepRate = 0;
 
-            return new InputElementDesc[] { pDesc, nDesc, tDesc };
+            switch (vertexLayout)
+            {
+                case VertexLayout.INVALID:
+                    return null;
+                case VertexLayout.P:
+                    return new InputElementDesc[] { pDesc };
+                case VertexLayout.P_PAD:
+                    return null;
+                case VertexLayout.PNT:
+                    return new InputElementDesc[] { pDesc, nDesc, tDesc };
+                case VertexLayout.PNTC:
+                    return null;
+                case VertexLayout.PNTM:
+                    return null;
+                case VertexLayout.TEXT:
+                    return null;
+                case VertexLayout.PC:
+                    return null;
+                case VertexLayout.COUNT:
+                    return null;
+            }
+
+            return null;
         }
     }
 }

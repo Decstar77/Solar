@@ -9,6 +9,13 @@ namespace SolarEditor
 {
     internal class ConsoleWindow : EditorWindow
     {
+        public override void Start()
+        {
+        }
+        public override void Shutdown()
+        {
+        }
+
         public override void Show(EditorState editorState)
         {
             if (ImGui.Begin("Console", ref show))

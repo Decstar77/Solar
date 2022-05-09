@@ -136,5 +136,15 @@ namespace SolarSharp.EngineAPI
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         public static extern void ContextSetCSShaderResources(IntPtr srv, uint slot);
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextMap(IntPtr res, uint subRes, uint mapType, uint mapFlags, ref DXMappedSubresource map);
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextUnmap(IntPtr res, uint subRes);
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextDraw(uint vertexCount, uint vertexStartLocation);
+
     }
 }

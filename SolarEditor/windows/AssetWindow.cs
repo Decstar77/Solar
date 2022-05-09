@@ -10,6 +10,13 @@ namespace SolarEditor
 {
     internal class AssetSystemWindow : EditorWindow
     {
+        public override void Start()
+        {            
+        }
+        public override void Shutdown()
+        {
+        }
+
         public override void Show(EditorState editorState)
         {
             if (ImGui.Begin("Assets ", ref show))

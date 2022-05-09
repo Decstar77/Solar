@@ -121,6 +121,16 @@ namespace SolarSharp.Rendering
 		CallbackEdit = 1 << 19,  // Callback on any edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
 	};
 
+	[Flags]
+	public enum ImGuiFocusedFlags
+	{
+		None = 0,
+		ChildWindows = 1 << 0,   // IsWindowFocused(): Return true if any children of the window is focused
+		RootWindow = 1 << 1,   // IsWindowFocused(): Test from root window (top most parent of the current hierarchy)
+		AnyWindow = 1 << 2,   // IsWindowFocused(): Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs, do NOT use this. Use 'io.WantCaptureMouse' instead! Please read the FAQ!
+		RootAndChildWindows = RootWindow | ChildWindows
+	};
+
 	public class ImGui
     {
 		public static bool Initialzie() => ImGuiAPI.ImGuiInitialzie();
@@ -228,5 +238,6 @@ namespace SolarSharp.Rendering
 		public static bool InputInt( string label, ref int v, int step = 1, int stepFast = 100, ImGuiInputTextFlags flags = 0) => ImGuiAPI.ImGuiInputInt(label, ref v, step, stepFast, (int)flags);
 		public static void PushId(int id) => ImGuiAPI.ImGuiPushId(id);
 		public static void PopId() => ImGuiAPI.ImGuiPopId();
+		public static bool IsWindowFocused(ImGuiFocusedFlags flags = 0) => ImGuiAPI.ImGuiIsWindowFocused((int)flags);
 	}
 }

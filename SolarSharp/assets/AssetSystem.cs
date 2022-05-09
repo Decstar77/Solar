@@ -99,6 +99,7 @@ namespace SolarSharp.Assets
 
         public static void SaveGameSceneAsset(string path, GameScene gameScene)
         {
+            Logger.Trace($"Saving {path}");
             string json = JsonSerializer.Serialize(gameScene);
             File.WriteAllText(path + gameScene.name + ".json", json);
         }

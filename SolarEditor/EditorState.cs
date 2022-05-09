@@ -17,14 +17,12 @@ namespace SolarEditor
         private List<EditorWindow> newWindows = new List<EditorWindow>();
         private FlyCamera camera = new FlyCamera();
 
-        
-
         internal EditorState()
         {
             //AddWindow(new AssetSystemWindow());
             //AddWindow(new ShaderEditorWindow(AssetSystem.ShaderAssets[0]));
             //AddWindow(new RenderGraphWindow());
-            EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; });
+            EventSystem.AddListener(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; }, this);
 
             Task.Run(() => 
             {
@@ -56,10 +54,6 @@ namespace SolarEditor
             });
 
 
-
-
-
-
             GameScene gameScene = new GameScene();
             gameScene.Camera = camera;
             
@@ -72,7 +66,7 @@ namespace SolarEditor
             gameScene.Entities.Add(entity);
             GameSystem.CurrentScene = gameScene;
 
-            AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", gameScene);
+            
 
             AssetSystem.AddGameScene(gameScene);
 
@@ -84,6 +78,16 @@ namespace SolarEditor
 
         internal void Update()
         {
+            ImGui.BeginFrame();
+            DrawGlobalMenu();
+            ShowWindows();
+
+            if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L)) {
+                EventSystem.Fire(EventType.ON_SAVE, null);
+
+                AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", GameSystem.CurrentScene);
+            }
+
             camera.Operate();
         }
 
@@ -94,8 +98,8 @@ namespace SolarEditor
 
         internal void UIDraw()
         {
-            ImGui.BeginFrame();
-            DrawGlobalMenu();            
+           
+                     
 
             //if (open)
             //{
@@ -136,28 +140,8 @@ namespace SolarEditor
 
                 ImGui.EndPopup();
             }
-      
-
-            //if (ImGui.BeginPopupModal("Create Shader", ImGuiWindowFlags.NoResize))
-            //{
-            //    ImGui.InputText("Name", ref name);
-            //    ImGui.InputText("Path", ref path);
-
-            //    if (ImGui.Button("Create", 80, 0))
-            //    {
-            //        RenderSystem.graphicsShaders.Add(ShaderFactory.CreateGraphicsShader(name, path));
-            //        ImGui.CloseCurrentPopup();
-            //    }
-            //    ImGui.SameLine();
-            //    if (ImGui.Button("Cancel", 80, 0))
-            //    {
-            //        ImGui.CloseCurrentPopup();
-            //    }
-
-            //    ImGui.EndPopup();
-            //}
-
-            ShowWindows();
+ 
+    
             ImGui.EndFrame();
         }  
 
@@ -173,10 +157,21 @@ namespace SolarEditor
 
         internal void ShowWindows()
         {
+            newWindows.ForEach(x => x.Start());
             windows.AddRange(newWindows);
             newWindows.Clear();
+            
             windows.ForEach(x => x.Show(this));
-            windows.RemoveAll(x => x.ShouldClose());            
+
+            windows.RemoveAll(x =>
+            {
+                if (x.ShouldClose())
+                {
+                    x.Shutdown();
+                    return true;
+                }
+                return false;
+            });
         }
 
         private void DrawGlobalMenu()
@@ -238,17 +233,21 @@ namespace SolarEditor
                         AddWindow(new ShaderEditorWindow(null));
                     }
 
-                    if (ImGui.MenuItem("Assets")) {
-                        AddWindow(new AssetSystemWindow());
-                    }
-
                     if (ImGui.MenuItem("Render graph")) {
                         AddWindow(new RenderGraphWindow());
                     }
 
+                    if (ImGui.MenuItem("Assets")) {
+                        AddWindow(new AssetSystemWindow());
+                    }
+
                     if (ImGui.MenuItem("Scene ")) {
                         AddWindow(new GameSceneWindow());
-                    }                    
+                    }
+
+                    if (ImGui.MenuItem("Debug")) {
+                        AddWindow(new DebugWindow());
+                    }
 
                     ImGui.EndMenu();
                 }

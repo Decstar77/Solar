@@ -12,6 +12,16 @@ namespace SolarEditor
 {
     internal class GameSceneWindow : EditorWindow
     {
+        public override void Start()
+        {
+            EventSystem.AddListener(EventType.ON_SAVE, (type, context) => { return false; }, this);
+        }
+
+        public override void Shutdown()
+        {
+            EventSystem.RemoveListner(EventType.ON_SAVE, this);
+        }
+
         public override void Show(EditorState editorState)
         {
             GameScene gameScene = GameSystem.CurrentScene;
@@ -34,10 +44,6 @@ namespace SolarEditor
 
                     gameScene.RenderGraph = AssetSystem.RenderGraphs[currentRenderGraphAsset];
                 }
-
-                
-
-                //ImGui.Combo("RenderGraph", )
             }
 
             ImGui.End();

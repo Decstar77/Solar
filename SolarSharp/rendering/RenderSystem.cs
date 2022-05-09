@@ -1,4 +1,5 @@
 ﻿using SolarSharp.Assets;
+using SolarSharp.core;
 using SolarSharp.Core;
 using SolarSharp.Tools;
 using System;
@@ -24,7 +25,9 @@ namespace SolarSharp.Rendering
         public static StaticMesh cube;
 
         public static GraphicsShader shader;
+
         private static ConstBuffer constBuffer0;
+        private static ConstBuffer constBuffer1;
 
         private static DXSamplerState samplerState0;
         private static DXSamplerState samplerState1;
@@ -86,10 +89,11 @@ namespace SolarSharp.Rendering
 
             //mesh = StaticMesh.CreateScreenSpaceQuad(deviceContext.Device);
 
-            shader = new GraphicsShader(device);
-            shader.Create(Assets.AssetSystem.ShaderAssets[0]);
+            shader = new GraphicsShader().Create(device, Assets.AssetSystem.ShaderAssets[0]); 
+            
             constBuffer0 = new ConstBuffer(device, 16 * 3).SetVS(context, 0);
-           
+            constBuffer1 = new ConstBuffer(device, 16 * 3).SetVS(context, 1);
+
             ImGui.Initialzie();
             ImGuiTextEditor.Initialize();
             ImNodes.Initialzie();
@@ -129,9 +133,15 @@ namespace SolarSharp.Rendering
             }
 
             Camera camera = GameSystem.CurrentScene.Camera;
-            Matrix4 mvp = camera.GetProjectionMatrix() * camera.GetViewMatrix();
-            constBuffer0.Reset().Prepare(mvp).Upload(context);
+
+            Matrix4 proj = camera.GetProjectionMatrix();
+            Matrix4 view = camera.GetViewMatrix();
+
+            Matrix4 mvp = proj * view;
             
+            constBuffer0.Reset().Prepare(mvp).Upload(context);
+            constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
+
             context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); 
             context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 1.0f, 0);
             context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
@@ -176,11 +186,10 @@ namespace SolarSharp.Rendering
                         }
                     }
 
-                    //context.SetVertexBuffers(cube.VertexBuffer, cube.StrideBytes);
-                    //context.SetIndexBuffer(cube.IndexBuffer, TextureFormat.R32_UINT, 0);
-                    //context.DrawIndexed(cube.IndexCount, 0, 0);
                 }
             }
+
+            DebugDraw.Flush(context);
         }
 
         public static void SwapBuffers(bool vysnc)

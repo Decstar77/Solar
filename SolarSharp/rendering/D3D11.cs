@@ -552,27 +552,8 @@ namespace SolarSharp.Rendering
 
     public static class VertexLayoutExtensions
     {
-        public static uint GetStride(this VertexLayout layout)
-        {
-            switch (layout)
-            {
-                case VertexLayout.P: return 3;
-                case VertexLayout.PNT: return (3 + 3 + 2);
-            }
 
-            return 0;
-        }
 
-        public static uint GetStrideBytes(this VertexLayout layout)
-        {
-            switch (layout)
-            {
-                case VertexLayout.P: return sizeof(float) * 3;
-                case VertexLayout.PNT: return sizeof(float) * (3 + 3 + 2);
-            }
-
-            return 0;
-        }
     }  
 
     public enum PrimitiveTopology
@@ -607,6 +588,22 @@ namespace SolarSharp.Rendering
         [MarshalAs(UnmanagedType.U4)] public uint bottom;
         [MarshalAs(UnmanagedType.U4)] public uint back;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DXMappedSubresource
+    {
+        public IntPtr pData;
+        [MarshalAs(UnmanagedType.U4)] public int RowPitch;
+        [MarshalAs(UnmanagedType.U4)] public uint DepthPitch;
+    }
+    public enum DXMapType
+    {
+        READ = 1,
+        WRITE = 2,
+        READ_WRITE = 3,
+        WRITE_DISCARD = 4,
+        WRITE_NO_OVERWRITE = 5
+    };
 
     public class DXDevice : DirectXObject
     {
@@ -746,9 +743,11 @@ namespace SolarSharp.Rendering
         public void SetPSShaderResources(DXShaderResourceView srv, uint slot) => D3D11API.ContextSetPSShaderResources(srv.Ptr, slot);
         public void SetCSShaderResources(DXShaderResourceView srv, uint slot) => D3D11API.ContextSetCSShaderResources(srv.Ptr, slot);
 
-        //public void SetPSShaderResources(DXShader srv, uint32 slot);
-        //public void SetCSShaderResources(void* srv, uint32 slot);
+        public void Map(DXBuffer buffer, uint subResource, DXMapType mapType, ref DXMappedSubresource map) 
+            => D3D11API.ContextMap(buffer.Ptr, subResource, (uint)mapType, 0, ref map);
 
+        public void Unmap(DXBuffer buffer, uint subRes) => D3D11API.ContextUnmap(buffer.Ptr, subRes);
+        public void Draw(uint vertexCount, uint vertexStartLocation) => D3D11API.ContextDraw(vertexCount, vertexStartLocation);
     }
 
     public class RenderTargetView : DirectXObject
