@@ -21,9 +21,9 @@ namespace SolarSharp.Assets
         public static List<RenderGraph> RenderGraphs { get { return renderGraphs; } }
         private static List<RenderGraph> renderGraphs = new List<RenderGraph>();
         
-        private static List<GameScene> gameScenes = new List<GameScene>();
-        
+        private static List<GameScene> gameScenes = new List<GameScene>();        
         private static List<ModelAsset> modelAssets = new List<ModelAsset>();
+        private static List<TextureAsset> textureAssets = new List<TextureAsset>();
 
         public static ModelAsset? GetModelAsset(string name)
         {
@@ -31,7 +31,7 @@ namespace SolarSharp.Assets
 
             lock (modelAssets)
             {
-                model = modelAssets.Find(x => x.Name == name);
+                model = modelAssets.Find(x => x.name == name);
             }
 
             return model;
@@ -49,14 +49,36 @@ namespace SolarSharp.Assets
             return model;
         }
 
+        public static List<ModelAsset> GetModelAssets() => new List<ModelAsset>(modelAssets);
         public static void AddModelAsset(ModelAsset model)
         {
             lock (modelAssets)
             {                
-                Logger.Info($"Placing {model.Name}");
+                Logger.Info($"Placing {model.name}");
                 modelAssets.Add(model);
             }
         }
+
+        public static List<TextureAsset> GetTextureAssets() => new List<TextureAsset>(textureAssets);
+        public static void AddTextureAsset(TextureAsset texture)
+        {
+            lock(textureAssets)
+            {
+                Logger.Info($"Placing {texture.name}");
+                textureAssets.Add(texture);
+            }
+        }
+
+        public static List<GameScene> GetGameScenes() => new List<GameScene>(gameScenes);
+        public static void AddGameScene(GameScene gameScene)
+        {
+            lock (gameScenes)
+            {
+                Logger.Info($"Placing {gameScene.name}");
+                gameScenes.Add(gameScene);
+            }
+        }
+
 
         public static bool Initialize()
         {
@@ -78,7 +100,7 @@ namespace SolarSharp.Assets
         public static void SaveGameSceneAsset(string path, GameScene gameScene)
         {
             string json = JsonSerializer.Serialize(gameScene);
-            File.WriteAllText(path + gameScene.Name + ".json", json);
+            File.WriteAllText(path + gameScene.name + ".json", json);
         }
 
         public static GameScene LoadGameSceneAsset(string path)
@@ -89,7 +111,7 @@ namespace SolarSharp.Assets
                 {
                     string json = File.ReadAllText(path);
                     GameScene gameScene = JsonSerializer.Deserialize<GameScene>(json);
-                    gameScene.Name = Path.GetFileNameWithoutExtension(path);
+                    gameScene.name = Path.GetFileNameWithoutExtension(path);
 
                     lock(gameScenes)
                     {

@@ -27,8 +27,8 @@ namespace SolarSharp.Rendering
             uint indicesStrideBytes = sizeof(uint);
 
             BufferDesc vertexDesc = new BufferDesc();
-            vertexDesc.BindFlags = (uint)(BufferBindFlag.VERTEX_BUFFER);
-            vertexDesc.Usage = BufferUsage.DEFAULT;
+            vertexDesc.BindFlags = DXBindFlag.VERTEX_BUFFER;
+            vertexDesc.Usage = DXUsage.DEFAULT;
             vertexDesc.CPUAccessFlags = 0;
             vertexDesc.MiscFlags = 0;
             vertexDesc.ByteWidth = (uint)(vertices.Length * sizeof(float));
@@ -39,8 +39,8 @@ namespace SolarSharp.Rendering
             vertexSubResourceData.pSysMem = vertexHandle.AddrOfPinnedObject();
 
             BufferDesc indexDesc = new BufferDesc();
-            indexDesc.BindFlags = (uint)(BufferBindFlag.INDEX_BUFFER);
-            indexDesc.Usage = BufferUsage.DEFAULT;
+            indexDesc.BindFlags = DXBindFlag.INDEX_BUFFER;
+            indexDesc.Usage = DXUsage.DEFAULT;
             indexDesc.CPUAccessFlags = 0;
             indexDesc.MiscFlags = 0;
             indexDesc.ByteWidth = (uint)(indices.Length * sizeof(float));

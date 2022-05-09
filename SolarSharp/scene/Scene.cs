@@ -42,11 +42,13 @@ namespace SolarSharp
     {
         public Guid ModelId { get; set; }
         public Guid ShaderId { get; set; }
+        public Guid AlbedoTexture { get; set; }
     }
 
     public class GameScene : EngineAsset
     {
-        public string Name = "";
+        public string name = "";
+        public string path = "";
 
         public Camera Camera { get { return camera; } set { camera = value; } }
         private Camera camera = new Camera();

@@ -26,16 +26,39 @@ namespace SolarEditor
             //AddWindow(new RenderGraphWindow());
             EventSystem.Listen(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; });
 
-            Directory.GetFiles(Application.Config.AssetPath, "*.fbx", SearchOption.AllDirectories).ToList().ForEach(x => {
-                Task.Run(() =>
-                {
+            Task.Run(() => 
+            {
+                Directory.GetFiles(Application.Config.AssetPath, "*.fbx", SearchOption.AllDirectories).ToList().ForEach(x => {               
                     Logger.Info($"Loading model {x}");
-                    MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x);
+                    MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x, AssetType.MODEL);
                     ModelAsset? modelAsset = ModelImporter.LoadFromFile(x, metaFileAsset);
                     if (modelAsset != null)
+                    {
                         AssetSystem.AddModelAsset(modelAsset);
+                        RenderSystem.RegisterModel(modelAsset);
+                    }
                 });
             });
+
+            Task.Run(() =>
+            {
+                Directory.GetFiles(Application.Config.AssetPath, "*.png", SearchOption.AllDirectories).ToList().ForEach(x => {
+
+                    Logger.Info($"Loading texture {x}");
+                    MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x, AssetType.TEXTURE);
+                    TextureAsset? textureAsset = TextureImporter.LoadFromFile(x, metaFileAsset);
+                    if (textureAsset != null)
+                    {
+                        AssetSystem.AddTextureAsset(textureAsset);
+                        RenderSystem.RegisterTexture(textureAsset);
+                    }
+                });
+            });
+
+
+
+
+
 
             GameScene gameScene = new GameScene();
             gameScene.Camera = camera;
@@ -43,12 +66,15 @@ namespace SolarEditor
             Entity entity = new Entity();
             entity.Name = "Bike";
             entity.Material = new Material();
-            entity.Material.ModelId = Guid.Parse("e7cc1002-89d4-49dc-a2f2-3269afdfcefc");
-
+            entity.Material.ModelId = Guid.Parse("10209316-f57b-41f7-88cf-8ea81614bdb2");
+            entity.Material.AlbedoTexture = Guid.Parse("a0e317e7-30a5-48ca-842f-098fc86f1494");
+            
             gameScene.Entities.Add(entity);
             GameSystem.CurrentScene = gameScene;
 
             AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", gameScene);
+
+            AssetSystem.AddGameScene(gameScene);
 
             Logger.Info("Editor startup complete");
         }        
@@ -86,12 +112,12 @@ namespace SolarEditor
             
             if (ImGui.BeginPopupModal("Create Model Asset"))
             {
-                string path = Application.Config.AssetPath + newModelAsset.Name;
+                string path = Application.Config.AssetPath + newModelAsset.name;
 
                 ImGui.InputText("Path", ref path);
                 if (ImGui.Button("Create", 200, 0))
                 { 
-                    File.Copy(newModelAsset.Path,  path);
+                    File.Copy(newModelAsset.path,  path);
 
                     //MeshAsset mesh = newModelAsset.meshes[0];
                     //StaticMesh newMesh = new StaticMesh(RenderSystem.device, mesh);

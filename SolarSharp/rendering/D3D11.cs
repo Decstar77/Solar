@@ -323,7 +323,7 @@ namespace SolarSharp.Rendering
         }
     }
 
-    public enum BufferUsage
+    public enum DXUsage
     {
         DEFAULT = 0,
         IMMUTABLE = 1,
@@ -332,7 +332,7 @@ namespace SolarSharp.Rendering
     };
 
     [Flags]
-    public enum BufferBindFlag
+    public enum DXBindFlag
     {
         INVALID = 0,
         VERTEX_BUFFER = 0x1,
@@ -348,17 +348,17 @@ namespace SolarSharp.Rendering
     }
 
     [Flags]
-    public enum CPUAccessFlag
+    public enum DXCPUAccessFlag
     {
-        INVALID = 0,
+        NONE = 0,
         D3D11_CPU_ACCESS_WRITE = 0x10000,
         D3D11_CPU_ACCESS_READ = 0x20000
     }
 
     [Flags]
-    public enum ResourceMiscFlag
+    public enum DXResourceMiscFlag
     {
-        INVALID = 0,
+        NONE = 0,
         GENERATE_MIPS = 0x1,
         SHARED = 0x2,
         TEXTURECUBE = 0x4,
@@ -385,10 +385,10 @@ namespace SolarSharp.Rendering
     public struct BufferDesc
     {
         [MarshalAs(UnmanagedType.U4)] public uint ByteWidth = 0;
-        [MarshalAs(UnmanagedType.I4)] public BufferUsage Usage = BufferUsage.DEFAULT;
-        [MarshalAs(UnmanagedType.U4)] public uint BindFlags = 0;
-        [MarshalAs(UnmanagedType.U4)] public uint CPUAccessFlags = 0;
-        [MarshalAs(UnmanagedType.U4)] public uint MiscFlags = 0;
+        [MarshalAs(UnmanagedType.I4)] public DXUsage Usage = DXUsage.DEFAULT;
+        [MarshalAs(UnmanagedType.U4)] public DXBindFlag BindFlags = 0;
+        [MarshalAs(UnmanagedType.U4)] public DXCPUAccessFlag CPUAccessFlags = 0;
+        [MarshalAs(UnmanagedType.U4)] public DXResourceMiscFlag MiscFlags = 0;
         [MarshalAs(UnmanagedType.U4)] public uint StructureByteStride = 0;
 
         public BufferDesc()
@@ -424,6 +424,93 @@ namespace SolarSharp.Rendering
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SampleDesc
+    {
+        [MarshalAs(UnmanagedType.U4)] public uint Count;
+        [MarshalAs(UnmanagedType.U4)] public uint Quality;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DXTexture2DDesc
+    {
+        [MarshalAs(UnmanagedType.U4)] public uint Width = 0;
+        [MarshalAs(UnmanagedType.U4)] public uint Height = 0;
+        [MarshalAs(UnmanagedType.U4)] public uint MipLevels = 0;
+        [MarshalAs(UnmanagedType.U4)] public uint ArraySize = 0;
+        [MarshalAs(UnmanagedType.I4)] public TextureFormat Format = 0;
+        public SampleDesc SampleDesc = new SampleDesc();
+        [MarshalAs(UnmanagedType.I4)] public DXUsage Usage = 0;
+        [MarshalAs(UnmanagedType.U4)] public DXBindFlag BindFlags = 0;
+        [MarshalAs(UnmanagedType.U4)] public DXCPUAccessFlag CPUAccessFlags = 0;
+        [MarshalAs(UnmanagedType.U4)] public DXResourceMiscFlag MiscFlags = 0;
+
+        public DXTexture2DDesc()
+        {
+
+        }
+    }
+
+    public class DXTexture2D : DirectXObject
+    {
+        public DXTexture2DDesc Desc { get; }
+        public DXTexture2D(IntPtr ptr, DXTexture2DDesc desc) : base(ptr)
+        {
+            Desc = desc;
+        }
+    }
+
+    public enum DXShaderResourceViewDimension
+    {
+        UNKNOWN = 0,
+        BUFFER = 1,
+        TEXTURE1D = 2,
+        TEXTURE1DARRAY = 3,
+        TEXTURE2D = 4,
+        TEXTURE2DARRAY = 5,
+        TEXTURE2DMS = 6,
+        TEXTURE2DMSARRAY = 7,
+        TEXTURE3D = 8,
+        TEXTURECUBE = 9,
+        TEXTURECUBEARRAY = 10,
+        BUFFEREX = 11
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DXTexutre2DSRV
+    {
+        [MarshalAs(UnmanagedType.U4)] public uint MostDetailedMip;
+        [MarshalAs(UnmanagedType.U4)] public uint MipLevels;
+    }
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DXTexutre2DArraySRV
+    {
+        [MarshalAs(UnmanagedType.U4)] public uint MostDetailedMip;
+        [MarshalAs(UnmanagedType.U4)] public uint MipLevels;
+        [MarshalAs(UnmanagedType.U4)] public uint FirstArraySlice;
+        [MarshalAs(UnmanagedType.U4)] public uint ArraySize;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct DXShaderResourceViewDesc
+    {
+        [FieldOffset(0)] public TextureFormat Format;
+        [FieldOffset(4)] public DXShaderResourceViewDimension ViewDimension;
+        [FieldOffset(8)] public DXTexutre2DSRV Texture2D;
+        [FieldOffset(8)] public DXTexutre2DArraySRV Texture2DArray;
+    }
+
+    public class DXShaderResourceView : DirectXObject
+    {
+        public DXShaderResourceViewDesc Desc { get; set; }
+        public DXShaderResourceView(IntPtr ptr, DXShaderResourceViewDesc desc) : base(ptr)
+        {
+            Desc = desc;
+        }
+    }
+
     public class DXVertexShader : DirectXObject
     {
         public DXVertexShader(IntPtr ptr) : base(ptr)
@@ -436,133 +523,7 @@ namespace SolarSharp.Rendering
         public DXPixelShader(IntPtr ptr) : base(ptr)
         {
         }
-    }
-
-    public enum DXGIFormat : uint
-    {
-        UNKNOWN = 0,
-        R32G32B32A32_TYPELESS = 1,
-        R32G32B32A32_FLOAT = 2,
-        R32G32B32A32_UINT = 3,
-        R32G32B32A32_SINT = 4,
-        R32G32B32_TYPELESS = 5,
-        R32G32B32_FLOAT = 6,
-        R32G32B32_UINT = 7,
-        R32G32B32_SINT = 8,
-        R16G16B16A16_TYPELESS = 9,
-        R16G16B16A16_FLOAT = 10,
-        R16G16B16A16_UNORM = 11,
-        R16G16B16A16_UINT = 12,
-        R16G16B16A16_SNORM = 13,
-        R16G16B16A16_SINT = 14,
-        R32G32_TYPELESS = 15,
-        R32G32_FLOAT = 16,
-        R32G32_UINT = 17,
-        R32G32_SINT = 18,
-        R32G8X24_TYPELESS = 19,
-        D32_FLOAT_S8X24_UINT = 20,
-        R32_FLOAT_X8X24_TYPELESS = 21,
-        X32_TYPELESS_G8X24_UINT = 22,
-        R10G10B10A2_TYPELESS = 23,
-        R10G10B10A2_UNORM = 24,
-        R10G10B10A2_UINT = 25,
-        R11G11B10_FLOAT = 26,
-        R8G8B8A8_TYPELESS = 27,
-        R8G8B8A8_UNORM = 28,
-        R8G8B8A8_UNORM_SRGB = 29,
-        R8G8B8A8_UINT = 30,
-        R8G8B8A8_SNORM = 31,
-        R8G8B8A8_SINT = 32,
-        R16G16_TYPELESS = 33,
-        R16G16_FLOAT = 34,
-        R16G16_UNORM = 35,
-        R16G16_UINT = 36,
-        R16G16_SNORM = 37,
-        R16G16_SINT = 38,
-        R32_TYPELESS = 39,
-        D32_FLOAT = 40,
-        R32_FLOAT = 41,
-        R32_UINT = 42,
-        R32_SINT = 43,
-        R24G8_TYPELESS = 44,
-        D24_UNORM_S8_UINT = 45,
-        R24_UNORM_X8_TYPELESS = 46,
-        X24_TYPELESS_G8_UINT = 47,
-        R8G8_TYPELESS = 48,
-        R8G8_UNORM = 49,
-        R8G8_UINT = 50,
-        R8G8_SNORM = 51,
-        R8G8_SINT = 52,
-        R16_TYPELESS = 53,
-        R16_FLOAT = 54,
-        D16_UNORM = 55,
-        R16_UNORM = 56,
-        R16_UINT = 57,
-        R16_SNORM = 58,
-        R16_SINT = 59,
-        R8_TYPELESS = 60,
-        R8_UNORM = 61,
-        R8_UINT = 62,
-        R8_SNORM = 63,
-        R8_SINT = 64,
-        A8_UNORM = 65,
-        R1_UNORM = 66,
-        R9G9B9E5_SHAREDEXP = 67,
-        R8G8_B8G8_UNORM = 68,
-        G8R8_G8B8_UNORM = 69,
-        BC1_TYPELESS = 70,
-        BC1_UNORM = 71,
-        BC1_UNORM_SRGB = 72,
-        BC2_TYPELESS = 73,
-        BC2_UNORM = 74,
-        BC2_UNORM_SRGB = 75,
-        BC3_TYPELESS = 76,
-        BC3_UNORM = 77,
-        BC3_UNORM_SRGB = 78,
-        BC4_TYPELESS = 79,
-        BC4_UNORM = 80,
-        BC4_SNORM = 81,
-        BC5_TYPELESS = 82,
-        BC5_UNORM = 83,
-        BC5_SNORM = 84,
-        B5G6R5_UNORM = 85,
-        B5G5R5A1_UNORM = 86,
-        B8G8R8A8_UNORM = 87,
-        B8G8R8X8_UNORM = 88,
-        R10G10B10_XR_BIAS_A2_UNORM = 89,
-        B8G8R8A8_TYPELESS = 90,
-        B8G8R8A8_UNORM_SRGB = 91,
-        B8G8R8X8_TYPELESS = 92,
-        B8G8R8X8_UNORM_SRGB = 93,
-        BC6H_TYPELESS = 94,
-        BC6H_UF16 = 95,
-        BC6H_SF16 = 96,
-        BC7_TYPELESS = 97,
-        BC7_UNORM = 98,
-        BC7_UNORM_SRGB = 99,
-        AYUV = 100,
-        Y410 = 101,
-        Y416 = 102,
-        NV12 = 103,
-        P010 = 104,
-        P016 = 105,
-        _420_OPAQUE = 106,
-        YUY2 = 107,
-        Y210 = 108,
-        Y216 = 109,
-        NV11 = 110,
-        AI44 = 111,
-        IA44 = 112,
-        P8 = 113,
-        A8P8 = 114,
-        B4G4R4A4_UNORM = 115,
-        P208 = 130,
-        V208 = 131,
-        V408 = 132,
-        SAMPLER_FEEDBACK_MIN_MIP_OPAQUE,
-        SAMPLER_FEEDBACK_MIP_REGION_USED_OPAQUE,
-        FORCE_UINT = 0xffffffff
-    }
+    }  
 
     public enum InputClassification
     {
@@ -575,7 +536,7 @@ namespace SolarSharp.Rendering
     {
         [MarshalAs(UnmanagedType.LPStr)] public string SemanticName;
         [MarshalAs(UnmanagedType.U4)] public uint SemanticIndex;
-        [MarshalAs(UnmanagedType.U4)] public DXGIFormat Format;
+        [MarshalAs(UnmanagedType.U4)] public TextureFormat Format;
         [MarshalAs(UnmanagedType.U4)] public uint InputSlot;
         [MarshalAs(UnmanagedType.U4)] public uint AlignedByteOffset;
         [MarshalAs(UnmanagedType.U4)] public InputClassification InputSlotClass;
@@ -612,8 +573,7 @@ namespace SolarSharp.Rendering
 
             return 0;
         }
-    }
-   
+    }  
 
     public enum PrimitiveTopology
     {
@@ -655,54 +615,43 @@ namespace SolarSharp.Rendering
         }
 
         public DXDepthStencilState CreateDepthStencilState(DepthStencilDesc desc)
-        {
-           return new DXDepthStencilState(D3D11API.DeviceCreateDepthStencilState(ref desc), desc);
-        }
+           => new DXDepthStencilState(D3D11API.DeviceCreateDepthStencilState(ref desc), desc);
 
         public DXRasterizerState CreateRasterizerState(RasterizerDesc desc)
-        {
-            return new DXRasterizerState(D3D11API.DeviceCreateRasterizerState(ref desc), desc);
-        }
+            => new DXRasterizerState(D3D11API.DeviceCreateRasterizerState(ref desc), desc);
 
         public DXBlendState CreateBlendState(BlendDesc desc)
-        {
-            return new DXBlendState(D3D11API.DeviceCreateBlendState(ref desc));
-        }
+            => new DXBlendState(D3D11API.DeviceCreateBlendState(ref desc));
 
         public DXSamplerState CreateSamplerState(SamplerDesc desc)
-        {
-            return new DXSamplerState(D3D11API.DeviceCreateSamplerState(ref desc));
-        }
+            => new DXSamplerState(D3D11API.DeviceCreateSamplerState(ref desc));
 
         public DXBuffer CreateBuffer(BufferDesc desc)
-        {
-            return new DXBuffer(D3D11API.DeviceCreateBufferNoSub(ref desc));
-        }
+            => new DXBuffer(D3D11API.DeviceCreateBufferNoSub(ref desc));
 
-        public DXBuffer CreateBuffer(BufferDesc desc, SubResourceData subResource)
-        {
-            return new DXBuffer(D3D11API.DeviceCreateBuffer(ref desc, ref subResource));
-        }
+        public DXBuffer CreateBuffer(BufferDesc desc, SubResourceData subResource) => 
+            new DXBuffer(D3D11API.DeviceCreateBuffer(ref desc, ref subResource));
+
+        public DXTexture2D CreateTexture2D(DXTexture2DDesc desc, SubResourceData resourceData) 
+            => new DXTexture2D(D3D11API.DeviceCreateTexture2D(ref desc, ref resourceData), desc);
+
+        public DXTexture2D CreateTexture2DNoSub(DXTexture2DDesc desc) 
+            => new DXTexture2D(D3D11API.DeviceCreateTexture2DNoSub(ref desc), desc);
+
+        public DXShaderResourceView CreateShaderResourceView(DXTexture2D resource, DXShaderResourceViewDesc desc) 
+            => new DXShaderResourceView(D3D11API.DeviceCreateShaderResourceView(resource.Ptr, ref desc), desc );
 
         public DXBlob CompileShader(string shaderCode, string entry, string target)
-        {
-            return new DXBlob(D3D11API.DeviceCompileShader(shaderCode, entry, target));
-        }
+            => new DXBlob(D3D11API.DeviceCompileShader(shaderCode, entry, target));
 
         public DXInputLayout CreateInputLayout(DXBlob vertexBlob, params InputElementDesc[] inputElementDescs)
-        {
-            return new DXInputLayout(D3D11API.DeviceCreateInputLayout(inputElementDescs, inputElementDescs.Length, vertexBlob.Ptr));
-        }
+            => new DXInputLayout(D3D11API.DeviceCreateInputLayout(inputElementDescs, inputElementDescs.Length, vertexBlob.Ptr));
 
         public DXVertexShader CreateVertexShader(DXBlob vertexBlob)
-        {
-            return new DXVertexShader(D3D11API.DeviceCreateVertexShader(vertexBlob.Ptr));
-        }
+            => new DXVertexShader(D3D11API.DeviceCreateVertexShader(vertexBlob.Ptr));
 
         public DXPixelShader CreatePixelShader(DXBlob pixelBlob)
-        {
-            return new DXPixelShader(D3D11API.DeviceCreatePixelShader(pixelBlob.Ptr));
-        }
+            => new DXPixelShader(D3D11API.DeviceCreatePixelShader(pixelBlob.Ptr));
     }
 
     public class DXContext : DirectXObject
@@ -771,7 +720,7 @@ namespace SolarSharp.Rendering
             D3D11API.ContextSetVertexBuffers(vertexBuffer.Ptr, stride);
         }
 
-        public void SetIndexBuffer(DXBuffer indexBuffer, DXGIFormat format, uint offset)
+        public void SetIndexBuffer(DXBuffer indexBuffer, TextureFormat format, uint offset)
         {
             D3D11API.ContextSetIndexBuffer(indexBuffer.Ptr, format, offset);
         }
@@ -791,6 +740,15 @@ namespace SolarSharp.Rendering
             D3D11API.ContextUpdateSubresource(buffer.Ptr, 0, IntPtr.Zero, handle.AddrOfPinnedObject(), 0, 0);
             handle.Free();
         }
+
+        public void SetPSSampler(DXSamplerState sampler, uint slot) => D3D11API.ContextSetPSSampler(sampler.Ptr, slot);
+        public void SetCSSampler(DXSamplerState sampler, uint slot) => D3D11API.ContextSetCSSampler(sampler.Ptr, slot);
+        public void SetPSShaderResources(DXShaderResourceView srv, uint slot) => D3D11API.ContextSetPSShaderResources(srv.Ptr, slot);
+        public void SetCSShaderResources(DXShaderResourceView srv, uint slot) => D3D11API.ContextSetCSShaderResources(srv.Ptr, slot);
+
+        //public void SetPSShaderResources(DXShader srv, uint32 slot);
+        //public void SetCSShaderResources(void* srv, uint32 slot);
+
     }
 
     public class RenderTargetView : DirectXObject

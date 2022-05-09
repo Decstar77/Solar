@@ -26,8 +26,35 @@ namespace SolarSharp.Rendering
         public static GraphicsShader shader;
         private static ConstBuffer constBuffer0;
 
+        private static DXSamplerState samplerState0;
+        private static DXSamplerState samplerState1;
+        private static DXSamplerState samplerState2;
+
         private static Dictionary<Guid, StaticMesh> meshes = new Dictionary<Guid, StaticMesh>();
-        private static List<ModelAsset> modelsToAdd = new List<ModelAsset> ();
+        private static List<ModelAsset> modelsToAdd = new List<ModelAsset>();
+        private static List<ModelAsset> modelsToRemove = new List<ModelAsset>();
+
+        private static Dictionary<Guid, StaticTexture> textures = new Dictionary<Guid, StaticTexture>();
+        private static List<TextureAsset> texturesToAdd = new List<TextureAsset>();
+        private static List<TextureAsset> texturesToRemove = new List<TextureAsset>();
+
+        public static void RegisterModel(ModelAsset modelAsset)
+        {
+            lock (modelsToAdd)
+            {
+                modelsToAdd.Add(modelAsset);
+            }
+        }
+
+        public static void RegisterTexture(TextureAsset textureAsset)
+        {
+            lock (texturesToAdd)
+            {
+                Logger.Trace($"Registering {textureAsset.name}");
+                texturesToAdd.Add(textureAsset);
+            }
+        }
+
 
         public static bool Initialize()
         {
@@ -48,7 +75,11 @@ namespace SolarSharp.Rendering
 
             rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc());
             blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
-            DXSamplerState samplerState = deviceContext.Device.CreateSamplerState(new SamplerDesc());
+
+            samplerState0 = deviceContext.Device.CreateSamplerState(new SamplerDesc { Filter = Filter.MIN_MAG_MIP_POINT });
+            samplerState1 = deviceContext.Device.CreateSamplerState(new SamplerDesc { Filter = Filter.MIN_MAG_LINEAR_MIP_POINT });
+            samplerState2 = deviceContext.Device.CreateSamplerState(new SamplerDesc { Filter = Filter.MIN_MAG_MIP_LINEAR });
+
 
             quad = new StaticMesh(device, MeshFactory.CreateQuad(-1, 1, 2, 2, 0));
             cube = new StaticMesh(device, MeshFactory.CreateBox(1, 1, 1, 1));
@@ -66,22 +97,36 @@ namespace SolarSharp.Rendering
             return true;
         }
 
-
         private static bool temp = false;
         public static void BackupRenderer()
         {
-            if ( !temp && AssetSystem.GetModelAsset("ionG_gravelBike_full.fbx") != null)
+            if ( !temp && AssetSystem.GetModelAsset("windmill.fbx") != null)
             {
-                ModelAsset model = AssetSystem.GetModelAsset("ionG_gravelBike_full.fbx");
+                ModelAsset model = AssetSystem.GetModelAsset("windmill.fbx");
 
                 cube = new StaticMesh(device, model.meshes[0]);
                 temp = true;
             };
-            
-            foreach (ModelAsset modelAsset in modelsToAdd) {
-                meshes.Add(modelAsset.Guid, new StaticMesh(device, modelAsset.meshes[0]));
+
+            lock (modelsToAdd)
+            {
+                foreach (ModelAsset modelAsset in modelsToAdd)
+                {
+                    Logger.Trace($"Uploading model {modelAsset.name}");
+                    meshes.Add(modelAsset.Guid, new StaticMesh(device, modelAsset.meshes[0]));
+                }
+                modelsToAdd.Clear();
             }
-            modelsToAdd.Clear();
+
+            lock (texturesToAdd)
+            {
+                foreach (TextureAsset textureAsset in texturesToAdd)
+                {
+                    Logger.Trace($"Uploading texture {textureAsset.name}");
+                    textures.Add(textureAsset.Guid, new StaticTexture(device, textureAsset));
+                }
+                texturesToAdd.Clear();
+            }
 
             Camera camera = GameSystem.CurrentScene.Camera;
             Matrix4 mvp = camera.GetProjectionMatrix() * camera.GetViewMatrix();
@@ -97,13 +142,17 @@ namespace SolarSharp.Rendering
             context.SetRasterizerState(rasterizerState); // @DONE
             //context.SetBlendState(blendState);
 
+            context.SetPSSampler(samplerState0, 0);
+            context.SetPSSampler(samplerState1, 1);
+            context.SetPSSampler(samplerState2, 2);
+
             if (shader != null && cube != null)
             {
                 if (shader.IsValid())
                 {
-                    context.SetInputLayout(shader.inputLayout);   // @DONE
-                    context.SetVertexShader(shader.vertexShader); // @DONE
-                    context.SetPixelShader(shader.pixelShader);   // @DONE
+                    context.SetInputLayout(shader.inputLayout);   
+                    context.SetVertexShader(shader.vertexShader); 
+                    context.SetPixelShader(shader.pixelShader);   
 
                     GameScene scene = GameSystem.CurrentScene;
 
@@ -114,23 +163,21 @@ namespace SolarSharp.Rendering
                             StaticMesh mesh;
                             if (meshes.TryGetValue(entity.Material.ModelId, out mesh))
                             {
-                                context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
-                                context.SetIndexBuffer(mesh.IndexBuffer, DXGIFormat.R32_UINT, 0);
-                                context.DrawIndexed(mesh.IndexCount, 0, 0);
-                            }
-                            else
-                            {
-                                ModelAsset asset = AssetSystem.GetModelAsset(entity.Material.ModelId);
-                                if (asset != null) 
+                                StaticTexture texture;
+                                if (textures.TryGetValue(entity.Material.AlbedoTexture, out texture))
                                 {
-                                    modelsToAdd.Add(asset);
-                                }                                
-                            }
+                                    context.SetPSShaderResources(texture.srv, 0);
+
+                                    context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                                    context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
+                                    context.DrawIndexed(mesh.IndexCount, 0, 0);
+                                }
+                            }  
                         }
                     }
 
                     //context.SetVertexBuffers(cube.VertexBuffer, cube.StrideBytes);
-                    //context.SetIndexBuffer(cube.IndexBuffer, DXGIFormat.R32_UINT, 0);
+                    //context.SetIndexBuffer(cube.IndexBuffer, TextureFormat.R32_UINT, 0);
                     //context.DrawIndexed(cube.IndexCount, 0, 0);
                 }
             }

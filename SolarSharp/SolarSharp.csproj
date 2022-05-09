@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Include="assets\ModelAsset.cs" />
     <Compile Include="assets\RenderGraphAsset.cs" />
+    <Compile Include="assets\TextureAsset.cs" />
     <Compile Include="collision\Primitives.cs" />
     <Compile Include="collision\Raycast.cs" />
     <Compile Include="core\Application.cs" />
@@ -34,6 +35,7 @@
     <Compile Include="core\Clock.cs" />
     <Compile Include="core\EventSystem.cs" />
     <Compile Include="core\Input.cs" />
+    <Compile Include="rendering\StaticTexture.cs" />
     <Compile Include="tools\MeshFactory.cs" />
     <Compile Include="core\RenderPacket.cs" />
     <Compile Include="core\Util.cs" />

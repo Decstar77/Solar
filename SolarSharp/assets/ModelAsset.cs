@@ -28,8 +28,8 @@ namespace SolarSharp.Assets
 
     public class ModelAsset : EngineAsset
     {
-        public string Name;
-        public string Path;
+        public string name;
+        public string path;
         public List<MeshAsset> meshes;
     }
 }

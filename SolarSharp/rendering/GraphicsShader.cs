@@ -72,7 +72,7 @@ namespace SolarSharp.Rendering
             InputElementDesc pDesc = new InputElementDesc();
             pDesc.SemanticName = "Position";
             pDesc.SemanticIndex = 0;
-            pDesc.Format = DXGIFormat.R32G32B32_FLOAT;
+            pDesc.Format = TextureFormat.R32G32B32_FLOAT;
             pDesc.InputSlot = 0;
             pDesc.AlignedByteOffset = 0;
             pDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
@@ -81,7 +81,7 @@ namespace SolarSharp.Rendering
             InputElementDesc nDesc = new InputElementDesc();
             nDesc.SemanticName = "Normal";
             nDesc.SemanticIndex = 0;
-            nDesc.Format = DXGIFormat.R32G32B32_FLOAT;
+            nDesc.Format = TextureFormat.R32G32B32_FLOAT;
             nDesc.InputSlot = 0;
             nDesc.AlignedByteOffset = 0xffffffff;
             nDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;
@@ -90,7 +90,7 @@ namespace SolarSharp.Rendering
             InputElementDesc tDesc = new InputElementDesc();
             tDesc.SemanticName = "TexCord";
             tDesc.SemanticIndex = 0;
-            tDesc.Format = DXGIFormat.R32G32_FLOAT;
+            tDesc.Format = TextureFormat.R32G32_FLOAT;
             tDesc.InputSlot = 0;
             tDesc.AlignedByteOffset = 0xffffffff;
             tDesc.InputSlotClass = InputClassification.PER_VERTEX_DATA;

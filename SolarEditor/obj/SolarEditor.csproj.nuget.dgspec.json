@@ -51,6 +51,10 @@
             "AssimpNet": {
               "target": "Package",
               "version": "[4.1.0, )"
+            },
+            "StbImageSharp": {
+              "target": "Package",
+              "version": "[2.27.8, )"
             }
           },
           "imports": [

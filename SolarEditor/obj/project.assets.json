@@ -284,6 +284,15 @@
           }
         }
       },
+      "StbImageSharp/2.27.8": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/StbImageSharp.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/StbImageSharp.dll": {}
+        }
+      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -1576,6 +1585,19 @@
         "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl.4.3.0.nupkg.sha512",
         "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl.nuspec",
         "runtimes/ubuntu.16.10-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
+      ]
+    },
+    "StbImageSharp/2.27.8": {
+      "sha512": "/LM7rEtSf7SWEJOPJfKVh3L0q/a+uYHOgaZg0bfz7QTqTzGUBRUcDWdxcjcANyj7RCSLH+40bmOflKziLTnrfw==",
+      "type": "package",
+      "path": "stbimagesharp/2.27.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net45/StbImageSharp.dll",
+        "lib/netstandard2.0/StbImageSharp.dll",
+        "stbimagesharp.2.27.8.nupkg.sha512",
+        "stbimagesharp.nuspec"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -4556,7 +4578,8 @@
   "projectFileDependencyGroups": {
     "net6.0-windows7.0": [
       "AssimpNet >= 4.1.0",
-      "SolarSharp >= 1.0.0"
+      "SolarSharp >= 1.0.0",
+      "StbImageSharp >= 2.27.8"
     ]
   },
   "packageFolders": {
@@ -4610,6 +4633,10 @@
           "AssimpNet": {
             "target": "Package",
             "version": "[4.1.0, )"
+          },
+          "StbImageSharp": {
+            "target": "Package",
+            "version": "[2.27.8, )"
           }
         },
         "imports": [

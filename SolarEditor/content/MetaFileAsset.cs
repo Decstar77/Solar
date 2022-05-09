@@ -20,10 +20,11 @@ namespace SolarEditor
 
     public class MetaFileAsset
     {
-        public AssetType AssetType { get; set; }
         public Guid Guid { get; set; }
+        public AssetType AssetType { get; set; }
+        public Dictionary<string, object> Data { get; set; }
 
-        public static MetaFileAsset GetOrCreateMetaFileAsset(string path)
+        public static MetaFileAsset GetOrCreateMetaFileAsset(string path, AssetType type)
         {
             path = Path.ChangeExtension(path, ".slo");
             if (File.Exists(path)) {                
@@ -32,6 +33,8 @@ namespace SolarEditor
 
             MetaFileAsset metaFileAsset = new MetaFileAsset();
             metaFileAsset.Guid = Guid.NewGuid();
+            metaFileAsset.AssetType = type;
+            metaFileAsset.Data = new Dictionary<string, object>();
 
             Logger.Trace($"Creating meta file, {path}");
             string json = JsonSerializer.Serialize(metaFileAsset);

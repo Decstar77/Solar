@@ -24,8 +24,8 @@ namespace SolarEditor
 
             Logger.Trace("Loading model " + filePath);
             ModelAsset model = LoadModel(scene);
-            model.Name = Path.GetFileName(filePath);
-            model.Path = filePath;
+            model.name = Path.GetFileName(filePath);
+            model.path = filePath;
             model.Guid = metaFile.Guid;
             
             importer.Dispose();            

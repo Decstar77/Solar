@@ -62,7 +62,7 @@ namespace SolarSharp
             }
 
             GameSystem.CurrentScene = new GameScene();
-            GameSystem.CurrentScene.Name = "Untitled";
+            GameSystem.CurrentScene.name = "Untitled";
 
             if (!config.OnInitializeCallback.Invoke()) {
                 Logger.Error("Could not intialize project");

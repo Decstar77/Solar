@@ -18,9 +18,9 @@ namespace SolarEditor
 
             if (ImGui.Begin("Current Scene", ref show))
             {
-                string name = gameScene.Name;
+                string name = gameScene.name;
                 ImGui.InputText("Name", ref name);
-                gameScene.Name = name;
+                gameScene.name = name;
 
                 string[] renderGraphAssets = AssetSystem.RenderGraphs.Select(x => x.Name).ToArray();
                 int currentRenderGraphAsset = AssetSystem.RenderGraphs.FindIndex(x => x.Name == gameScene.RenderGraph?.Name);

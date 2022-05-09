@@ -17,8 +17,8 @@ namespace SolarSharp.Rendering
             buffer = new float[floatCount];
 
             dxBuffer = device.CreateBuffer(new BufferDesc {
-                BindFlags = (uint)BufferBindFlag.CONSTANT_BUFFER,
-                Usage = BufferUsage.DEFAULT,
+                BindFlags = DXBindFlag.CONSTANT_BUFFER,
+                Usage = DXUsage.DEFAULT,
                 ByteWidth = sizeof(float) * floatCount
             });
         }

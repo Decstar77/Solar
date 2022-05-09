@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 using SolarSharp.Rendering;
+using SolarSharp.Assets;
 
 namespace SolarSharp.EngineAPI
 {
@@ -46,7 +47,16 @@ namespace SolarSharp.EngineAPI
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern IntPtr DeviceCreateBufferNoSub(ref BufferDesc desc);
 
-		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr DeviceCreateTexture2D(ref DXTexture2DDesc desc, ref SubResourceData resourceData);
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr DeviceCreateTexture2DNoSub(ref DXTexture2DDesc desc);
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr DeviceCreateShaderResourceView(IntPtr resource, ref DXShaderResourceViewDesc desc);
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		public static extern IntPtr DeviceCompileShader([MarshalAs(UnmanagedType.LPStr)] string code, [MarshalAs(UnmanagedType.LPStr)] string entry, [MarshalAs(UnmanagedType.LPStr)] string target);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
@@ -98,7 +108,7 @@ namespace SolarSharp.EngineAPI
         public static extern void ContextSetVertexBuffers(IntPtr vertexBuffer, uint stride);
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        public static extern void ContextSetIndexBuffer(IntPtr indexBuffer, DXGIFormat format, uint offset);
+        public static extern void ContextSetIndexBuffer(IntPtr indexBuffer, TextureFormat format, uint offset);
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         public static extern void ContextDrawIndexed(uint indexCount, uint startLocation, uint baseVertexLocation);
@@ -115,72 +125,16 @@ namespace SolarSharp.EngineAPI
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         public static extern void ContextUpdateSubresource(IntPtr buffer, uint subResource, IntPtr box, IntPtr data, uint rowPitch, uint depthPitch);
 
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void Win32DestroyRenderer();
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextSetPSSampler(IntPtr smp, uint slot);
 
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererBeginFrame();
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextSetCSSampler(IntPtr smp, uint slot);
 
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererEndFrame(int vsync);
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextSetPSShaderResources(IntPtr srv, uint slot);
 
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateConstBuffer(int sizeBytes);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateRasterState(int fillMode, int cullMode);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateDepthStencilState([MarshalAs(UnmanagedType.Bool)] bool enabled, [MarshalAs(UnmanagedType.Bool)] bool write, int comparison);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateSamplerState(int filter, int wrapMode);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateBlendState();
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateStaticMesh(float[] vertices, int vertexCount, uint[] indices, int indexCount, int layout);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateStaticTexture(byte[] data, int width, int height, int format);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern int RendererCreateStaticProgram([MarshalAs(UnmanagedType.LPStr)] string shaderCode, int layout);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetViewportState(int width, int height);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetTopologyState(int topo);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetRasterState(int id);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetDepthState(int id);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetBlendState(int id);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetSamplerState(int id, int slot);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetStaticProgram(int id);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetVertexConstBuffer(int id, int slot);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererSetConstBufferData(int id, float[] data);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererClearRenderTarget(int id);
-
-        //[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        //public static extern void RendererDrawStaticMesh(int id);
-
-
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void ContextSetCSShaderResources(IntPtr srv, uint slot);
     }
 }

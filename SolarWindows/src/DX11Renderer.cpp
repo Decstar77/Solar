@@ -263,6 +263,40 @@ EDITOR_INTERFACE(void*) DeviceCreateBufferNoSub(void* desc)
 	return DeviceCreateBuffer(desc, nullptr);
 }
 
+EDITOR_INTERFACE(void*) DeviceCreateTexture2D(void* desc, void* data)
+{
+	D3D11_TEXTURE2D_DESC  textureDesc = *(D3D11_TEXTURE2D_DESC*)desc;
+
+	ID3D11Texture2D* texture2D = nullptr;
+	if (data)
+	{
+		D3D11_SUBRESOURCE_DATA sub = *(D3D11_SUBRESOURCE_DATA*)data;
+		DXCHECK(renderState.device->CreateTexture2D(&textureDesc, &sub, &texture2D));
+	}
+	else
+	{
+		DXCHECK(renderState.device->CreateTexture2D(&textureDesc, nullptr, &texture2D));
+	}
+
+	return texture2D;
+}
+
+EDITOR_INTERFACE(void*) DeviceCreateTexture2DNoSub(void* desc)
+{
+	return DeviceCreateTexture2D(desc, nullptr);
+}
+
+EDITOR_INTERFACE(void*) DeviceCreateShaderResourceView(void* resource, void* desc)
+{
+	ID3D11Resource* res = (ID3D11Resource*)resource;
+	D3D11_SHADER_RESOURCE_VIEW_DESC des = *(D3D11_SHADER_RESOURCE_VIEW_DESC*)desc;
+
+	ID3D11ShaderResourceView* srv;
+	DXCHECK(renderState.device->CreateShaderResourceView(res, &des, &srv));
+
+	return srv;
+}
+
 inline std::wstring AnsiToWString(const std::string& str)
 {
 	WCHAR buffer[512];
@@ -438,4 +472,28 @@ EDITOR_INTERFACE(void) ContextSetCSConstBuffer(void* buf, uint32 slot)
 EDITOR_INTERFACE(void) ContextUpdateSubresource(void* buffer, uint32 subResource, void* box, void* data, uint32 rowPitch, uint32 depthPitch)
 {
 	DXINFO(renderState.context->UpdateSubresource((ID3D11Resource*)buffer, subResource, (D3D11_BOX*)box, data, rowPitch, depthPitch));
+}
+
+EDITOR_INTERFACE(void) ContextSetPSSampler(void* smp, uint32 slot)
+{
+	ID3D11SamplerState* samplers[] = { (ID3D11SamplerState*)smp };
+	DXINFO(renderState.context->PSSetSamplers(slot, 1, samplers));
+}
+
+EDITOR_INTERFACE(void) ContextSetCSSampler(void* smp, uint32 slot)
+{
+	ID3D11SamplerState* buffers[] = { (ID3D11SamplerState*)smp };
+	DXINFO(renderState.context->CSSetSamplers(slot, 1, buffers));
+}
+
+EDITOR_INTERFACE(void) ContextSetPSShaderResources(void* srv, uint32 slot)
+{
+	ID3D11ShaderResourceView* srvs[] = { (ID3D11ShaderResourceView*)srv };
+	DXINFO(renderState.context->PSSetShaderResources(slot, 1, srvs));
+}
+
+EDITOR_INTERFACE(void) ContextSetCSShaderResources(void* srv, uint32 slot)
+{
+	ID3D11ShaderResourceView* srvs[] = { (ID3D11ShaderResourceView*)srv };
+	DXINFO(renderState.context->CSSetShaderResources(slot, 1, srvs));
 }
