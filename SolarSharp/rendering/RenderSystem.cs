@@ -87,8 +87,6 @@ namespace SolarSharp.Rendering
             quad = new StaticMesh(device, MeshFactory.CreateQuad(-1, 1, 2, 2, 0));
             cube = new StaticMesh(device, MeshFactory.CreateBox(1, 1, 1, 1));
 
-            //mesh = StaticMesh.CreateScreenSpaceQuad(deviceContext.Device);
-
             shader = new GraphicsShader().Create(device, Assets.AssetSystem.ShaderAssets[0]); 
             
             constBuffer0 = new ConstBuffer(device, 16 * 3).SetVS(context, 0);
@@ -137,10 +135,7 @@ namespace SolarSharp.Rendering
             Matrix4 proj = camera.GetProjectionMatrix();
             Matrix4 view = camera.GetViewMatrix();
 
-            Matrix4 mvp = proj * view;
-            
-            constBuffer0.Reset().Prepare(mvp).Upload(context);
-            constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
+
 
             context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); 
             context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -176,6 +171,11 @@ namespace SolarSharp.Rendering
                                 StaticTexture texture;
                                 if (textures.TryGetValue(entity.Material.AlbedoTexture, out texture))
                                 {
+                                    Matrix4 mvp = proj * view * entity.ComputeModelMatrix();
+
+                                    constBuffer0.Reset().Prepare(mvp).Upload(context);
+                                    constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
+
                                     context.SetPSShaderResources(texture.srv, 0);
 
                                     context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);

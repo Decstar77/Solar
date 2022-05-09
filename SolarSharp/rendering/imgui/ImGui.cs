@@ -239,5 +239,7 @@ namespace SolarSharp.Rendering
 		public static void PushId(int id) => ImGuiAPI.ImGuiPushId(id);
 		public static void PopId() => ImGuiAPI.ImGuiPopId();
 		public static bool IsWindowFocused(ImGuiFocusedFlags flags = 0) => ImGuiAPI.ImGuiIsWindowFocused((int)flags);
+		public static bool WantMouseInput() => ImGuiAPI.ImGuiWantMouseInput();
+
 	}
 }

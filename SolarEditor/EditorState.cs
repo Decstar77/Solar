@@ -7,6 +7,7 @@ using SolarSharp;
 using SolarSharp.Rendering;
 using SolarSharp.Rendering.Graph;
 using SolarSharp.Assets;
+using SolarSharp.core;
 
 namespace SolarEditor
 {
@@ -62,7 +63,9 @@ namespace SolarEditor
             entity.Material = new Material();
             entity.Material.ModelId = Guid.Parse("10209316-f57b-41f7-88cf-8ea81614bdb2");
             entity.Material.AlbedoTexture = Guid.Parse("a0e317e7-30a5-48ca-842f-098fc86f1494");
-            
+            entity.Position = new Vector3(0, -1, -3);
+            entity.Orientation = Quaternion.RotateLocalZ(Quaternion.Identity, Util.DegToRad(45.0f));
+
             gameScene.Entities.Add(entity);
             GameSystem.CurrentScene = gameScene;
 
@@ -86,6 +89,13 @@ namespace SolarEditor
                 EventSystem.Fire(EventType.ON_SAVE, null);
 
                 AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", GameSystem.CurrentScene);
+            }
+
+            //if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1) && !ImGui.WantMouseInput())
+            {
+                GameSystem.CurrentScene.Entities.ForEach(entity => {
+                    DebugDraw.AlignedBox(entity.LocalSpaceBoundingBox);
+                });
             }
 
             camera.Operate();

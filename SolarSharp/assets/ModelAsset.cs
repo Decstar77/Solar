@@ -59,18 +59,19 @@ namespace SolarSharp.Assets
         }
     }
 
-
     public class MeshAsset : EngineAsset
     {
         public List<float> vertices;
         public List<uint> indices;
         public VertexLayout layout;
+        public AlignedBox alignedBox;
     }
 
     public class ModelAsset : EngineAsset
     {
         public string name;
         public string path;
+        public AlignedBox alignedBox;
         public List<MeshAsset> meshes;
     }
 }

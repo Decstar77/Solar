@@ -23,6 +23,13 @@ namespace SolarSharp
 
         //public float X { get { return x; } set { x = value; } }
 
+        public Vector3(float a)
+        {
+            x = a; 
+            y = a;
+            z = a;
+        }
+
         public Vector3(float x, float y, float z)
         {
             this.x = x;
@@ -46,6 +53,22 @@ namespace SolarSharp
         public float Mag { get { return MathF.Sqrt(x * x + y * y + z * z); } }
         [JsonIgnore]
         public float MagSqrd { get { return (x * x + y * y + z * z); } }
+
+        public float this[int key]
+        {
+            get { 
+                if (key == 0) return x; 
+                if (key == 1) return y;
+                if (key == 2) return z;
+                return 0;
+            }
+
+            set {
+                if (key == 0) x = value;
+                else if (key == 1) y = value;
+                else if (key == 2) z = value;                
+            }
+        }
 
         public static Vector3 Normalize(Vector3 value)
         {
@@ -148,5 +171,11 @@ namespace SolarSharp
         {
             return new Vector3(left.x * right, left.y * right, left.z * right);
         }
+
+        public static Vector3 operator /(Vector3 left, float right)
+        {
+            return new Vector3(left.x / right, left.y / right, left.z / right);
+        }
+
     }
 }

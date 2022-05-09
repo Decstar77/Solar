@@ -107,6 +107,11 @@ namespace SolarSharp
             }
         }
 
+        public static Vector3 Transform(Matrix4 a, Vector3 b)
+        {
+            return new Vector3(a * new Vector4(b.x, b.y, b.z, 1.0f));
+        }
+
         public static Matrix4 CreatePerspectiveRH(float fovYRads, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
         {
             var yScale = 1.0f / (float)MathF.Tan(fovYRads * 0.5f);

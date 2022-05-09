@@ -49,14 +49,12 @@ namespace SolarSharp
             m33 = matrix.m33;
         }
 
-        public Vector3 row1 { get { return new Vector3(m11, m12, m13); } set { m11 = value.x; m12 = value.y; m13 = value.z; } }
-        public Vector3 row2 { get { return new Vector3(m21, m22, m23); } set { m21 = value.x; m22 = value.y; m23 = value.z; } }
-        public Vector3 row3 { get { return new Vector3(m31, m32, m33); } set { m31 = value.x; m32 = value.y; m33 = value.z; } }
-
-
-        public Vector3 col1 { get { return new Vector3(m11, m21, m31); } set { m11 = value.x; m21 = value.y; m31 = value.z; } }
-        public Vector3 col2 { get { return new Vector3(m12, m22, m32); } set { m12 = value.x; m22 = value.y; m32 = value.z; } }
-        public Vector3 col3 { get { return new Vector3(m13, m23, m33); } set { m13 = value.x; m23 = value.y; m33 = value.z; } }
+        public Vector3 row0 { get { return new Vector3(m11, m12, m13); } set { m11 = value.x; m12 = value.y; m13 = value.z; } }
+        public Vector3 row1 { get { return new Vector3(m21, m22, m23); } set { m21 = value.x; m22 = value.y; m23 = value.z; } }
+        public Vector3 row2 { get { return new Vector3(m31, m32, m33); } set { m31 = value.x; m32 = value.y; m33 = value.z; } }
+        public Vector3 col0 { get { return new Vector3(m11, m21, m31); } set { m11 = value.x; m21 = value.y; m31 = value.z; } }
+        public Vector3 col1 { get { return new Vector3(m12, m22, m32); } set { m12 = value.x; m22 = value.y; m32 = value.z; } }
+        public Vector3 col2 { get { return new Vector3(m13, m23, m33); } set { m13 = value.x; m23 = value.y; m33 = value.z; } }
 
         public static Matrix3 Identity
         {
@@ -79,7 +77,28 @@ namespace SolarSharp
                     0.0f, 0.0f, 0.0f);
             }
         }
-                
+
+        public Vector3 this[int key]
+        {
+            get => GetColumn(key);
+            set => SetColumn(key, value);
+        }
+
+        public Vector3 GetColumn(int i)
+        {
+            if (i == 0) return col0;
+            if (i == 1) return col1;
+            if (i == 2) return col2;
+            return col2;
+        }
+
+        public void SetColumn(int i, Vector3 value)
+        {
+            if (i == 0) col0 = value;
+            else if (i == 1) col1 = value;
+            else if (i == 2) col2 = value;
+        }
+
         public override string ToString()
         {
             string pattern = @"Matrix3(
@@ -141,17 +160,16 @@ namespace SolarSharp
 
         public Basis Basis
         {
-            get 
+            get
             {
-                return new Basis(col1, col2, col3);
+                return new Basis(col0, col1, col2);
             }
         }
 
-
         public static Quaternion ToQuaternion(Matrix3 matrix)
-        {   
+        {
             Quaternion q = new Quaternion();
-                        
+
             float t;
             float tr = matrix.m11 + matrix.m22 + matrix.m33;
 
@@ -212,5 +230,8 @@ namespace SolarSharp
             M.m33 = a.m31 * b.m13 + a.m32 * b.m23 + a.m33 * b.m33;
             return M;
         }
+
+
+
     }
 }

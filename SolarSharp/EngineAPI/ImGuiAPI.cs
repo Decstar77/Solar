@@ -174,5 +174,9 @@ namespace SolarSharp.EngineAPI
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool ImGuiIsWindowFocused(int flags);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static extern bool ImGuiWantMouseInput();
 	}
 }

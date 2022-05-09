@@ -37,12 +37,16 @@ namespace SolarEditor
         {
             ModelAsset model = new ModelAsset();            
             model.meshes = new List<MeshAsset>(scene.MeshCount);
+            model.alignedBox = new AlignedBox();
 
             foreach (Mesh m in scene.Meshes)
             {
                 MeshAsset mesh = new MeshAsset();
                 mesh.vertices = new List<float>(m.VertexCount);
                 mesh.indices = new List<uint>(3 * m.FaceCount);
+
+                Vector3 minPos = new Vector3(float.MaxValue);
+                Vector3 maxPos = new Vector3(-float.MaxValue);
 
                 List<Vector3D> verts = m.Vertices;
                 List<Vector3D> norms = m.Normals;
@@ -54,6 +58,9 @@ namespace SolarEditor
                     Vector3D norm = norms[i];
                     Vector3D uv = uvs[i];
 
+                    minPos = Vector3.Min(minPos, new SolarSharp.Vector3(pos.X, pos.Y, pos.Z));
+                    maxPos = Vector3.Max(maxPos, new SolarSharp.Vector3(pos.X, pos.Y, pos.Z));
+
                     mesh.vertices.Add(pos.X);
                     mesh.vertices.Add(pos.Y);
                     mesh.vertices.Add(pos.Z);
@@ -63,8 +70,11 @@ namespace SolarEditor
                     mesh.vertices.Add(norm.Z);
 
                     mesh.vertices.Add(uv.X);
-                    mesh.vertices.Add(uv.Y);                    
+                    mesh.vertices.Add(uv.Y);  
                 }
+
+                mesh.alignedBox = new AlignedBox(minPos, maxPos);
+                model.alignedBox = AlignedBox.Combine(model.alignedBox, mesh.alignedBox);
 
                 List<Face> faces = m.Faces;
                 for (int i = 0; i < faces.Count; i++)
@@ -83,10 +93,11 @@ namespace SolarEditor
                 }
                 
                 mesh.layout = VertexLayout.PNT;
-
+                
                 model.meshes.Add(mesh);
             }
 
+            
 
             return model;
         }

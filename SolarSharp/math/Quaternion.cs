@@ -88,9 +88,9 @@ namespace SolarSharp
         {
             Matrix3 matrix = Matrix3.Identity;
             
+            matrix.row0 = RotatePoint(matrix.row0, value);
             matrix.row1 = RotatePoint(matrix.row1, value);
             matrix.row2 = RotatePoint(matrix.row2, value);
-            matrix.row3 = RotatePoint(matrix.row3, value);
 
             return matrix;
         }

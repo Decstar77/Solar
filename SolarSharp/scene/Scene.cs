@@ -33,11 +33,9 @@ namespace SolarSharp
         protected Vector3 scale = new Vector3(1, 1, 1);
         public Vector3 Scale { get { return scale; } set { scale = value; } }
 
-
         public Material Material { get; set; }
         public AlignedBox WorldSpaceBoundingBox { get; }
-        public AlignedBox LocalSpaceBoundingBox { get; }
-
+        public AlignedBox LocalSpaceBoundingBox { get { return GetLocalBoundingBox(); } }
 
         public EntityReference Parent { get; set; }
         public List<EntityReference> Children { get; set; }
@@ -51,7 +49,25 @@ namespace SolarSharp
             Matrix4 transform = translation * rotation * scaling;
 
             return transform;
-        }        
+        }
+
+        protected AlignedBox GetLocalBoundingBox()
+        {
+            if (Material?.ModelId != null)
+            {
+                if (Material.ModelId != Guid.Empty)
+                {
+                    ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
+                    if (modelAsset != null)
+                    {
+                        return AlignedBox.Transform(modelAsset.alignedBox, position, orientation, scale);
+                        //return modelAsset.alignedBox;
+                    }
+                }
+            }
+
+            return new AlignedBox();
+        }
     }
 
     [Flags]

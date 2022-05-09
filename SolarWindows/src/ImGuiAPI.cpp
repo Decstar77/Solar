@@ -288,7 +288,12 @@ namespace ImGuiAPI
 	EDITOR_INTERFACE(bool) ImGuiIsWindowFocused(int flags)
 	{
 		bool r =  ImGui::IsWindowFocused(flags);
-		return r;
+		return r; 
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiWantMouseInput()
+	{
+		return ImGui::GetIO().WantCaptureMouse;
 	}
 
 }
