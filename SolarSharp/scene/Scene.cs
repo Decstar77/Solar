@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 
@@ -23,7 +24,6 @@ namespace SolarSharp
         protected string name = string.Empty;
         public string Name { get { return name; } set { name = value; } }
 
-
         protected Vector3 position = Vector3.Zero;
         public Vector3 Position { get { return position; } set { position = value; } }
 
@@ -34,7 +34,11 @@ namespace SolarSharp
         public Vector3 Scale { get { return scale; } set { scale = value; } }
 
         public Material Material { get; set; }
-        public AlignedBox WorldSpaceBoundingBox { get; }
+
+        [JsonIgnore]
+        public AlignedBox WorldSpaceBoundingBox { get { return GetWorldBoundingBox(); } }
+
+        [JsonIgnore]
         public AlignedBox LocalSpaceBoundingBox { get { return GetLocalBoundingBox(); } }
 
         public EntityReference Parent { get; set; }
@@ -59,9 +63,25 @@ namespace SolarSharp
                 {
                     ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
                     if (modelAsset != null)
+                    {                        
+                        return modelAsset.alignedBox;
+                    }
+                }
+            }
+
+            return new AlignedBox();
+        }
+
+        protected AlignedBox GetWorldBoundingBox()
+        {
+            if (Material?.ModelId != null)
+            {
+                if (Material.ModelId != Guid.Empty)
+                {
+                    ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
+                    if (modelAsset != null)
                     {
-                        return AlignedBox.Transform(modelAsset.alignedBox, position, orientation, scale);
-                        //return modelAsset.alignedBox;
+                        return AlignedBox.Transform(modelAsset.alignedBox, position, Orientation);
                     }
                 }
             }

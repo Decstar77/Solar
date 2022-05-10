@@ -181,7 +181,7 @@ namespace SolarSharp.Rendering
 		}
 		public static void SameLine(float offsetFromStartX = 0.0f, float spacingW = 1.0f) => ImGuiAPI.ImGuiSameLine(offsetFromStartX, spacingW);
 		public static bool Button(string label, float sizeX = 0, float sizeY = 0) => ImGuiAPI.ImGuiButton(label, sizeX, sizeY);
-		public static bool DragFloat3(string label, ref float x, ref float y, ref float z, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f) => ImGuiAPI.ImGuiDragFloat3(label, ref x, ref y, ref z, v_max, v_min);
+		public static bool DragFloat3(string label, ref float x, ref float y, ref float z, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f) => ImGuiAPI.ImGuiDragFloat3(label, ref x, ref y, ref z, v_speed, v_max, v_min);
 		public static bool DragFloat3(string label, ref Vector3 v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f)
 		{
 			return DragFloat3(label, ref v.x, ref v.y, ref v.z, v_speed, v_min, v_max);

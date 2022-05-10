@@ -12,7 +12,7 @@ namespace SolarEditor
 {
     internal class ModelImporter
     {
-        internal static ModelAsset? LoadFromFile(string filePath, MetaFileAsset metaFile)
+        internal static ModelAsset? LoadFromFile(string filePath)
         {
             if (!File.Exists(filePath)) { Logger.Error("File path does not exist + " + filePath); return null; }
 
@@ -26,9 +26,20 @@ namespace SolarEditor
             ModelAsset model = LoadModel(scene);
             model.name = Path.GetFileName(filePath);
             model.path = filePath;
-            model.Guid = metaFile.Guid;
             
-            importer.Dispose();            
+
+            importer.Dispose();
+
+            return model;
+        }
+
+        internal static ModelAsset? LoadFromFile(string filePath, MetaFileAsset metaFile)
+        {
+            ModelAsset? model = LoadFromFile(filePath);
+            if (model != null)
+            {
+                model.Guid = metaFile.Guid;
+            }
 
             return model;
         }

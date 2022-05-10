@@ -17,7 +17,6 @@ namespace SolarSharp.Assets
     {
         public static List<ShaderAsset> ShaderAssets { get { return shaderAssets; } }
         private static List<ShaderAsset> shaderAssets = new List<ShaderAsset>();
-
         public static List<RenderGraph> RenderGraphs { get { return renderGraphs; } }
         private static List<RenderGraph> renderGraphs = new List<RenderGraph>();
         
@@ -49,13 +48,34 @@ namespace SolarSharp.Assets
             return model;
         }
 
-        public static List<ModelAsset> GetModelAssets() => new List<ModelAsset>(modelAssets);
+        public static List<ModelAsset> GetSortedModelAssets() {
+            lock(modelAssets)
+            {
+                modelAssets.Sort((x, y) => (x.name.CompareTo(y.name)));
+                List<ModelAsset> models = new List<ModelAsset>(modelAssets);
+                return models;
+            }             
+        }
+            
         public static void AddModelAsset(ModelAsset model)
         {
             lock (modelAssets)
             {                
-                Logger.Info($"Placing {model.name}");
+                Logger.Trace($"Placing {model.name}");
                 modelAssets.Add(model);
+            }
+        }
+
+        public static void RemoveModelAsset(Guid id)
+        {
+            lock (modelAssets)
+            {
+                int index = modelAssets.FindIndex(x => x.Guid == id);
+                if (index >= 0)
+                {
+                    Logger.Trace($"Removing {modelAssets[index].name}");
+                    modelAssets.RemoveAt(index);
+                }                
             }
         }
 
@@ -64,7 +84,7 @@ namespace SolarSharp.Assets
         {
             lock(textureAssets)
             {
-                Logger.Info($"Placing {texture.name}");
+                Logger.Trace($"Placing {texture.name}");
                 textureAssets.Add(texture);
             }
         }

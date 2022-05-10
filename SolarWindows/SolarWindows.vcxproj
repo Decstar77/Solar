@@ -99,9 +99,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\DX11Renderer.cpp" />
+    <ClCompile Include="src\ImGizmo.cpp" />
     <ClCompile Include="src\ImGuiAPI.cpp" />
     <ClCompile Include="src\ImGuiTextAPI.cpp" />
     <ClCompile Include="src\SolarMath.cpp" />
+    <ClCompile Include="src\vendor\imgizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="src\vendor\imgizmo\ImGradient.cpp" />
+    <ClCompile Include="src\vendor\imgizmo\ImGuizmo.cpp" />
+    <ClCompile Include="src\vendor\imgizmo\ImSequencer.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
     <ClCompile Include="src\vendor\imgui\ImGuizmo.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_demo.cpp" />
@@ -118,6 +123,10 @@
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\DX11Renderer.h" />
     <ClInclude Include="src\SolarMath.h" />
+    <ClInclude Include="src\vendor\imgizmo\ImCurveEdit.h" />
+    <ClInclude Include="src\vendor\imgizmo\ImGradient.h" />
+    <ClInclude Include="src\vendor\imgizmo\ImGuizmo.h" />
+    <ClInclude Include="src\vendor\imgizmo\ImSequencer.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
     <ClInclude Include="src\vendor\imgui\ImGuizmo.h" />

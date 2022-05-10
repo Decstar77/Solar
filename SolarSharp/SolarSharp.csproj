@@ -36,7 +36,9 @@
     <Compile Include="core\DebugDraw.cs" />
     <Compile Include="core\EventSystem.cs" />
     <Compile Include="core\Input.cs" />
+    <Compile Include="EngineAPI\ImGizmoAPI.cs" />
     <Compile Include="rendering\DynamicMesh.cs" />
+    <Compile Include="rendering\imgui\ImGizmo.cs" />
     <Compile Include="rendering\StaticTexture.cs" />
     <Compile Include="tools\MeshFactory.cs" />
     <Compile Include="core\RenderPacket.cs" />

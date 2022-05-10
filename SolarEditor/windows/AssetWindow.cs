@@ -1,4 +1,5 @@
-﻿using SolarSharp.Assets;
+﻿using SolarSharp;
+using SolarSharp.Assets;
 using SolarSharp.Rendering;
 using System;
 using System.Collections.Generic;
@@ -34,21 +35,44 @@ namespace SolarEditor
                         ImGui.Text("Path"); ImGui.NextColumn();
 
                         int idCounter = 0;
-                        AssetSystem.GetModelAssets().ForEach(x => {
+
+                        ModelAsset? reimportModel = null;
+                        AssetSystem.GetSortedModelAssets().ForEach(x => {
                             ImGui.Separator();
                             ImGui.Text(x.name); ImGui.NextColumn();
 
                             ImGui.PushId(idCounter++);
-                            if (ImGui.Button("Edit"))
-                            {
 
+                            if (ImGui.Button("Reimport")) {
+                                reimportModel = x;
                             }
+
                             ImGui.PopId();
                             ImGui.NextColumn();
 
                             ImGui.Text(x.Guid.ToString()); ImGui.NextColumn();                      
                             ImGui.Text(x.path); ImGui.NextColumn();
                         });
+
+                        if (reimportModel != null)
+                        {
+                            Task.Run(() => {
+                                ModelAsset? modelAsset = ModelImporter.LoadFromFile(reimportModel.path);
+                                if (modelAsset != null) {
+                                    modelAsset.Guid = reimportModel.Guid;
+
+                                    AssetSystem.RemoveModelAsset(modelAsset.Guid);
+                                    AssetSystem.AddModelAsset(modelAsset);
+
+                                    RenderSystem.DeregisterModel(modelAsset.Guid);
+                                    RenderSystem.RegisterModel(modelAsset);
+                                }
+                                else
+                                {
+                                    Logger.Error($"Could not reimport {reimportModel.name}");
+                                }
+                            });
+                        }
 
                         ImGui.Columns(1);
                         ImGui.EndTabItem();

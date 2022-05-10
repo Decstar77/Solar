@@ -35,7 +35,7 @@ namespace SolarSharp.Rendering
 
         private static Dictionary<Guid, StaticMesh> meshes = new Dictionary<Guid, StaticMesh>();
         private static List<ModelAsset> modelsToAdd = new List<ModelAsset>();
-        private static List<ModelAsset> modelsToRemove = new List<ModelAsset>();
+        private static List<Guid> modelsToRemove = new List<Guid>();
 
         private static Dictionary<Guid, StaticTexture> textures = new Dictionary<Guid, StaticTexture>();
         private static List<TextureAsset> texturesToAdd = new List<TextureAsset>();
@@ -46,6 +46,14 @@ namespace SolarSharp.Rendering
             lock (modelsToAdd)
             {
                 modelsToAdd.Add(modelAsset);
+            }
+        }
+
+        public static void DeregisterModel(Guid modelId)
+        {
+            lock (modelsToRemove)
+            {
+                modelsToRemove.Add(modelId);
             }
         }
 
@@ -110,11 +118,31 @@ namespace SolarSharp.Rendering
                 temp = true;
             };
 
+            lock (modelsToRemove)
+            {
+                foreach (Guid modelAsset in modelsToRemove)
+                {
+                    Logger.Trace($"Removing model {modelAsset}");
+                    StaticMesh mesh;
+                    if (meshes.TryGetValue(modelAsset, out mesh))
+                    {
+                        mesh.Release();
+                        meshes.Remove(modelAsset);
+                    }
+                }
+
+                modelsToRemove.Clear();
+            }
+
             lock (modelsToAdd)
             {
                 foreach (ModelAsset modelAsset in modelsToAdd)
                 {
                     Logger.Trace($"Uploading model {modelAsset.name}");
+
+                    // @TODO: Probably not a failure case but I want to investigate later 
+                    Debug.Assert(!meshes.ContainsKey(modelAsset.Guid));
+
                     meshes.Add(modelAsset.Guid, new StaticMesh(device, modelAsset.meshes[0]));
                 }
                 modelsToAdd.Clear();

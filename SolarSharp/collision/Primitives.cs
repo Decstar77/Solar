@@ -80,7 +80,7 @@ namespace SolarSharp
             return new AlignedBox(Vector3.Min(b1.min, b2.min), Vector3.Max(b1.max, b2.max)); 
         }
 
-        public static AlignedBox Transform(AlignedBox a, Vector3 translation, Quaternion orientation, Vector3 scale)
+        public static AlignedBox Transform(AlignedBox a, Vector3 translation, Quaternion orientation)
         {            
             Matrix3 rotation = Quaternion.ToMatrix3(orientation);
 

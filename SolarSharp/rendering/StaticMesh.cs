@@ -60,6 +60,12 @@ namespace SolarSharp.Rendering
             indexHandle.Free();
         }
 
+        public void Release()
+        {
+            VertexBuffer?.Release();
+            IndexBuffer?.Release();
+        }
+
         public static StaticMesh CreateScreenSpaceQuad(DXDevice device)
         {
             float[] vertexData = {

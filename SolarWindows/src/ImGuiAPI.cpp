@@ -5,6 +5,7 @@
 #include "Win32Platform.h"
 #include "DX11Renderer.h"
 
+#include "vendor/imgizmo/ImGuizmo.h"
 
 namespace ImGuiAPI
 {
@@ -54,6 +55,7 @@ namespace ImGuiAPI
 		ImGui_ImplWin32_NewFrame();
 
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	EDITOR_INTERFACE(void) ImGuiEndFrame()
@@ -147,7 +149,7 @@ namespace ImGuiAPI
 	{
 		float v[3] = {*x, *y, *z};
 		bool r = ImGui::DragFloat3(label, v, v_speed, v_min, v_max);
-
+		
 		*x = v[0];
 		*y = v[1];
 		*z = v[2];

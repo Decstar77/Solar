@@ -8,6 +8,7 @@ using SolarSharp.Rendering;
 using SolarSharp.Rendering.Graph;
 using SolarSharp.Assets;
 using SolarSharp.core;
+using SolarSharp.Core;
 
 namespace SolarEditor
 {
@@ -27,7 +28,9 @@ namespace SolarEditor
 
             Task.Run(() => 
             {
-                Directory.GetFiles(Application.Config.AssetPath, "*.fbx", SearchOption.AllDirectories).ToList().ForEach(x => {               
+                Directory.GetFiles(Application.Config.AssetPath, "*.fbx", SearchOption.AllDirectories)
+                .Concat(Directory.GetFiles(Application.Config.AssetPath, "*.obj", SearchOption.AllDirectories))
+                .ToList().ForEach(x => {               
                     Logger.Info($"Loading model {x}");
                     MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x, AssetType.MODEL);
                     ModelAsset? modelAsset = ModelImporter.LoadFromFile(x, metaFileAsset);
@@ -42,7 +45,6 @@ namespace SolarEditor
             Task.Run(() =>
             {
                 Directory.GetFiles(Application.Config.AssetPath, "*.png", SearchOption.AllDirectories).ToList().ForEach(x => {
-
                     Logger.Info($"Loading texture {x}");
                     MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x, AssetType.TEXTURE);
                     TextureAsset? textureAsset = TextureImporter.LoadFromFile(x, metaFileAsset);
@@ -62,13 +64,12 @@ namespace SolarEditor
             entity.Name = "Bike";
             entity.Material = new Material();
             entity.Material.ModelId = Guid.Parse("10209316-f57b-41f7-88cf-8ea81614bdb2");
-            entity.Material.AlbedoTexture = Guid.Parse("a0e317e7-30a5-48ca-842f-098fc86f1494");
-            entity.Position = new Vector3(0, -1, -3);
-            entity.Orientation = Quaternion.RotateLocalZ(Quaternion.Identity, Util.DegToRad(45.0f));
+            entity.Material.AlbedoTexture = Guid.Parse("5b767a8f-5e2e-428d-81d2-8b350bf556fc");
+            entity.Position = new Vector3(0, 0, -3);
+            //entity.Orientation = Quaternion.RotateLocalZ(Quaternion.Identity, Util.DegToRad(45.0f));
 
             gameScene.Entities.Add(entity);
             GameSystem.CurrentScene = gameScene;
-
             
 
             AssetSystem.AddGameScene(gameScene);
@@ -91,11 +92,37 @@ namespace SolarEditor
                 AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", GameSystem.CurrentScene);
             }
 
-            //if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1) && !ImGui.WantMouseInput())
+            GameSystem.CurrentScene.Entities.ForEach(entity => {
+                DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
+            });
+
+            if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1) && !ImGui.WantMouseInput())
             {
+                Ray ray = camera.ShootRayFromMousePos();
+
                 GameSystem.CurrentScene.Entities.ForEach(entity => {
-                    DebugDraw.AlignedBox(entity.LocalSpaceBoundingBox);
+                    if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out _))
+                    {
+                        Console.WriteLine("hit");
+                    }
                 });
+            }
+
+            Entity entity = GameSystem.CurrentScene.Entities[0];
+            ImGizmo.Enable(true);
+            ImGizmo.SetRect(0, 0, Window.SurfaceWidth, Window.SurfaceHeight);
+
+            Matrix4 modelMatrix = entity.ComputeModelMatrix().Transpose;
+            if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose ,ref modelMatrix, ImGizmoOperation.TRANSLATE, ImGizmoMode.LOCAL))
+            {
+                Vector3 pos;
+                Quaternion rot;
+                Vector3 scl;
+                Matrix4.Decompose(modelMatrix.Transpose, out pos, out rot, out scl);
+
+                entity.Position = pos;
+                entity.Orientation = rot;
+                entity.Scale = scl;
             }
 
             camera.Operate();
@@ -253,6 +280,10 @@ namespace SolarEditor
 
                     if (ImGui.MenuItem("Scene ")) {
                         AddWindow(new GameSceneWindow());
+                    }
+
+                    if (ImGui.MenuItem("Entity inspector ")) {
+                        AddWindow(new EntityWindow());
                     }
 
                     if (ImGui.MenuItem("Debug")) {
