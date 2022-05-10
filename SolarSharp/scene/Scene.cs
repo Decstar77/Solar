@@ -11,9 +11,26 @@ using System.Threading.Tasks;
 
 namespace SolarSharp
 {
-    public class EntityReference
+    public struct EntityReference
     { 
+        public static EntityReference Invalid { get { return new EntityReference(-1); } }
         public int EntityId { get; set; }
+
+        public EntityReference(int id)
+        {
+            EntityId = id;
+        }
+
+        public Entity? GetEntity()
+        {
+            foreach (Entity entity in GameSystem.CurrentScene.Entities)
+            {
+                if (entity.Id == EntityId)
+                    return entity;
+            }
+
+            return null;
+        }            
     }
 
     public class Entity
@@ -32,6 +49,8 @@ namespace SolarSharp
 
         protected Vector3 scale = new Vector3(1, 1, 1);
         public Vector3 Scale { get { return scale; } set { scale = value; } }
+        public EntityReference Reference { get { return new EntityReference(id); } }
+        public void SetTransform(Matrix4 m) => Matrix4.Decompose(m, out position, out orientation, out scale);
 
         public Material Material { get; set; }
 

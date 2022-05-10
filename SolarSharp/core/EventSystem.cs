@@ -64,16 +64,18 @@ namespace SolarSharp
             events[index].RemoveAt(removeIndex);
         }
 
-        public static void Fire(EventType type, object context)
+        public static bool Fire(EventType type, object context)
         {
             int index = (int)type;
             foreach (EventCallback callback in events[index])
             {
                 if (callback.Invoke(type, context))
                 {
-                    break;
+                    return true;
                 }
             }
+
+            return false;
         }
     }
 }

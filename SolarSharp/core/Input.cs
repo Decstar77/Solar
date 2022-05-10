@@ -144,7 +144,21 @@ namespace SolarSharp
 			return false;
         }
 
-        public static bool IskeyJustDown(KeyCode keyCode)
+		public static bool IsMouseButtonJustUp(MouseButton mouse)
+		{
+			switch (mouse)
+			{
+				case MouseButton.MOUSE1:
+					return IskeyJustUp(Application.Input.mb1, Application.OldInput.mb1);
+				case MouseButton.MOUSE2:
+					return IskeyJustUp(Application.Input.mb2, Application.OldInput.mb2);
+				case MouseButton.MOUSE3:
+					return IskeyJustUp(Application.Input.mb3, Application.OldInput.mb3);
+			}
+			return false;
+		}
+
+		public static bool IskeyJustDown(KeyCode keyCode)
         {
             switch (keyCode)
             {
@@ -249,5 +263,10 @@ namespace SolarSharp
         {
 			return cur && !old;
         }
-    }
+
+		private static bool IskeyJustUp(bool cur, bool old)
+		{
+			return !cur && old;
+		}
+	}
 }

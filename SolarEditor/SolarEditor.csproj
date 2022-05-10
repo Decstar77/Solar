@@ -25,7 +25,10 @@
     <Compile Include="content\TextureImporter.cs" />
     <Compile Include="EditorState.cs" />
     <Compile Include="FlyCamera.cs" />
+    <Compile Include="Gizmo.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="undo\UndoAction.cs" />
+    <Compile Include="undo\UndoSystem.cs" />
     <Compile Include="windows\AssetWindow.cs" />
     <Compile Include="windows\DebugWindow.cs" />
     <Compile Include="windows\EntityWindow.cs" />

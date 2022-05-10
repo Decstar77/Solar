@@ -295,7 +295,18 @@ namespace ImGuiAPI
 
 	EDITOR_INTERFACE(bool) ImGuiWantMouseInput()
 	{
-		return ImGui::GetIO().WantCaptureMouse;
+		 return ImGui::GetIO().WantCaptureMouse;
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiIsAnyItemHovered()
+	{
+		return ImGui::IsAnyItemHovered();
+	}	
+
+	EDITOR_INTERFACE(bool) ImGuiIsWindowHovered(int flags)
+	{
+		bool r = ImGui::IsWindowHovered(flags);
+		return r;
 	}
 
 }

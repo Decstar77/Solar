@@ -18,6 +18,9 @@ namespace SolarEditor
         private List<EditorWindow> windows = new List<EditorWindow>();
         private List<EditorWindow> newWindows = new List<EditorWindow>();
         private FlyCamera camera = new FlyCamera();
+        private Gizmo gizmo = new Gizmo();
+
+        private List<Entity> selectedEntities = new List<Entity>();
 
         internal EditorState()
         {
@@ -80,6 +83,7 @@ namespace SolarEditor
         private bool newModelDialog = false;
         private ModelAsset? newModelAsset = null;
 
+
         internal void Update()
         {
             ImGui.BeginFrame();
@@ -87,42 +91,40 @@ namespace SolarEditor
             ShowWindows();
 
             if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L)) {
-                EventSystem.Fire(EventType.ON_SAVE, null);
-
-                AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", GameSystem.CurrentScene);
+                if (!EventSystem.Fire(EventType.ON_SAVE, null)) {
+                    AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", GameSystem.CurrentScene);
+                }
             }
 
-            GameSystem.CurrentScene.Entities.ForEach(entity => {
-                DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
-            });
 
-            if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1) && !ImGui.WantMouseInput())
+            if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
             {
-                Ray ray = camera.ShootRayFromMousePos();
+                if (selectedEntities.Count > 0 && gizmo.Operate(camera, selectedEntities[0]))
+                {
+                }
+                else if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
+                {
+                    Ray ray = camera.ShootRayFromMousePos();
 
-                GameSystem.CurrentScene.Entities.ForEach(entity => {
-                    if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out _))
+                    selectedEntities.Clear();
+                    GameSystem.CurrentScene.Entities.ForEach(entity =>
                     {
-                        Console.WriteLine("hit");
-                    }
-                });
-            }
+                        if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out _))
+                        {
+                            selectedEntities.Add(entity);
+                        }
+                    });
+                }
+            }            
 
-            Entity entity = GameSystem.CurrentScene.Entities[0];
-            ImGizmo.Enable(true);
-            ImGizmo.SetRect(0, 0, Window.SurfaceWidth, Window.SurfaceHeight);
 
-            Matrix4 modelMatrix = entity.ComputeModelMatrix().Transpose;
-            if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose ,ref modelMatrix, ImGizmoOperation.TRANSLATE, ImGizmoMode.LOCAL))
+            if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
             {
-                Vector3 pos;
-                Quaternion rot;
-                Vector3 scl;
-                Matrix4.Decompose(modelMatrix.Transpose, out pos, out rot, out scl);
-
-                entity.Position = pos;
-                entity.Orientation = rot;
-                entity.Scale = scl;
+                UndoSystem.Redo();
+            }
+            else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
+            {
+                UndoSystem.Undo();
             }
 
             camera.Operate();

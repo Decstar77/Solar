@@ -25,10 +25,12 @@ namespace SolarSharp.Rendering
     {
         const string DLLName = "SolarWindows";
         public static void Enable(bool enable) 
-			=> ImGizmoAPI.GizmoEnable(enable);
+			=> ImGizmoAPI.ImGizmoEnable(enable);
         public static void SetRect(float x, float y, float width, float height) 
-			=> ImGizmoAPI.GizmoSetRect(x, y, width, height);
-        public static bool Manipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, ImGizmoOperation operation, ImGizmoMode mode) 
-			=> ImGizmoAPI.GizmoManipulate(proj,view, ref world, (int)operation, (int)mode);
+			=> ImGizmoAPI.ImGizmoSetRect(x, y, width, height);
+
+		public static bool GizmoIsUsing() => ImGizmoAPI.ImGizmoIsUsing();
+		public static bool Manipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, ImGizmoOperation operation, ImGizmoMode mode) 
+			=> ImGizmoAPI.ImGizmoManipulate(proj,view, ref world, (int)operation, (int)mode);
     }
 }

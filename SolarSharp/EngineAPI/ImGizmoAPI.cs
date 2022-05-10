@@ -12,14 +12,18 @@ namespace SolarSharp.EngineAPI
         const string DLLName = "SolarWindows";
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        public static extern void GizmoEnable(bool enable);
+        public static extern void ImGizmoEnable(bool enable);
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-        public static extern void GizmoSetRect(float x, float y, float width, float height);
+        public static extern void ImGizmoSetRect(float x, float y, float width, float height);
 
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool GizmoManipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, int operation, int mode);
+        public static extern bool ImGizmoIsUsing();
+
+        [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool ImGizmoManipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, int operation, int mode);
 
     }
 }
