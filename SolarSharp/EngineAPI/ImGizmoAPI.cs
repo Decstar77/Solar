@@ -24,6 +24,5 @@ namespace SolarSharp.EngineAPI
         [DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool ImGizmoManipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, int operation, int mode);
-
     }
 }

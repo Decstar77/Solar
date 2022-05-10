@@ -99,6 +99,7 @@ namespace SolarSharp
 		F8,
 		F9,
 		TLDA,
+		DEL,
     }
 
     public enum MouseButton
@@ -204,6 +205,8 @@ namespace SolarSharp
 					return IskeyJustDown(Application.Input.f9, Application.OldInput.f9);
 				case KeyCode.TLDA:
 					return IskeyJustDown(Application.Input.tlda, Application.OldInput.tlda);
+				case KeyCode.DEL:
+					return (Application.Input.del);
 			}
 			return false;
         }
@@ -254,6 +257,8 @@ namespace SolarSharp
 					return (Application.Input.f9);
 				case KeyCode.TLDA:
 					return (Application.Input.tlda);
+				case KeyCode.DEL:
+					return (Application.Input.del);
 			}
 			return false;
 		}

@@ -14,14 +14,39 @@ namespace SolarEditor
         private bool isUsing = false;
         private Matrix4 oldM = Matrix4.Identity;
 
+        private ImGizmoOperation operation = ImGizmoOperation.TRANSLATE;
+        private ImGizmoMode mode = ImGizmoMode.LOCAL;
+
         public bool Operate(Camera camera, Entity entity)
         {
             ImGizmo.Enable(true);
             ImGizmo.SetRect(0, 0, Window.SurfaceWidth, Window.SurfaceHeight);
 
+            if (Input.IskeyJustDown(KeyCode.T))
+            {
+                operation = ImGizmoOperation.TRANSLATE;
+            }
+            else if (Input.IskeyJustDown(KeyCode.R))
+            {
+                operation = ImGizmoOperation.ROTATE;
+            }
+            else if (Input.IskeyJustDown(KeyCode.E))
+            {
+                operation = ImGizmoOperation.SCALE;
+                mode = ImGizmoMode.LOCAL;
+            }
+
+            if (Input.IskeyJustDown(KeyCode.TLDA))
+            {
+                if (operation != ImGizmoOperation.SCALE)
+                {
+                    mode = mode == ImGizmoMode.LOCAL ? ImGizmoMode.WORLD : ImGizmoMode.LOCAL;
+                }
+            }
+
             Matrix4 modelMatrix = entity.ComputeModelMatrix();
             Matrix4 inputMatrix = modelMatrix.Transpose;
-            if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose, ref inputMatrix, ImGizmoOperation.TRANSLATE, ImGizmoMode.LOCAL))
+            if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose, ref inputMatrix, operation, mode))
             {
                 Vector3 pos;
                 Quaternion rot;

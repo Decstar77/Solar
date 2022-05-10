@@ -88,7 +88,7 @@ namespace SolarEditor
                         ImGui.Text("Path"); ImGui.NextColumn();
 
                         int idCounter = 0;
-                        AssetSystem.GetTextureAssets().ForEach(x => {
+                        AssetSystem.GetSortedTextureAssets().ForEach(x => {
                             ImGui.Separator();
                             ImGui.Text(x.name); ImGui.NextColumn();
 

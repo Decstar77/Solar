@@ -79,7 +79,16 @@ namespace SolarSharp.Assets
             }
         }
 
-        public static List<TextureAsset> GetTextureAssets() => new List<TextureAsset>(textureAssets);
+        public static List<TextureAsset> GetSortedTextureAssets()
+        {
+            lock (textureAssets)
+            {
+                textureAssets.Sort((x, y) => (x.name.CompareTo(y.name)));
+                List<TextureAsset> textures = new List<TextureAsset>(textureAssets);
+                return textures;
+            }
+        }
+
         public static void AddTextureAsset(TextureAsset texture)
         {
             lock(textureAssets)

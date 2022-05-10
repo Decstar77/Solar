@@ -49,7 +49,7 @@ namespace SolarSharp.core
 			data.Free();
 
 			context.SetVertexBuffers(mesh.buffer, mesh.StrideBytes);
-			context.Draw((uint)meshVertices.Length / 3, 0);
+			context.Draw((uint)debugMeshVertexCount / 3, 0);
 
             debugMeshVertexCount = 0;
 

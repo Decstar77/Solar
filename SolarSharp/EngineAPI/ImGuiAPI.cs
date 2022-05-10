@@ -149,7 +149,7 @@ namespace SolarSharp.EngineAPI
 		public static extern bool ImGuiBeginPopup([MarshalAs(UnmanagedType.LPStr)] string id, int flags);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
-		public static extern bool ImGuiCheckBox([MarshalAs(UnmanagedType.LPStr)] string label, [MarshalAs(UnmanagedType.Bool)] ref bool b);
+		public static extern bool ImGuiCheckBox([MarshalAs(UnmanagedType.LPStr)] string label, [MarshalAs(UnmanagedType.I1)] ref bool b);
 
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		[return: MarshalAs(UnmanagedType.I1)]
@@ -187,5 +187,8 @@ namespace SolarSharp.EngineAPI
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool ImGuiIsWindowHovered(int flags);
 
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static extern bool ImGuiWantCaptureKeyboard();
 	}
 }

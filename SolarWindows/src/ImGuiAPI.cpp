@@ -309,4 +309,8 @@ namespace ImGuiAPI
 		return r;
 	}
 
+	EDITOR_INTERFACE(bool) ImGuiWantCaptureKeyboard()
+	{
+		return ImGui::GetIO().WantCaptureKeyboard;
+	}
 }

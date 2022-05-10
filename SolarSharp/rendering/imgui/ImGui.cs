@@ -174,7 +174,7 @@ namespace SolarSharp.Rendering
 			return result;
 		}
 		public static void End() => ImGuiAPI.ImGuiEnd();
-		public static bool CollapsingHeader(string label, int flags) => ImGuiAPI.ImGuiCollapsingHeader(label, flags);
+		public static bool CollapsingHeader(string label, int flags = 0) => ImGuiAPI.ImGuiCollapsingHeader(label, flags);
 		public static void Text(string text) => ImGuiAPI.ImGuiText(text);
 		private static bool InputText(string label, byte[] buf, int bufSize, int flags) => ImGuiAPI.ImGuiInputText(label, buf, bufSize, flags);
 		private static bool InputText(string label, byte[] buf, int flags = 0)
@@ -257,6 +257,7 @@ namespace SolarSharp.Rendering
 		public static bool WantMouseInput() => ImGuiAPI.ImGuiWantMouseInput();
 		public static bool IsAnyItemHovered() => ImGuiAPI.ImGuiIsAnyItemHovered();
 		public static bool IsWindowHovered(ImGuiHoveredFlags flags = 0) => ImGuiAPI.ImGuiIsWindowHovered((int)flags);
+		public static bool WantCaptureKeyboard() => ImGuiAPI.ImGuiWantCaptureKeyboard();
 
 	}
 }

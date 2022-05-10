@@ -189,7 +189,8 @@ namespace SolarSharp.Rendering
 
                     GameScene scene = GameSystem.CurrentScene;
 
-                    foreach (Entity entity in scene.Entities)
+                    Entity[] entities = scene.GetAllEntities();
+                    foreach (Entity entity in entities)
                     {
                         if (entity.Material != null)
                         {

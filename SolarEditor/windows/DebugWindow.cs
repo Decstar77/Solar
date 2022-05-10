@@ -11,22 +11,15 @@ namespace SolarEditor
 {
     internal class DebugWindow : EditorWindow
     {
-        public static bool ShowBoundingBoxes = false;
+        
 
         public override void Show(EditorState editorState)
         {
-            if (ImGui.Begin("Debug window", ref show))
-            {
-                ImGui.CheckBox("Show Bounding boxes", ref ShowBoundingBoxes);
+            if (ImGui.Begin("Debug window", ref show))  {
+                ImGui.CheckBox("Show Bounding boxes", ref editorState.ShowBoundingBoxes );
+                ImGui.CheckBox("Show empties", ref editorState.ShowEmpties);
             }
             ImGui.End();
-
-            if (ShowBoundingBoxes) {
-                GameSystem.CurrentScene.Entities.ForEach(entity => {
-                    DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
-                });
-
-            }
         }
 
         public override void Shutdown()

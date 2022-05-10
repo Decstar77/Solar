@@ -38,4 +38,68 @@ namespace SolarEditor
             return true;
         }
     }
+
+    internal class CreateEntityAction : UndoAction
+    {
+        private Entity entity;
+
+        public CreateEntityAction(Entity entity)
+        {
+            this.entity = entity;
+        }
+
+        internal override bool Redo()
+        {
+            GameSystem.CurrentScene.PlaceEntity(entity);
+            return true;
+        }
+
+        internal override bool Undo()
+        {
+            GameSystem.CurrentScene.DeleteEntity(entity.Id);
+            return true;
+        }
+    }
+
+    internal class DeleteEntityAction : UndoAction
+    {
+        private Entity entity;
+
+        public DeleteEntityAction(Entity entity)
+        {
+            this.entity = entity;
+        }
+
+        internal override bool Redo()
+        {
+            GameSystem.CurrentScene.DeleteEntity(entity.Id);
+            return true;
+        }
+
+        internal override bool Undo()
+        {
+            GameSystem.CurrentScene.PlaceEntity(entity);
+            return true;
+        }
+    }
+
+    internal class SelectionEntityAction : UndoAction
+    {
+        private List<EntityReference> selection;
+
+        public SelectionEntityAction(List<EntityReference> selection) {
+            selection = new List<EntityReference>(selection);
+        }
+
+        internal override bool Redo()
+        {
+            return true;
+        }
+
+        internal override bool Undo()
+        {
+            return true;
+        }
+    }
+
 }

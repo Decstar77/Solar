@@ -44,6 +44,25 @@ namespace SolarEditor
 
                     gameScene.RenderGraph = AssetSystem.RenderGraphs[currentRenderGraphAsset];
                 }
+
+                if (ImGui.CollapsingHeader("Entities", 0))
+                {
+                    Entity[] entities = GameSystem.CurrentScene.GetAllEntities();
+
+                    for (int i = 0; i < entities.Length; i++)
+                    {
+                        Entity entity = entities[i];
+
+                        ImGui.PushId(i);
+                        if (ImGui.Selectable(entity.Name))
+                        {
+                            editorState.AddWindow(new EntityWindow());
+                            editorState.selection.Set(entity);
+                        }
+                        ImGui.PopId();
+
+                    }
+                }
             }
 
             ImGui.End();

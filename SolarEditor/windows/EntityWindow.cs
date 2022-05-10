@@ -15,26 +15,48 @@ namespace SolarEditor
 
         public override void Show(EditorState editorState)
         {
-            Entity = GameSystem.CurrentScene.Entities[0];
-
             if (ImGui.Begin("Entity inspector", ref show))
-            {
-                if (Entity != null)
+            {                
+                if (editorState.selection.SelectedEntities.Count > 0)
                 {
-                    Vector3 pos = Entity.Position;
-                    if (ImGui.DragFloat3("Position", ref pos)) {
-                        Entity.Position = pos;
+                    Entity = editorState.selection.SelectedEntities[0].GetEntity();
+
+                    if (ImGui.CollapsingHeader("Identifiers"))
+                    {
+                        ImGui.InputText("Name", ref Entity.Name);                        
+                        ImGui.Text("Id " + Entity.Id.ToString());
                     }
 
-                    var models = AssetSystem.GetSortedModelAssets();
-
-                    string[] modelNames = models.Select(x => x.name).ToArray();
-                    int index = models.FindIndex(x => x.Guid == Entity.Material.ModelId);                    
-
-                    if (ImGui.Combo("Model", ref index, modelNames))
+                    if (ImGui.CollapsingHeader("Transform"))
                     {
-                         Entity.Material.ModelId = models[index].Guid;
-                    }                    
+                        Vector3 pos = Entity.Position;
+                        if (ImGui.DragFloat3("Position", ref pos))
+                        {
+                            Entity.Position = pos;
+                        }
+                    }
+                    
+                    if (ImGui.CollapsingHeader("Material"))
+                    {
+                        var models = AssetSystem.GetSortedModelAssets();
+                        string[] modelNames = models.Select(x => x.name).ToArray();
+                        int modelIndex = models.FindIndex(x => x.Guid == Entity.Material.ModelId);
+
+                        if (ImGui.Combo("Model", ref modelIndex, modelNames)) {
+                            Entity.Material.ModelId = models[modelIndex].Guid;
+                        }
+
+                        var textures = AssetSystem.GetSortedTextureAssets();
+                        string[] textureNames = textures.Select(x => x.name).ToArray();
+                        int textureIndex = textures.FindIndex(x => x.Guid == Entity.Material.AlbedoTexture);
+                        if (ImGui.Combo("Albedo", ref textureIndex, textureNames)) {
+                            Entity.Material.AlbedoTexture = textures[textureIndex].Guid;
+                        }
+
+
+
+                    }
+
                 }
             }
 
