@@ -1,0 +1,15 @@
+F:\codes\Solar\PlaneGame\bin\Debug\net6.0-windows\PlaneGame.deps.json
+F:\codes\Solar\PlaneGame\bin\Debug\net6.0-windows\PlaneGame.dll
+F:\codes\Solar\PlaneGame\bin\Debug\net6.0-windows\PlaneGame.pdb
+F:\codes\Solar\PlaneGame\bin\Debug\net6.0-windows\SolarSharp.dll
+F:\codes\Solar\PlaneGame\bin\Debug\net6.0-windows\SolarSharp.pdb
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.csproj.AssemblyReference.cache
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.GeneratedMSBuildEditorConfig.editorconfig
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.AssemblyInfoInputs.cache
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.AssemblyInfo.cs
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.csproj.CoreCompileInputs.cache
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.csproj.CopyComplete
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.dll
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\refint\PlaneGame.dll
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\PlaneGame.pdb
+F:\codes\Solar\PlaneGame\obj\Debug\net6.0-windows\ref\PlaneGame.dll

@@ -5,35 +5,34 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SolarSharp;
-using SolarSharp.EngineAPI;
-using System.Text.Json;
+using PlaneGame;
+using SolarSharp.Core;
 
 namespace SolarEditor
 {
     public class Program
     {
         private static EditorState? editorState;
+        private static Game? game;
         public static bool OnInitialize()
         {
-            editorState = new EditorState();           
+            editorState = new EditorState();
+            game = new AirGame();
 
+            game.Start();
             return true;
         }
 
         public static void OnUpdate()
         {
             editorState?.Update();
+            game?.TickUpdate();
         }
-
-        //public static void OnRender(RenderPacket renderPacket)
-        //{
-        //    renderPacket.renderEntries.Add(new RenderEntry(new Vector3(5, 0, 0), Quaternion.Identity, new Vector3(0.1f, 1, 1)));
-        //    renderPacket.renderEntries.Add(new RenderEntry(new Vector3(0, 0, 0), Quaternion.Identity, new Vector3(1,1,1)));
-        //}
 
         public static void OnShutdown()
         {
             editorState?.Shutdown();
+            game?.Shutdown();
         }
 
         public static void Main()
@@ -43,13 +42,13 @@ namespace SolarEditor
             config.Description = "Solar editor";
             config.SurfaceWidth = 1900;
             config.SurfaceHeight = 1000;
-            config.WindowXPos = 200;
-            config.WindowYPos = 200;
+            config.WindowXPos = 20;
+            config.WindowYPos = 30;
             config.Version = "0.1";
             config.OnInitializeCallback = OnInitialize;
             config.OnUpdateCallback = OnUpdate; 
             config.OnShutdownCallback = OnShutdown;
-            config.AssetPath = "C:/Users/claud/OneDrive/Desktop/DeclanStuff/Solar/EngineAssets/";
+            config.AssetPath = "F:/codes/Solar/EngineAssets/";
 
             //string json = JsonSerializer.Serialize(config);
             //File.WriteAllText("appConfig.json", json);

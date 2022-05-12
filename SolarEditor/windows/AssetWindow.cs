@@ -43,6 +43,10 @@ namespace SolarEditor
 
                             ImGui.PushId(idCounter++);
 
+                            if (ImGui.Button("View")) {
+                                editorState.AddWindow(new ModelViewerWindow(x));
+                            }
+                            ImGui.SameLine();
                             if (ImGui.Button("Reimport")) {
                                 reimportModel = x;
                             }
@@ -57,14 +61,15 @@ namespace SolarEditor
                         if (reimportModel != null)
                         {
                             Task.Run(() => {
-                                ModelAsset? modelAsset = ModelImporter.LoadFromFile(reimportModel.path);
-                                if (modelAsset != null) {
+                                ModelImporter modelImporter = new ModelImporter(reimportModel.path);
+                                if (modelImporter.Loaded) {
+                                    ModelAsset modelAsset = modelImporter.LoadModel();
                                     modelAsset.Guid = reimportModel.Guid;
 
                                     AssetSystem.RemoveModelAsset(modelAsset.Guid);
                                     AssetSystem.AddModelAsset(modelAsset);
 
-                                    RenderSystem.DeregisterModel(modelAsset.Guid);
+                                    RenderSystem.DeregisterModel(modelAsset);
                                     RenderSystem.RegisterModel(modelAsset);
                                 }
                                 else
@@ -102,6 +107,31 @@ namespace SolarEditor
 
                             ImGui.Text(x.Guid.ToString()); ImGui.NextColumn();
                             ImGui.Text(x.path); ImGui.NextColumn();
+                        });
+
+                        ImGui.Columns(1);
+                        ImGui.EndTabItem();
+                    }
+                    if (ImGui.BeginTabItem("Materials"))
+                    {
+                        ImGui.Columns(2, "materialColumns", true);
+                        ImGui.Separator();
+
+                        ImGui.Text("Name"); ImGui.NextColumn();
+                        ImGui.Text("Actions"); ImGui.NextColumn();
+
+                        int idCounter = 0;
+                        AssetSystem.GetSortedMaterialAssets().ForEach(x => {
+                            ImGui.Separator();
+                            ImGui.Text(x.name); ImGui.NextColumn();
+
+                            ImGui.PushId(idCounter++);
+                            if (ImGui.Button("Edit"))
+                            {
+
+                            }
+                            ImGui.PopId();
+                            ImGui.NextColumn();
                         });
 
                         ImGui.Columns(1);
@@ -153,20 +183,20 @@ namespace SolarEditor
                         ImGui.Text("Path"); ImGui.NextColumn();
 
                         int idCounter = 0;
-                        AssetSystem.GetGameScenes().ForEach(x => {
+                        AssetSystem.GetScenesAssets().ForEach(x => {
                             ImGui.Separator();
                             ImGui.Text(x.name); ImGui.NextColumn();
 
                             ImGui.PushId(idCounter++);
-                            if (ImGui.Button("Edit"))
+                            if (ImGui.Button("Open"))
                             {
-
+                                //AssetSystem.LoadGameSceneAsset()
                             }
                             ImGui.PopId();
                             ImGui.NextColumn();
 
                             ImGui.Text(x.Guid.ToString()); ImGui.NextColumn();
-                            ImGui.Text(x.path); ImGui.NextColumn();
+                            ImGui.Text("Path"); ImGui.NextColumn();
                         });
 
                         ImGui.Columns(1);

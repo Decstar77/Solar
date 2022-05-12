@@ -32,13 +32,19 @@ namespace SolarSharp
             }
 
             return null;
-        }            
+        }
+    }
+
+
+    public class RenderingState
+    {
+        public Guid ModelId { get; set; }
+        public string MaterialReference { get; set; }
     }
 
     public class Entity
     {
-        public int Id { get { return id; } }
-        protected int id;
+        public int Id { get; set; } = -1;
 
         [JsonInclude]
         public string Name = "Untitled";
@@ -47,14 +53,14 @@ namespace SolarSharp
         public Vector3 Position { get { return position; } set { position = value; } }
 
         protected Quaternion orientation = Quaternion.Identity;
-
         public Quaternion Orientation { get { return orientation; } set { orientation = value; } }
 
         protected Vector3 scale = new Vector3(1, 1, 1);
         public Vector3 Scale { get { return scale; } set { scale = value; } }
-        public EntityReference Reference { get { return new EntityReference(id); } }
-        public void SetTransform(Matrix4 m) => Matrix4.Decompose(m, out position, out orientation, out scale);
-        public Material Material { get; set; } = new Material();
+
+
+        public EntityReference Reference { get { return new EntityReference(Id); } }
+        public RenderingState RenderingState { get; set; } = new RenderingState();
 
         [JsonIgnore]
         public AlignedBox WorldSpaceBoundingBox { get { return GetWorldBoundingBox(); } }
@@ -72,8 +78,10 @@ namespace SolarSharp
 
         public Entity(int id)
         {
-            this.id = id;
+            this.Id = id;
         }
+
+        public void SetTransform(Matrix4 m) => Matrix4.Decompose(m, out position, out orientation, out scale);
 
         public Matrix4 ComputeModelMatrix()
         {
@@ -88,72 +96,53 @@ namespace SolarSharp
 
         protected AlignedBox GetLocalBoundingBox()
         {
-            if (Material?.ModelId != null)
-            {
-                if (Material.ModelId != Guid.Empty)
-                {
-                    ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
-                    if (modelAsset != null)
-                    {                        
-                        return modelAsset.alignedBox;
-                    }
-                }
-            }
+            //if (Material?.ModelId != null)
+            //{
+            //    if (Material.ModelId != Guid.Empty)
+            //    {
+            //        ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
+            //        if (modelAsset != null)
+            //        {                        
+            //            return modelAsset.alignedBox;
+            //        }
+            //    }
+            //}
 
             return new AlignedBox();
         }
 
         protected AlignedBox GetWorldBoundingBox()
         {
-            if (Material?.ModelId != null)
-            {
-                if (Material.ModelId != Guid.Empty)
-                {
-                    ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
-                    if (modelAsset != null)
-                    {
-                        return AlignedBox.Transform(modelAsset.alignedBox, position, Orientation);
-                    }
-                }
-            }
+            //if (Material?.ModelId != null)
+            //{
+            //    if (Material.ModelId != Guid.Empty)
+            //    {
+            //        ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
+            //        if (modelAsset != null)
+            //        {
+            //            return AlignedBox.Transform(modelAsset.alignedBox, position, Orientation);
+            //        }
+            //    }
+            //}
 
             return new AlignedBox();
         }
     }
 
-    [Flags]
-    public enum MaterialFlag
-    { 
-        SHADOW = 0x1,
-        TRANSPARENT = 0x2
-    }
-
-    public class Material
-    {
-        public MaterialFlag Flags { get; set; }
-        public Guid ModelId { get; set; }
-        public Guid ShaderId { get; set; }
-        public Guid AlbedoTexture { get; set; }
-        public Guid NormalTexture { get; set; }
-    }
 
     public class FreeList<T> where T : class
     {
-        [JsonInclude]
-        public int Count { get; private set; }
-        
-        [JsonInclude]
-        private Queue<int> freeList;
-
-        [JsonInclude]
+        public int Count { get; set; }  
+                
         private T[] data;
+        private Queue<int> freeList;
 
         public FreeList(int size)
         {
             freeList = new Queue<int>(size);
             data = new T[size];
             Count = 0;
-
+            
             for (int i = 0 ; i < size; i++) {
                 freeList.Enqueue(i);
             }
@@ -176,15 +165,36 @@ namespace SolarSharp
         }
     }
 
-    public class GameScene : EngineAsset
+    public class SceneAsset : EngineAsset
+    {
+        [JsonInclude]
+        public string name;
+        [JsonInclude]
+        public List<Entity> entities;
+    }
+
+    public class GameScene
     {
         public string name = "";
         public string path = "";
 
         public Camera Camera { get { return camera; } set { camera = value; } }
         private Camera camera = new Camera();
-
+        
         private FreeList<Entity> entities = new FreeList<Entity>(1000);
+
+        public GameScene()
+        {
+        }
+
+        public GameScene(SceneAsset sceneAsset)
+        {
+            if (sceneAsset != null)
+            {
+                name = sceneAsset.name;
+                sceneAsset.entities?.ForEach(e => { e.Id = entities.GetNextFreeIndex(); PlaceEntity(e); });
+            }            
+        }
 
         public Entity CreateEntity()
         {
@@ -199,8 +209,22 @@ namespace SolarSharp
             entities.Add(entity);
         }
 
-        public void DeleteEntity(int id) => entities.Remove(id);
+        public void DeleteEntity(int id) 
+        {
+            entities.Remove(id);
+        }
+
+        public SceneAsset CreateSceneAsset()
+        {
+            SceneAsset sceneAsset = new SceneAsset();
+            sceneAsset.name = name;
+            sceneAsset.entities = entities.GetValues().Where(x => x != null).ToList();
+
+            return sceneAsset;
+        }
+        
         public Entity[] GetAllEntities() => entities.GetValues().Where(x => x != null).ToArray();
+                
 
         public RenderGraph RenderGraph { get { return renderGraph; } set { renderGraph?.Shutdown(); renderGraph = value; } }
         private RenderGraph renderGraph = null;

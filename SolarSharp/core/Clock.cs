@@ -11,7 +11,7 @@ namespace SolarSharp.Core
     {
         private double lastLoopTime;
 
-        public void Init()
+        public void Start()
         {
             lastLoopTime = GetTime();
         }

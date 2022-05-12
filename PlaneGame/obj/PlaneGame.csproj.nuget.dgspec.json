@@ -1,0 +1,139 @@
+{
+  "format": 1,
+  "restore": {
+    "F:\\codes\\Solar\\PlaneGame\\PlaneGame.csproj": {}
+  },
+  "projects": {
+    "F:\\codes\\Solar\\PlaneGame\\PlaneGame.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "F:\\codes\\Solar\\PlaneGame\\PlaneGame.csproj",
+        "projectName": "PlaneGame",
+        "projectPath": "F:\\codes\\Solar\\PlaneGame\\PlaneGame.csproj",
+        "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
+        "outputPath": "F:\\codes\\Solar\\PlaneGame\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0-windows7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0-windows7.0": {
+            "targetAlias": "net6.0-windows",
+            "projectReferences": {
+              "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
+                "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0-windows7.0": {
+          "targetAlias": "net6.0-windows",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
+        "projectName": "SolarSharp",
+        "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj",
+        "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
+        "outputPath": "F:\\codes\\Solar\\SolarSharp\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0-windows7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0-windows7.0": {
+            "targetAlias": "net6.0-windows",
+            "projectReferences": {
+              "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
+                "projectPath": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0-windows7.0": {
+          "targetAlias": "net6.0-windows",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj": {
+      "restore": {
+        "projectUniqueName": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj",
+        "projectName": "SolarWindows",
+        "projectPath": "F:\\codes\\Solar\\SolarWindows\\SolarWindows.vcxproj",
+        "frameworks": {
+          "native": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "native": {}
+      }
+    }
+  }
+}

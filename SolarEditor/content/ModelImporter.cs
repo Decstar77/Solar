@@ -12,39 +12,43 @@ namespace SolarEditor
 {
     internal class ModelImporter
     {
-        internal static ModelAsset? LoadFromFile(string filePath)
+        private static AssimpContext? importer = null;
+        public bool Loaded { get; private set; } = false;
+        private Scene scene;
+        private string filePath;
+
+        public ModelImporter(string filePath) 
         {
-            if (!File.Exists(filePath)) { Logger.Error("File path does not exist + " + filePath); return null; }
+            if (!File.Exists(filePath)) { Logger.Error("File path does not exist + " + filePath); return; }
 
-            AssimpContext importer = new AssimpContext();
-            if (importer == null) { Logger.Error("Assimp importer does not work"); return null; }
+            if (importer == null)
+                importer = new AssimpContext();
 
-            Scene scene = importer.ImportFile(filePath, PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.Triangulate);
-            if (scene == null) { Logger.Error("Assimp scene is null"); return null; }
+            if (importer == null) { Logger.Error("Assimp importer does not work"); return; }
 
-            Logger.Trace("Loading model " + filePath);
-            ModelAsset model = LoadModel(scene);
-            model.name = Path.GetFileName(filePath);
-            model.path = filePath;
-            
+            scene = importer.ImportFile(filePath, PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.Triangulate);
+            if (scene == null) { Logger.Error("Assimp scene is null"); return; }
 
-            importer.Dispose();
-
-            return model;
+            this.filePath = filePath;
+            Loaded = true;
         }
 
-        internal static ModelAsset? LoadFromFile(string filePath, MetaFileAsset metaFile)
+        public List<MaterialAsset> LoadMaterials()
         {
-            ModelAsset? model = LoadFromFile(filePath);
-            if (model != null)
+            List<MaterialAsset> materials = new List<MaterialAsset>();
+            foreach (Assimp.Material material in scene.Materials)
             {
-                model.Guid = metaFile.Guid;
+                MaterialAsset m = new MaterialAsset();
+                m.name = material.Name;
+                m.AlbedoColour = new Vector4(material.ColorDiffuse.R, material.ColorDiffuse.G, material.ColorDiffuse.B, material.ColorDiffuse.A);
+                m.SpecularColour = new Vector4(material.ColorSpecular.R, material.ColorSpecular.G, material.ColorSpecular.B, material.ColorSpecular.A);
+                materials.Add(m);
             }
 
-            return model;
+            return materials;
         }
-        
-        private static ModelAsset LoadModel(Scene scene)
+
+        public ModelAsset LoadModel()
         {
             ModelAsset model = new ModelAsset();            
             model.meshes = new List<MeshAsset>(scene.MeshCount);
@@ -104,11 +108,13 @@ namespace SolarEditor
                 }
                 
                 mesh.layout = VertexLayout.PNT;
-                
+                mesh.name = m.Name;
+                mesh.materialName = scene.Materials[m.MaterialIndex].Name;
                 model.meshes.Add(mesh);
             }
 
-            
+            model.name = Path.GetFileName(filePath);
+            model.path = filePath;
 
             return model;
         }

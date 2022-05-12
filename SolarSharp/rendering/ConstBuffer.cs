@@ -41,12 +41,24 @@ namespace SolarSharp.Rendering
             return this;
         }
 
+        public ConstBuffer SetPS(DXContext context, uint slot)
+        {
+            context.SetPSConstBuffer(dxBuffer, slot);
+            return this;
+        }
+
         public ConstBuffer Prepare(Matrix4 m)
         {
             buffer[index++] = m.m11; buffer[index++] = m.m12; buffer[index++] = m.m13; buffer[index++] = m.m14;
             buffer[index++] = m.m21; buffer[index++] = m.m22; buffer[index++] = m.m23; buffer[index++] = m.m24;
             buffer[index++] = m.m31; buffer[index++] = m.m32; buffer[index++] = m.m33; buffer[index++] = m.m34;
             buffer[index++] = m.m41; buffer[index++] = m.m42; buffer[index++] = m.m43; buffer[index++] = m.m44;
+            return this;
+        }
+
+        public ConstBuffer Prepare(Vector4 v)
+        {
+            buffer[index++] = v.x; buffer[index++] = v.y; buffer[index++] = v.z; buffer[index++] = v.w;
             return this;
         }
     }

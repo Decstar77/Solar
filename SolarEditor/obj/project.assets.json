@@ -1232,6 +1232,19 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
+      "PlaneGame/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "SolarSharp": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/PlaneGame.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/PlaneGame.dll": {}
+        }
+      },
       "SolarSharp/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
@@ -4564,6 +4577,11 @@
         "system.xml.xdocument.nuspec"
       ]
     },
+    "PlaneGame/1.0.0": {
+      "type": "project",
+      "path": "../PlaneGame/PlaneGame.csproj",
+      "msbuildProject": "../PlaneGame/PlaneGame.csproj"
+    },
     "SolarSharp/1.0.0": {
       "type": "project",
       "path": "../SolarSharp/SolarSharp.csproj",
@@ -4578,29 +4596,25 @@
   "projectFileDependencyGroups": {
     "net6.0-windows7.0": [
       "AssimpNet >= 4.1.0",
+      "PlaneGame >= 1.0.0",
       "SolarSharp >= 1.0.0",
       "StbImageSharp >= 2.27.8"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\claud\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\porte\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarEditor\\SolarEditor.csproj",
+      "projectUniqueName": "F:\\codes\\Solar\\SolarEditor\\SolarEditor.csproj",
       "projectName": "SolarEditor",
-      "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarEditor\\SolarEditor.csproj",
-      "packagesPath": "C:\\Users\\claud\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarEditor\\obj\\",
+      "projectPath": "F:\\codes\\Solar\\SolarEditor\\SolarEditor.csproj",
+      "packagesPath": "C:\\Users\\porte\\.nuget\\packages\\",
+      "outputPath": "F:\\codes\\Solar\\SolarEditor\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\claud\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\porte\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4614,8 +4628,11 @@
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
           "projectReferences": {
-            "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj": {
-              "projectPath": "C:\\Users\\claud\\OneDrive\\Desktop\\DeclanStuff\\Solar\\SolarSharp\\SolarSharp.csproj"
+            "F:\\codes\\Solar\\PlaneGame\\PlaneGame.csproj": {
+              "projectPath": "F:\\codes\\Solar\\PlaneGame\\PlaneGame.csproj"
+            },
+            "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj": {
+              "projectPath": "F:\\codes\\Solar\\SolarSharp\\SolarSharp.csproj"
             }
           }
         }
@@ -4654,7 +4671,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

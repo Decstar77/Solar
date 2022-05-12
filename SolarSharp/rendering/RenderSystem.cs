@@ -29,13 +29,15 @@ namespace SolarSharp.Rendering
         private static ConstBuffer constBuffer0;
         private static ConstBuffer constBuffer1;
 
+        private static ConstBuffer materialConstBuffer;
+
         private static DXSamplerState samplerState0;
         private static DXSamplerState samplerState1;
         private static DXSamplerState samplerState2;
 
         private static Dictionary<Guid, StaticMesh> meshes = new Dictionary<Guid, StaticMesh>();
-        private static List<ModelAsset> modelsToAdd = new List<ModelAsset>();
-        private static List<Guid> modelsToRemove = new List<Guid>();
+        private static List<MeshAsset> meshesToAdd = new List<MeshAsset>();
+        private static List<Guid> meshesToRemove = new List<Guid>();
 
         private static Dictionary<Guid, StaticTexture> textures = new Dictionary<Guid, StaticTexture>();
         private static List<TextureAsset> texturesToAdd = new List<TextureAsset>();
@@ -43,17 +45,17 @@ namespace SolarSharp.Rendering
 
         public static void RegisterModel(ModelAsset modelAsset)
         {
-            lock (modelsToAdd)
+            lock (meshesToAdd)
             {
-                modelsToAdd.Add(modelAsset);
+                meshesToAdd.AddRange(modelAsset.meshes);
             }
         }
 
-        public static void DeregisterModel(Guid modelId)
+        public static void DeregisterModel(ModelAsset modelAsset)
         {
-            lock (modelsToRemove)
+            lock (meshesToRemove)
             {
-                modelsToRemove.Add(modelId);
+                meshesToRemove.AddRange(modelAsset.meshes.Select(x => x.Guid));
             }
         }
 
@@ -84,7 +86,9 @@ namespace SolarSharp.Rendering
                 DepthFunc = DepthComparisonFunc.LESS_EQUAL
             });
 
-            rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc());
+            rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc { 
+                CullMode = RasterizerCullMode.BACK            
+            });
             blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
 
             samplerState0 = deviceContext.Device.CreateSamplerState(new SamplerDesc { Filter = Filter.MIN_MAG_MIP_POINT });
@@ -99,6 +103,7 @@ namespace SolarSharp.Rendering
             
             constBuffer0 = new ConstBuffer(device, 16 * 3).SetVS(context, 0);
             constBuffer1 = new ConstBuffer(device, 16 * 3).SetVS(context, 1);
+            materialConstBuffer = new ConstBuffer(device, 16).SetPS(context, 0);
 
             ImGui.Initialzie();
             ImGuiTextEditor.Initialize();
@@ -118,11 +123,11 @@ namespace SolarSharp.Rendering
                 temp = true;
             };
 
-            lock (modelsToRemove)
+            lock (meshesToRemove)
             {
-                foreach (Guid modelAsset in modelsToRemove)
+                foreach (Guid modelAsset in meshesToRemove)
                 {
-                    Logger.Trace($"Removing model {modelAsset}");
+                    Logger.Trace($"Removing mesh {modelAsset}");
                     StaticMesh mesh;
                     if (meshes.TryGetValue(modelAsset, out mesh))
                     {
@@ -131,21 +136,21 @@ namespace SolarSharp.Rendering
                     }
                 }
 
-                modelsToRemove.Clear();
+                meshesToRemove.Clear();
             }
 
-            lock (modelsToAdd)
+            lock (meshesToAdd)
             {
-                foreach (ModelAsset modelAsset in modelsToAdd)
+                foreach (MeshAsset meshAsset in meshesToAdd)
                 {
-                    Logger.Trace($"Uploading model {modelAsset.name}");
+                    Logger.Trace($"Uploading mesh {meshAsset.name}");
 
                     // @TODO: Probably not a failure case but I want to investigate later 
-                    Debug.Assert(!meshes.ContainsKey(modelAsset.Guid));
+                    Debug.Assert(!meshes.ContainsKey(meshAsset.Guid));
 
-                    meshes.Add(modelAsset.Guid, new StaticMesh(device, modelAsset.meshes[0]));
+                    meshes.Add(meshAsset.Guid, new StaticMesh(device, meshAsset));
                 }
-                modelsToAdd.Clear();
+                meshesToAdd.Clear();
             }
 
             lock (texturesToAdd)
@@ -163,8 +168,6 @@ namespace SolarSharp.Rendering
             Matrix4 proj = camera.GetProjectionMatrix();
             Matrix4 view = camera.GetViewMatrix();
 
-
-
             context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); 
             context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 1.0f, 0);
             context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
@@ -179,6 +182,8 @@ namespace SolarSharp.Rendering
             context.SetPSSampler(samplerState1, 1);
             context.SetPSSampler(samplerState2, 2);
 
+            constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
+            int drawCallCount = 0;
             if (shader != null && cube != null)
             {
                 if (shader.IsValid())
@@ -192,32 +197,55 @@ namespace SolarSharp.Rendering
                     Entity[] entities = scene.GetAllEntities();
                     foreach (Entity entity in entities)
                     {
-                        if (entity.Material != null)
+                        if (entity.RenderingState.ModelId != Guid.Empty)
                         {
-                            StaticMesh mesh;
-                            if (meshes.TryGetValue(entity.Material.ModelId, out mesh))
+                            ModelAsset modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
+                            if (modelAsset != null)
                             {
-                                StaticTexture texture;
-                                if (textures.TryGetValue(entity.Material.AlbedoTexture, out texture))
+                                foreach (MeshAsset meshAsset in modelAsset.meshes)
                                 {
-                                    Matrix4 mvp = proj * view * entity.ComputeModelMatrix();
+                                    StaticMesh mesh;
+                                    if (meshes.TryGetValue(meshAsset.Guid, out mesh))
+                                    {
+                                        Matrix4 mvp = proj * view * entity.ComputeModelMatrix();
 
-                                    constBuffer0.Reset().Prepare(mvp).Upload(context);
-                                    constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
+                                        MaterialAsset materialAsset = AssetSystem.GetMaterialAsset(meshAsset.materialName);
 
-                                    context.SetPSShaderResources(texture.srv, 0);
+                                        constBuffer0.Reset().Prepare(mvp).Upload(context);
+                                        materialConstBuffer.Reset().Prepare(materialAsset.AlbedoColour).Upload(context);
 
-                                    context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
-                                    context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
-                                    context.DrawIndexed(mesh.IndexCount, 0, 0);
+                                        context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                                        context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
+                                        context.DrawIndexed(mesh.IndexCount, 0, 0);
+                                        drawCallCount++;
+                                    }
+
                                 }
-                            }  
+
+                            }
+                            //{
+                            //    StaticTexture texture;
+                            //    if (textures.TryGetValue(entity.Material.AlbedoTexture, out texture))
+                            //    {
+                            //        Matrix4 mvp = proj * view * entity.ComputeModelMatrix();
+
+                            //        constBuffer0.Reset().Prepare(mvp).Upload(context);
+                            //        constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
+
+                            //        context.SetPSShaderResources(texture.srv, 0);
+
+                            //        context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                            //        context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
+                            //        context.DrawIndexed(mesh.IndexCount, 0, 0);
+                            //    }
+                            //}  
                         }
                     }
 
                 }
             }
 
+            //Logger.Info("Draw calls: " + drawCallCount);
             DebugDraw.Flush(context);
         }
 

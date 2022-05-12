@@ -9,6 +9,7 @@
       "SolarEditor/1.0.0": {
         "dependencies": {
           "AssimpNet": "4.1.0",
+          "PlaneGame": "1.0.0",
           "SolarSharp": "1.0.0",
           "StbImageSharp": "2.27.8"
         },
@@ -723,6 +724,14 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
+      "PlaneGame/1.0.0": {
+        "dependencies": {
+          "SolarSharp": "1.0.0"
+        },
+        "runtime": {
+          "PlaneGame.dll": {}
+        }
+      },
       "SolarSharp/1.0.0": {
         "dependencies": {
           "SolarWindows": "1.0.0"
@@ -1263,6 +1272,11 @@
       "sha512": "sha512-5zJ0XDxAIg8iy+t4aMnQAu0MqVbqyvfoUVl1yDV61xdo3Vth45oA2FoY4pPkxYAH5f8ixpmTqXeEIya95x0aCQ==",
       "path": "system.xml.xdocument/4.3.0",
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
+    },
+    "PlaneGame/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "SolarSharp/1.0.0": {
       "type": "project",

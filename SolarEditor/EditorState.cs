@@ -62,10 +62,16 @@ namespace SolarEditor
                 .ToList().ForEach(x => {               
                     Logger.Info($"Loading model {x}");
                     MetaFileAsset metaFileAsset = MetaFileAsset.GetOrCreateMetaFileAsset(x, AssetType.MODEL);
-                    ModelAsset? modelAsset = ModelImporter.LoadFromFile(x, metaFileAsset);
-                    if (modelAsset != null)
+                    ModelImporter modelImporter = new ModelImporter(x);
+                    if (modelImporter.Loaded)
                     {
+                        ModelAsset modelAsset = modelImporter.LoadModel();
+                        modelAsset.Guid = metaFileAsset.Guid;
+
+                        List<MaterialAsset> materials = modelImporter.LoadMaterials();
+
                         AssetSystem.AddModelAsset(modelAsset);
+                        AssetSystem.AddMaterialAssets(materials);
                         RenderSystem.RegisterModel(modelAsset);
                     }
                 });
@@ -85,22 +91,17 @@ namespace SolarEditor
                 });
             });
 
-
-            GameScene gameScene = new GameScene();
-            gameScene.Camera = camera;
-            
-            Entity entity = gameScene.CreateEntity();
-            entity.Name = "Bike";
-            entity.Material = new Material();
-            entity.Material.ModelId = Guid.Parse("10209316-f57b-41f7-88cf-8ea81614bdb2");
-            entity.Material.AlbedoTexture = Guid.Parse("5b767a8f-5e2e-428d-81d2-8b350bf556fc");
-            entity.Position = new Vector3(0, 0, -3);
+            //Entity entity = gameScene.CreateEntity();
+            //entity.Name = "Bike";
+            //entity.Material = new MaterialAsset();
+            //entity.Material.ModelId = Guid.Parse("10209316-f57b-41f7-88cf-8ea81614bdb2");
+            //entity.Material.AlbedoTexture = Guid.Parse("5b767a8f-5e2e-428d-81d2-8b350bf556fc");
+            //entity.Position = new Vector3(0, 0, -3);
             //entity.Orientation = Quaternion.RotateLocalZ(Quaternion.Identity, Util.DegToRad(45.0f));
-            
-            GameSystem.CurrentScene = gameScene;
-            
 
-            AssetSystem.AddGameScene(gameScene);
+            //GameSystem.CurrentScene = gameScene;
+            GameSystem.CurrentScene = new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "NewScene.json"));
+            GameSystem.CurrentScene.Camera = camera;
 
             Logger.Info("Editor startup complete");
         }        
@@ -112,109 +113,119 @@ namespace SolarEditor
         internal void Update()
         {
             ImGui.BeginFrame();
-            DrawGlobalMenu();
-            ShowWindows();
 
-            if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L)) {
-                if (!EventSystem.Fire(EventType.ON_SAVE, null)) {
-                    AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath + "scene", GameSystem.CurrentScene);
-                }
-            }
-
-            if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered())
+            if (!camera.Operate())
             {
-                if (selection.SelectedEntities.Count > 0 && gizmo.Operate(camera, selection.SelectedEntities[0].GetEntity() ))
+                DrawGlobalMenu();
+                ShowWindows();
+
+                if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
                 {
+                    if (!EventSystem.Fire(EventType.ON_SAVE, null))
+                    {
+                        AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, GameSystem.CurrentScene.CreateSceneAsset());
+                    }
                 }
-                else if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
+
+                if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered())
                 {
-                    Ray ray = camera.ShootRayFromMousePos();
-                    Entity? selectedEntity = null;
-                    float minDist = float.MaxValue;
-                    foreach (var entity in GameSystem.CurrentScene.GetAllEntities()) {
-                        RaycastInfo info;
-                        if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info)) {
-                            if (info.t < minDist)
+                    if (selection.SelectedEntities.Count > 0 && gizmo.Operate(camera, selection.SelectedEntities[0].GetEntity()))
+                    {
+                    }
+                    else if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
+                    {
+                        Ray ray = camera.ShootRayFromMousePos();
+                        Entity? selectedEntity = null;
+                        float minDist = float.MaxValue;
+                        foreach (var entity in GameSystem.CurrentScene.GetAllEntities())
+                        {
+                            RaycastInfo info;
+                            if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info))
                             {
-                                minDist = info.t;
-                                selectedEntity = entity;
+                                if (info.t < minDist)
+                                {
+                                    minDist = info.t;
+                                    selectedEntity = entity;
+                                }
                             }
                         }
-                    }
 
-                    if (selectedEntity != null)
+                        if (selectedEntity != null)
+                        {
+                            selection.Set(selectedEntity);
+                        }
+                    }
+                }
+
+                if (!ImGui.WantCaptureKeyboard())
+                {
+                    if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
                     {
-                        selection.Set(selectedEntity);
+                        Entity entity = GameSystem.CurrentScene.CreateEntity();
+                        selection.Set((Entity)entity);
+                        AddWindow(new EntityWindow());
                     }
-                }
-            }
 
-            if (!ImGui.WantCaptureKeyboard())
-            {
-                if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
-                {
-                    Entity entity = GameSystem.CurrentScene.CreateEntity();
-                    selection.Set((Entity)entity);
-                    AddWindow(new EntityWindow());
-                }
+                    if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
+                    {
+                        //if (selectedEntities.Count > 0)
+                        //{
+                        //    List<Entity> newEntities = new List<Entity>();
+                        //    for (int i = 0; i < selectedEntities.Count; i++)
+                        //    {
+                        //        Entity entity = GameSystem.CurrentScene.CreateEntity();
+                        //        entity.Position = selectedEntities[i].Position + Vector3.UnitX;
+                        //        entity.Orientation= selectedEntities[i].Orientation;
+                        //        entity.Scale = selectedEntities[i].Scale;                            
+                        //        entity.Name = selectedEntities[i].Name + " Clone";
+                        //        entity.Material.Flags = selectedEntities[i].Material.Flags;
+                        //        entity.Material.ModelId = selectedEntities[i].Material.ModelId;
+                        //        entity.Material.AlbedoTexture = selectedEntities[i].Material.AlbedoTexture;
+                        //        entity.Material.NormalTexture = selectedEntities[i].Material.NormalTexture;
+                        //        entity.Material.ShaderId = selectedEntities[i].Material.ShaderId;
 
-                if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
-                {
-                    //if (selectedEntities.Count > 0)
-                    //{
-                    //    List<Entity> newEntities = new List<Entity>();
-                    //    for (int i = 0; i < selectedEntities.Count; i++)
-                    //    {
-                    //        Entity entity = GameSystem.CurrentScene.CreateEntity();
-                    //        entity.Position = selectedEntities[i].Position + Vector3.UnitX;
-                    //        entity.Orientation= selectedEntities[i].Orientation;
-                    //        entity.Scale = selectedEntities[i].Scale;                            
-                    //        entity.Name = selectedEntities[i].Name + " Clone";
-                    //        entity.Material.Flags = selectedEntities[i].Material.Flags;
-                    //        entity.Material.ModelId = selectedEntities[i].Material.ModelId;
-                    //        entity.Material.AlbedoTexture = selectedEntities[i].Material.AlbedoTexture;
-                    //        entity.Material.NormalTexture = selectedEntities[i].Material.NormalTexture;
-                    //        entity.Material.ShaderId = selectedEntities[i].Material.ShaderId;
+                        //        newEntities.Add(entity);
+                        //    }
 
-                    //        newEntities.Add(entity);
-                    //    }
+                        //    selectedEntities.Clear();
+                        //    selectedEntities.AddRange(newEntities); 
+                        //}
+                    }
 
-                    //    selectedEntities.Clear();
-                    //    selectedEntities.AddRange(newEntities); 
-                    //}
-                }
+                    if (Input.IskeyJustDown(KeyCode.DEL))
+                    {
+                        //selectedEntities.ForEach(x => GameSystem.CurrentScene.DeleteEntity(x.Id));
+                        //selectedEntities.Clear();
+                    }
 
-                if (Input.IskeyJustDown(KeyCode.DEL))
-                {
-                    //selectedEntities.ForEach(x => GameSystem.CurrentScene.DeleteEntity(x.Id));
-                    //selectedEntities.Clear();
-                }
-
-                if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
-                {
-                    UndoSystem.Redo();
-                }
-                else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
-                {
-                    UndoSystem.Undo();
-                }
-            }
-            
-            GameSystem.CurrentScene.GetAllEntities().ToList().ForEach(entity => {
-                if (ShowBoundingBoxes) {
-                    DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
-                }
-
-                if (ShowEmpties) {
-                    if (entity.Material.ModelId == Guid.Empty) {
-                        DebugDraw.Point(entity.Position);
+                    if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
+                    {
+                        UndoSystem.Redo();
+                    }
+                    else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
+                    {
+                        UndoSystem.Undo();
                     }
                 }
 
-            });
-            
+                GameSystem.CurrentScene.GetAllEntities().ToList().ForEach(entity =>
+                {
+                    if (ShowBoundingBoxes)
+                    {
+                        DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
+                    }
 
-            camera.Operate();
+                    if (ShowEmpties)
+                    {
+                        //if (entity.Material.ModelId == Guid.Empty) {
+                        //    DebugDraw.Point(entity.Position);
+                        //}
+                    }
+
+                });
+            }
+
+           
         }
 
         internal void Shutdown()

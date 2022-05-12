@@ -1,2 +1,1 @@
-﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1098,5): warning MSB8027: Two or more files with the name of ImGuizmo.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are src\vendor\imgizmo\ImGuizmo.cpp, src\vendor\imgui\ImGuizmo.cpp.
-  SolarWindows.vcxproj -> C:\Users\claud\OneDrive\Desktop\DeclanStuff\Solar\x64\Release\SolarWindows.dll
+﻿  SolarWindows.vcxproj -> F:\codes\Solar\x64\Release\SolarWindows.dll

@@ -108,7 +108,6 @@
     <ClCompile Include="src\vendor\imgizmo\ImGuizmo.cpp" />
     <ClCompile Include="src\vendor\imgizmo\ImSequencer.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
-    <ClCompile Include="src\vendor\imgui\ImGuizmo.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui_impl_dx11.cpp" />
@@ -129,7 +128,6 @@
     <ClInclude Include="src\vendor\imgizmo\ImSequencer.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
-    <ClInclude Include="src\vendor\imgui\ImGuizmo.h" />
     <ClInclude Include="src\vendor\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="src\vendor\imgui\imgui_impl_win32.h" />
     <ClInclude Include="src\vendor\imgui\imgui_internal.h" />

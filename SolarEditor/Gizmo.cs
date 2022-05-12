@@ -22,7 +22,7 @@ namespace SolarEditor
             ImGizmo.Enable(true);
             ImGizmo.SetRect(0, 0, Window.SurfaceWidth, Window.SurfaceHeight);
 
-            if (Input.IskeyJustDown(KeyCode.T))
+            if (Input.IskeyJustDown(KeyCode.W))
             {
                 operation = ImGizmoOperation.TRANSLATE;
             }

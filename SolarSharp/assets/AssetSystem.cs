@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SolarSharp.Assets
 {
     public class EngineAsset
     {
+        [JsonInclude]
         public Guid Guid = Guid.NewGuid();
     }
 
@@ -20,10 +22,11 @@ namespace SolarSharp.Assets
         public static List<RenderGraph> RenderGraphs { get { return renderGraphs; } }
         private static List<RenderGraph> renderGraphs = new List<RenderGraph>();
         
-        private static List<GameScene> gameScenes = new List<GameScene>();        
+        private static Dictionary<Guid, SceneAsset> scenes = new Dictionary<Guid, SceneAsset>();        
         private static List<ModelAsset> modelAssets = new List<ModelAsset>();
         private static List<TextureAsset> textureAssets = new List<TextureAsset>();
-
+        private static List<MaterialAsset> materialAssets = new List<MaterialAsset>();
+        
         public static ModelAsset? GetModelAsset(string name)
         {
             ModelAsset? model = null;
@@ -38,14 +41,10 @@ namespace SolarSharp.Assets
 
         public static ModelAsset? GetModelAsset(Guid id)
         {
-            ModelAsset? model = null;
-
             lock (modelAssets)
             {
-                model = modelAssets.Find(x => x.Guid == id);
+                return modelAssets.Find(x => x.Guid == id);
             }
-
-            return model;
         }
 
         public static List<ModelAsset> GetSortedModelAssets() {
@@ -79,6 +78,12 @@ namespace SolarSharp.Assets
             }
         }
 
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        
         public static List<TextureAsset> GetSortedTextureAssets()
         {
             lock (textureAssets)
@@ -98,16 +103,134 @@ namespace SolarSharp.Assets
             }
         }
 
-        public static List<GameScene> GetGameScenes() => new List<GameScene>(gameScenes);
-        public static void AddGameScene(GameScene gameScene)
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+
+        public static List<SceneAsset> GetScenesAssets() => new List<SceneAsset>(scenes.Values);
+        public static void AddGameScene(SceneAsset sceneAsset)
         {
-            lock (gameScenes)
+            lock (scenes)
             {
-                Logger.Info($"Placing {gameScene.name}");
-                gameScenes.Add(gameScene);
+                Logger.Trace($"Placing {sceneAsset.name}");
+                if (sceneAsset.Guid != Guid.Empty)
+                {
+                    if (!scenes.ContainsKey(sceneAsset.Guid))
+                    {
+                        scenes.Add(sceneAsset.Guid, sceneAsset);
+                    }                    
+                }
+                else
+                {
+                    Logger.Error("Adding scene with invalid guid");
+                }
             }
         }
 
+        public static void SaveGameSceneAsset(string path, SceneAsset sceneAsset)
+        {
+            Logger.Trace($"Saving {path + GameSystem.CurrentScene.name}");
+            string json = JsonSerializer.Serialize(sceneAsset);
+            File.WriteAllText(path + sceneAsset.name + ".json", json);
+        }
+
+        public static SceneAsset LoadGameSceneAsset(string path)
+        {
+            if (File.Exists(path))
+            {
+                try
+                {
+                    Logger.Trace($"Loading {path}");
+                    string json = File.ReadAllText(path);
+                    SceneAsset gameScene = JsonSerializer.Deserialize<SceneAsset>(json);
+                    gameScene.name = Path.GetFileNameWithoutExtension(path);
+                    AddGameScene(gameScene);
+
+                    return gameScene;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
+            }
+            else
+            {
+                Logger.Error("LoadGameSceneAsset, File does not exist: " + path);
+            }
+
+            return null;
+        }
+
+
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+
+        public static void AddMaterialAsset(MaterialAsset materialAsset)
+        {
+            lock (materialAssets)
+            {
+                // @TODO: Speed this up with hash table things prehaps ?
+                if (materialAssets.Find(x => x.name == materialAsset.name) == null)
+                {
+                    Logger.Trace($"Placing {materialAsset.name}");
+                    materialAssets.Add(materialAsset);
+                }
+                else
+                {
+                    Logger.Warn($"Material {materialAsset.name} already exists in the material registery");
+                }
+            }
+        }
+
+        public static void AddMaterialAssets(List<MaterialAsset> materials)
+        {
+            lock (materialAssets)
+            {
+                foreach (MaterialAsset materialAsset in materials)
+                {
+
+                    // @TODO: Speed this up with hash table things prehaps ?
+                    if (materialAssets.Find(x => x.name == materialAsset.name) == null)
+                    {
+                        Logger.Trace($"Placing {materialAsset.name}");
+                        materialAssets.Add(materialAsset);
+                    }
+                    else
+                    {
+                        Logger.Warn($"Material {materialAsset.name} already exists in the material registery");
+                    }
+                }
+            }
+        }
+
+        public static List<MaterialAsset> GetSortedMaterialAssets()
+        {
+            lock (materialAssets)
+            {
+                materialAssets.Sort((x, y) => (x.name.CompareTo(y.name)));
+                List<MaterialAsset> materials = new List<MaterialAsset>(materialAssets);
+                return materials;
+            }
+        }
+
+        public static MaterialAsset? GetMaterialAsset(string name)
+        {
+            lock(materialAssets)
+            {
+                return materialAssets.Find(x => x.name == name);
+            }
+        }
+
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
 
         public static bool Initialize()
         {
@@ -126,42 +249,6 @@ namespace SolarSharp.Assets
             return true;
         }
 
-        public static void SaveGameSceneAsset(string path, GameScene gameScene)
-        {
-            Logger.Trace($"Saving {path}");
-            string json = JsonSerializer.Serialize(gameScene);
-            File.WriteAllText(path + gameScene.name + ".json", json);
-        }
-
-        public static GameScene LoadGameSceneAsset(string path)
-        {
-            if (File.Exists(path))
-            {
-                try
-                {
-                    string json = File.ReadAllText(path);
-                    GameScene gameScene = JsonSerializer.Deserialize<GameScene>(json);
-                    gameScene.name = Path.GetFileNameWithoutExtension(path);
-
-                    lock(gameScenes)
-                    {
-                        gameScenes.Add(gameScene);
-                    }
-
-                    return gameScene;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                }
-            }
-            else
-            {
-                Logger.Error("LoadGameSceneAsset, File does not exist: " + path);
-            }
-
-            return null;
-        }
 
         public static RenderGraphAsset LoadRenderGraphAsset(string path)
         {

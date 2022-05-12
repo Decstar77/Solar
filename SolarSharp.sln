@@ -10,9 +10,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolarSharp", "SolarSharp\So
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolarWindows", "SolarWindows\SolarWindows.vcxproj", "{E771DA2A-BFA9-4CC3-A166-30488FB1A4CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameCode", "GameCode\GameCode.csproj", "{EE287631-C55C-4C39-BE10-7A9E8D06D844}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolarEditor", "SolarEditor\SolarEditor.csproj", "{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolarEditor", "SolarEditor\SolarEditor.csproj", "{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaneGame", "PlaneGame\PlaneGame.csproj", "{20B134B7-DC89-4D83-B85A-B5E5E877944C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,14 +37,6 @@ Global
 		{E771DA2A-BFA9-4CC3-A166-30488FB1A4CD}.Release|Any CPU.Build.0 = Release|x64
 		{E771DA2A-BFA9-4CC3-A166-30488FB1A4CD}.Release|x64.ActiveCfg = Release|x64
 		{E771DA2A-BFA9-4CC3-A166-30488FB1A4CD}.Release|x64.Build.0 = Release|x64
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Debug|x64.Build.0 = Debug|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Release|x64.ActiveCfg = Release|Any CPU
-		{EE287631-C55C-4C39-BE10-7A9E8D06D844}.Release|x64.Build.0 = Release|Any CPU
 		{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}.Debug|x64.ActiveCfg = Debug|x64
@@ -53,6 +45,14 @@ Global
 		{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}.Release|x64.ActiveCfg = Release|x64
 		{3AA36ECF-1800-4090-AD2F-1FD7B7233C9D}.Release|x64.Build.0 = Release|x64
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Debug|x64.Build.0 = Debug|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Release|x64.ActiveCfg = Release|Any CPU
+		{20B134B7-DC89-4D83-B85A-B5E5E877944C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
