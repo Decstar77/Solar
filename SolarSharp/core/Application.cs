@@ -78,20 +78,17 @@ namespace SolarSharp
             clock.Start();
             while (Window.Running(ref Input)) {
 
-                Clock t = new Clock();
-                t.Start();
                 config.OnUpdateCallback.Invoke();
 
                 RenderSystem.BackupRenderer();                
                 EventSystem.Fire(EventType.RENDER_END, null);
-                Console.WriteLine(t.GetElapsedTime() * 1000);
 
-                RenderSystem.SwapBuffers(false);
+                RenderSystem.SwapBuffers(true);
 
                 OldInput = Input;
                 DeltaTime = clock.GetElapsedTime();
 
-                Console.WriteLine(DeltaTime * 1000);
+                //Console.WriteLine(DeltaTime * 1000);
             }
 
             ImNodes.Shutdown();

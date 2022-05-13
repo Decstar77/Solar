@@ -8,28 +8,67 @@ namespace SolarSharp
 {
     public class Logger
     {
+        private static List<string> logs = new List<string>();
+
+        public static List<string> GetLogs()
+        {
+            lock (logs)
+            {
+                return new List<string>(logs);
+            }
+        }
+
+        public static void ClearLogs()
+        {
+            lock (logs)
+            {
+                logs.Clear();
+            }
+        }
+
+
         public static void Error(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("ERROR: " + message);
+            lock(logs)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                string msg = "ERROR: " + message;
+                logs.Add(msg);
+                Console.WriteLine(msg);
+            }            
         }
 
         public static void Warn(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("WARN:  " + message);
+            lock (logs)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                string msg = "WARN:  " + message;
+                logs.Add(msg);
+                Console.WriteLine(msg);
+            }
         }
 
         public static void Info(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("INFO:  " + message);
+            lock (logs)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                string msg = "INFO:  " + message;
+                logs.Add(msg);
+                Console.WriteLine(msg);
+            }
         }
 
         public static void Trace(string message)
         {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("TRACE: " + message);
+            lock (logs)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                string msg = "TRACE: " + message;
+                logs.Add(msg);
+                Console.WriteLine(msg);
+            }
         }
     }
 }

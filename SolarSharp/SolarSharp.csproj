@@ -28,6 +28,7 @@
     <Compile Include="assets\MaterialAsset.cs" />
     <Compile Include="assets\ModelAsset.cs" />
     <Compile Include="assets\RenderGraphAsset.cs" />
+    <Compile Include="assets\SceneAsset.cs" />
     <Compile Include="assets\TextureAsset.cs" />
     <Compile Include="collision\Primitives.cs" />
     <Compile Include="collision\Raycast.cs" />

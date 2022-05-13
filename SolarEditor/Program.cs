@@ -13,26 +13,22 @@ namespace SolarEditor
     public class Program
     {
         private static EditorState? editorState;
-        private static Game? game;
+        
         public static bool OnInitialize()
         {
             editorState = new EditorState();
-            game = new AirGame();
-
-            game.Start();
+            
             return true;
         }
 
         public static void OnUpdate()
         {
             editorState?.Update();
-            game?.TickUpdate();
         }
 
         public static void OnShutdown()
         {
             editorState?.Shutdown();
-            game?.Shutdown();
         }
 
         public static void Main()

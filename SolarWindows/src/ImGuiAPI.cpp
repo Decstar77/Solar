@@ -309,8 +309,75 @@ namespace ImGuiAPI
 		return r;
 	}
 
+
+
+
 	EDITOR_INTERFACE(bool) ImGuiWantCaptureKeyboard()
 	{
 		return ImGui::GetIO().WantCaptureKeyboard;
+		
 	}
+
+	EDITOR_INTERFACE(float) ImGuiGetStyleItemSpacingX()
+	{
+		return ImGui::GetStyle().ItemSpacing.x;
+	}
+
+	EDITOR_INTERFACE(float) ImGuiGetStyleItemSpacingY()
+	{
+		return ImGui::GetStyle().ItemSpacing.y;
+	}
+
+	EDITOR_INTERFACE(float) ImGuiGetFrameHeightWithSpacing()
+	{
+		return ImGui::GetFrameHeightWithSpacing();
+	}
+
+	EDITOR_INTERFACE(bool) ImGuiBeginChild(const char *strId, float sizeX, float sizeY, bool border, int flags)
+	{
+		return ImGui::BeginChild(strId, ImVec2(sizeX, sizeY), border, flags);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiEndChild()
+	{
+		return ImGui::EndChild();
+	}
+
+	EDITOR_INTERFACE(void) ImGuiPushStyleVar(int var, float x, float y)
+	{
+		ImGui::PushStyleVar(var, ImVec2(x, y));
+	}
+
+	EDITOR_INTERFACE(void) ImGuiPopStyleVar()
+	{
+		ImGui::PopStyleVar();
+	}
+
+	EDITOR_INTERFACE(void) ImGuiTextColored(float r, float g, float b, float a, const char* text)
+	{
+		ImGui::TextColored(ImVec4(r, g, b, a), text);
+	}
+
+	EDITOR_INTERFACE(void) ImGuiTextUnformatted(const char* text)
+	{
+		ImGui::TextUnformatted(text);
+	}
+
+	EDITOR_INTERFACE(float) ImGuiGetScrollY()
+	{
+		return ImGui::GetScrollY();
+	}
+
+	EDITOR_INTERFACE(float) ImGuiGetScrollMaxY()
+	{
+		return ImGui::GetScrollMaxY();
+	}
+
+	EDITOR_INTERFACE(void) ImGuiSetScrollHereY(float v)
+	{
+		return ImGui::SetScrollHereY(v);
+	}
+
+
+
 }

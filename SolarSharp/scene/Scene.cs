@@ -33,6 +33,23 @@ namespace SolarSharp
 
             return null;
         }
+
+        public static bool operator ==(EntityReference left, EntityReference right)
+        {
+            return left.EntityId == right.EntityId;
+        }
+
+        public static bool operator !=(EntityReference left, EntityReference right)
+        {
+            return left.EntityId != right.EntityId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is EntityReference entityReference)
+                return entityReference.EntityId == EntityId;
+            return false;
+        }
     }
 
 
@@ -57,8 +74,7 @@ namespace SolarSharp
 
         protected Vector3 scale = new Vector3(1, 1, 1);
         public Vector3 Scale { get { return scale; } set { scale = value; } }
-
-
+        
         public EntityReference Reference { get { return new EntityReference(Id); } }
         public RenderingState RenderingState { get; set; } = new RenderingState();
 
@@ -73,14 +89,55 @@ namespace SolarSharp
 
         public Entity()
         {
-
         }
 
-        public Entity(int id)
+        //public Entity Clone()
+        //{
+        //    Entity entity = new Entity();
+        //    entity.Id = Id;
+        //    entity.Position = Position + Vector3.UnitX;
+        //    entity.Orientation= Orientation;
+        //    entity.Scale = Scale;                            
+        //    entity.Name = Name + " Clone";
+        //    entity.RenderingState.ModelId = RenderingState.ModelId;
+        //
+        //    //entity.RenderingState.Flags = RenderingState.Flags;
+        //    //entity.RenderingState.AlbedoTexture = RenderingState.AlbedoTexture;
+        //    //entity.RenderingState.NormalTexture = RenderingState.NormalTexture;
+        //    //entity.RenderingState.ShaderId = RenderingState.ShaderId;
+        //
+        //    return entity;
+        //}
+
+        public EntityAsset CreateEntityAsset()
         {
-            this.Id = id;
+            EntityAsset asset = new EntityAsset();
+            asset.name = Name;
+            asset.renderingState = new RenderingState();
+            asset.renderingState.ModelId = RenderingState.ModelId;
+            asset.renderingState.MaterialReference = RenderingState.MaterialReference;
+            asset.reference = Reference;
+            asset.position = Position;
+            asset.orientation = Orientation;
+            asset.scale = Scale;
+            asset.parent = Parent;
+            asset.children = Children;
+            
+            return asset;
         }
 
+        public void SetFromEntityAsset(EntityAsset asset)
+        {
+            Name = asset.name;
+            RenderingState.ModelId = asset.renderingState.ModelId;
+            RenderingState.MaterialReference = asset.renderingState.MaterialReference;
+            Position = asset.position;
+            Orientation = asset.orientation;
+            Scale = asset.scale;
+            Parent = asset.parent;
+            Children = asset.children;
+        }
+        
         public void SetTransform(Matrix4 m) => Matrix4.Decompose(m, out position, out orientation, out scale);
 
         public Matrix4 ComputeModelMatrix()
@@ -135,17 +192,18 @@ namespace SolarSharp
         public int Count { get; set; }  
                 
         private T[] data;
-        private Queue<int> freeList;
+        private Stack<int> freeList;
 
         public FreeList(int size)
         {
-            freeList = new Queue<int>(size);
+            freeList = new Stack<int>(size);
             data = new T[size];
             Count = 0;
             
-            for (int i = 0 ; i < size; i++) {
-                freeList.Enqueue(i);
+            for (int i = size - 1; i >= 0; i--) {
+                freeList.Push(i);
             }
+            
         }
 
         public int GetNextFreeIndex() => freeList.Peek();
@@ -153,25 +211,19 @@ namespace SolarSharp
 
         public void Add(T t)
         {
-            data[freeList.Dequeue()] = t;
+            data[freeList.Pop()] = t;
             Count++;
         }
 
         public void Remove(int index)
         {
-            freeList.Enqueue(index);
+            freeList.Push(index);
             Count--;
             data[index] = null;
         }
     }
 
-    public class SceneAsset : EngineAsset
-    {
-        [JsonInclude]
-        public string name;
-        [JsonInclude]
-        public List<Entity> entities;
-    }
+
 
     public class GameScene
     {
@@ -198,8 +250,19 @@ namespace SolarSharp
 
         public Entity CreateEntity()
         {
-            Entity entity = new Entity(entities.GetNextFreeIndex());
+            Entity entity = new Entity();
+            entity.Id = entities.GetNextFreeIndex();
             entities.Add(entity);
+            return entity;
+        }
+
+        public Entity CreateEntity(EntityAsset entityAsset)
+        {
+            Entity entity = new Entity();
+            entity.Id = entities.GetNextFreeIndex();
+            entity.SetFromEntityAsset(entityAsset);
+            entities.Add(entity);
+
             return entity;
         }
 
@@ -209,7 +272,12 @@ namespace SolarSharp
             entities.Add(entity);
         }
 
-        public void DeleteEntity(int id) 
+        public void DestroyEntity(EntityReference entityReference)
+        {
+            entities.Remove(entityReference.EntityId);
+        }
+
+        public void DestroyEntity(int id) 
         {
             entities.Remove(id);
         }

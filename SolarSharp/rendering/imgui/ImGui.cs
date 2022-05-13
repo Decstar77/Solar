@@ -146,6 +146,34 @@ namespace SolarSharp.Rendering
 		RootAndChildWindows = RootWindow | ChildWindows
 	};
 
+	public enum ImGuiStyleVar
+	{
+		// Enum name --------------------- // Member in ImGuiStyle structure (see ImGuiStyle for descriptions)
+		Alpha,               // float     Alpha
+		WindowPadding,       // ImVec2    WindowPadding
+		WindowRounding,      // float     WindowRounding
+		WindowBorderSize,    // float     WindowBorderSize
+		WindowMinSize,       // ImVec2    WindowMinSize
+		WindowTitleAlign,    // ImVec2    WindowTitleAlign
+		ChildRounding,       // float     ChildRounding
+		ChildBorderSize,     // float     ChildBorderSize
+		PopupRounding,       // float     PopupRounding
+		PopupBorderSize,     // float     PopupBorderSize
+		FramePadding,        // ImVec2    FramePadding
+		FrameRounding,       // float     FrameRounding
+		FrameBorderSize,     // float     FrameBorderSize
+		ItemSpacing,         // ImVec2    ItemSpacing
+		ItemInnerSpacing,    // ImVec2    ItemInnerSpacing
+		IndentSpacing,       // float     IndentSpacing
+		ScrollbarSize,       // float     ScrollbarSize
+		ScrollbarRounding,   // float     ScrollbarRounding
+		GrabMinSize,         // float     GrabMinSize
+		GrabRounding,        // float     GrabRounding
+		TabRounding,         // float     TabRounding
+		ButtonTextAlign,     // ImVec2    ButtonTextAlign
+		SelectableTextAlign, // ImVec2    SelectableTextAlign
+	};
+
 	public class ImGui
     {
 		public static bool Initialzie() => ImGuiAPI.ImGuiInitialzie();
@@ -258,6 +286,18 @@ namespace SolarSharp.Rendering
 		public static bool IsAnyItemHovered() => ImGuiAPI.ImGuiIsAnyItemHovered();
 		public static bool IsWindowHovered(ImGuiHoveredFlags flags = 0) => ImGuiAPI.ImGuiIsWindowHovered((int)flags);
 		public static bool WantCaptureKeyboard() => ImGuiAPI.ImGuiWantCaptureKeyboard();
+		public static float GetStyleItemSpacingX() => ImGuiAPI.ImGuiGetStyleItemSpacingX();
+		public static float GetStyleItemSpacingY() => ImGuiAPI.ImGuiGetStyleItemSpacingY();
+		public static float GetFrameHeightWithSpacing() => ImGuiAPI.ImGuiGetFrameHeightWithSpacing();
+		public static bool BeginChild(string strId, float sizeX, float sizeY, bool border, ImGuiWindowFlags flags) => ImGuiAPI.ImGuiBeginChild(strId, sizeX, sizeY, border, (int)flags);
+		public static void EndChild() => ImGuiAPI.ImGuiEndChild();
+		public static void PushStyleVar(ImGuiStyleVar var, float x, float y) => ImGuiAPI.ImGuiPushStyleVar((int)var, x, y);
+		public static void PopStyleVar() => ImGuiAPI.ImGuiPopStyleVar();
+		public static void TextColored(float r, float g, float b, float a, string text) => ImGuiAPI.ImGuiTextColored(r, g, b, a, text);
+		public static void TextUnformatted(string text) => ImGuiAPI.ImGuiTextUnformatted(text);
+		public static float GetScrollY() => ImGuiAPI.ImGuiGetScrollY();
+		public static float GetScrollMaxY() => ImGuiAPI.ImGuiGetScrollMaxY();
+		public static void SetScrollHereY(float v) => ImGuiAPI.ImGuiSetScrollHereY(v);
 
 	}
 }

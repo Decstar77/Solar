@@ -122,8 +122,8 @@ EDITOR_INTERFACE(void*) CreateSwapchain()
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.BufferCount = 1;
-		//swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+		swapChainDesc.BufferCount = 2;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.Flags = 0;
 
 		HWND window = winState.window;
@@ -181,9 +181,9 @@ EDITOR_INTERFACE(void*) CreateSwapchainDepthStencilView()
 EDITOR_INTERFACE(void) SwapchainPresent(int vsync)
 {
 	DXGI_PRESENT_PARAMETERS parameters = { 0 };
-	//DXCHECK(renderState.swapChain.swapChain->Present(0, 0));
+	DXCHECK(renderState.swapChain.swapChain->Present(vsync, 0));
 	//XCHECK(renderState.swapChain.swapChain->Present1(0, DXGI_PRESENT_RESTART, &parameters));
-	DXCHECK(renderState.swapChain.swapChain->Present1(vsync, 0, &parameters));
+	//DXCHECK(renderState.swapChain.swapChain->Present1(vsync, 0, &parameters));
 	//DXCHECK(renderState.swapChain.swapChain->Present1(0, DXGI_PRESENT_DO_NOT_WAIT, &parameters));
 }
 

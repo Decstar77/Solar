@@ -190,5 +190,45 @@ namespace SolarSharp.EngineAPI
 		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool ImGuiWantCaptureKeyboard();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.R4)]
+		public static extern float ImGuiGetStyleItemSpacingX();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.R4)]
+		public static extern float ImGuiGetStyleItemSpacingY();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.R4)]
+		public static extern float ImGuiGetFrameHeightWithSpacing();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static extern bool ImGuiBeginChild([MarshalAs(UnmanagedType.LPStr)] string strId, float sizeX, float sizeY, bool border, int flags);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiEndChild();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiPushStyleVar(int var, float x, float y);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiPopStyleVar();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiTextColored(float r, float g, float b, float a, [MarshalAs(UnmanagedType.LPStr)] string text);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiTextUnformatted([MarshalAs(UnmanagedType.LPStr)] string text);
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern float ImGuiGetScrollY();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern float ImGuiGetScrollMaxY();
+
+		[DllImport(DLLName, CallingConvention = CallingConvention.StdCall)]
+		public static extern void ImGuiSetScrollHereY(float v);
 	}
 }

@@ -206,7 +206,7 @@ namespace SolarSharp
 				case KeyCode.TLDA:
 					return IskeyJustDown(Application.Input.tlda, Application.OldInput.tlda);
 				case KeyCode.DEL:
-					return (Application.Input.del);
+					return IskeyJustDown(Application.Input.del, Application.OldInput.del);
 			}
 			return false;
         }

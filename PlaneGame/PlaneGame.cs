@@ -6,6 +6,8 @@ namespace PlaneGame
 {
     public class AirGame : Game
     {
+        public Guid PlaneModel { get; set; } = Guid.Empty;
+
         public bool Start()
         {
             return true;

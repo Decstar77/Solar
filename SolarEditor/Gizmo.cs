@@ -17,7 +17,7 @@ namespace SolarEditor
         private ImGizmoOperation operation = ImGizmoOperation.TRANSLATE;
         private ImGizmoMode mode = ImGizmoMode.LOCAL;
 
-        public bool Operate(Camera camera, Entity entity)
+        public bool Operate(Camera camera, List<Entity> entities)
         {
             ImGizmo.Enable(true);
             ImGizmo.SetRect(0, 0, Window.SurfaceWidth, Window.SurfaceHeight);
@@ -44,31 +44,42 @@ namespace SolarEditor
                 }
             }
 
-            Matrix4 modelMatrix = entity.ComputeModelMatrix();
-            Matrix4 inputMatrix = modelMatrix.Transpose;
-            if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose, ref inputMatrix, operation, mode))
+            if (entities.Count > 0)
             {
-                Vector3 pos;
-                Quaternion rot;
-                Vector3 scl;
-                Matrix4.Decompose(inputMatrix.Transpose, out pos, out rot, out scl);
+                Matrix4 modelMatrix = entities[0].ComputeModelMatrix();
+                Matrix4 inputMatrix = modelMatrix.Transpose;
 
-                entity.Position = pos;
-                entity.Orientation = rot;
-                entity.Scale = scl;
-            }
+                bool action = !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered();
 
-            if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1) && ImGizmo.GizmoIsUsing())
-            {
-                isUsing = true;
-                oldM = modelMatrix;
-            }
+                if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose, ref inputMatrix, operation, mode))
+                {
+                    if (action)
+                    {
+                        Vector3 pos;
+                        Quaternion rot;
+                        Vector3 scl;
+                        Matrix4.Decompose(inputMatrix.Transpose, out pos, out rot, out scl);
 
-            if (Input.IsMouseButtonJustUp(MouseButton.MOUSE1) && isUsing)
-            {
-                isUsing = false;
+                        entities[0].Position = pos;
+                        entities[0].Orientation = rot;
+                        entities[0].Scale = scl;
+                    }
+                }
 
-                UndoSystem.Add(new TransformAction(entity.Reference, oldM, modelMatrix));
+                if (action)
+                {
+                    if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1) && ImGizmo.GizmoIsUsing())
+                    {
+                        isUsing = true;
+                        oldM = modelMatrix;
+                    }
+
+                    if (Input.IsMouseButtonJustUp(MouseButton.MOUSE1) && isUsing)
+                    {
+                        isUsing = false;
+                        UndoSystem.Add(new TransformAction(entities[0].Reference, oldM, modelMatrix));
+                    }
+                }
             }
 
             return isUsing;

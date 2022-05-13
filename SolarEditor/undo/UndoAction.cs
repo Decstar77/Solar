@@ -1,4 +1,5 @@
 ﻿using SolarSharp;
+using SolarSharp.Assets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,65 +40,83 @@ namespace SolarEditor
         }
     }
 
-    internal class CreateEntityAction : UndoAction
+    internal class CreateEntityUndoAction : UndoAction
     {
-        private Entity entity;
+        private List<EntityAsset> entityAssets;
+        private GameScene scene;
+        private Selection selection;
 
-        public CreateEntityAction(Entity entity)
+        public CreateEntityUndoAction(GameScene scene, Selection selection, List<Entity> entities)
         {
-            this.entity = entity;
+            entityAssets = new List<EntityAsset>(entities.Select(x => x.CreateEntityAsset()));
+            this.scene = scene;
+            this.selection = selection;
         }
 
         internal override bool Redo()
         {
-            GameSystem.CurrentScene.PlaceEntity(entity);
+            entityAssets.ForEach(x => scene.CreateEntity(x));
+            selection.Set(entityAssets.Select(x => x.reference).ToList(), false);
             return true;
         }
 
         internal override bool Undo()
         {
-            GameSystem.CurrentScene.DeleteEntity(entity.Id);
+            selection.Clear(false);
+            entityAssets.ForEach(x => scene.DestroyEntity(x.reference));
             return true;
         }
     }
 
-    internal class DeleteEntityAction : UndoAction
+    internal class DeleteEntityUndoAction : UndoAction
     {
-        private Entity entity;
+        private List<EntityAsset> entityAssets;
+        private GameScene scene;
+        private Selection selection;
 
-        public DeleteEntityAction(Entity entity)
+        public DeleteEntityUndoAction(GameScene scene, Selection selection, List<Entity> entities)
         {
-            this.entity = entity;
+            entityAssets = new List<EntityAsset>(entities.Select(x => x.CreateEntityAsset()));
+            this.scene = scene;
+            this.selection= selection;
         }
 
         internal override bool Redo()
         {
-            GameSystem.CurrentScene.DeleteEntity(entity.Id);
+            selection.Clear(false);
+            entityAssets.ForEach(x => scene.DestroyEntity(x.reference));
             return true;
         }
 
         internal override bool Undo()
         {
-            GameSystem.CurrentScene.PlaceEntity(entity);
+            entityAssets.ForEach(x => scene.CreateEntity(x));
+            selection.Set(entityAssets.Select(x => x.reference).ToList(), false);
             return true;
         }
     }
 
-    internal class SelectionEntityAction : UndoAction
+    internal class SelectionUndoAction : UndoAction
     {
-        private List<EntityReference> selection;
+        private List<EntityReference> lastSelection;
+        private List<EntityReference> newSelection;
+        private Selection selection;
 
-        public SelectionEntityAction(List<EntityReference> selection) {
-            selection = new List<EntityReference>(selection);
+        public SelectionUndoAction(Selection selection, List<EntityReference> lastSelection, List<EntityReference> newSelection) {
+            this.lastSelection = lastSelection;
+            this.newSelection = newSelection;
+            this.selection = selection;
         }
 
         internal override bool Redo()
         {
+            selection.Set(newSelection, false);
             return true;
         }
 
         internal override bool Undo()
         {
+            selection.Set(lastSelection, false);
             return true;
         }
     }

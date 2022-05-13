@@ -9,33 +9,118 @@ using SolarSharp.Rendering.Graph;
 using SolarSharp.Assets;
 using SolarSharp.core;
 using SolarSharp.Core;
+using PlaneGame;
 
 /*
 @TODO:
-* Console
-* Selection undo redo.
 * Entity Creation
 * Entity Deletion
+* Console Scroll to bottom
+* Undo redo can be a bit sticky
  */
 
 namespace SolarEditor
 {
     internal class Selection
     {
-        public List<EntityReference> SelectedEntities = new List<EntityReference>();
+        public IReadOnlyList<EntityReference> SelectedEntities { get { return currentSelected; } }
+        private List<EntityReference> currentSelected = new List<EntityReference>();        
 
-        internal void Add(Entity selectedEntity)
+        public List<Entity> GetValidEntities()
         {
-            SelectedEntities.Add(selectedEntity.Reference);
+            List<Entity> entities = new List<Entity>();
+            foreach (EntityReference entity in SelectedEntities)
+            {
+                Entity? e = entity.GetEntity();
+                if (e != null)
+                {
+                    entities.Add(e);
+                }
+            }
+
+            return entities;
         }
 
-        internal void Set(Entity selectedEntity)
+        internal void Add(Entity selectedEntity, bool undoable)
         {
-            SelectedEntities.Clear();
-            SelectedEntities.Add(selectedEntity.Reference);
+            if (undoable)
+            {
+                List<EntityReference> lastSelection = new List<EntityReference>(currentSelected);
+                currentSelected.Add(selectedEntity.Reference);
+                List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
+
+                UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+            }
+            else
+            {                
+                currentSelected.Add(selectedEntity.Reference);
+            }                
         }
 
-        internal void Clear() => SelectedEntities.Clear();
+        internal void Set(Entity selectedEntity, bool undoable)
+        {
+            if (!currentSelected.Contains(selectedEntity.Reference))
+            {
+                if (undoable)
+                {
+                    List<EntityReference> lastSelection = new List<EntityReference>(currentSelected);
+                    currentSelected.Clear();
+                    currentSelected.Add(selectedEntity.Reference);
+                    List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
+
+                    UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+                }
+                else
+                {
+                    currentSelected.Clear();
+                    currentSelected.Add(selectedEntity.Reference);
+                }
+            }
+        }
+
+        internal void Set(List<EntityReference> entities, bool undoable)
+        {
+            if (entities.Count == 0)
+            {
+                Clear(undoable);
+                return;
+            }
+
+            entities = entities.Except(SelectedEntities).ToList();
+            if (entities.Count > 0)
+            {
+                if (undoable)
+                {
+                    List<EntityReference> lastSelection = new List<EntityReference>(currentSelected);
+                    currentSelected.Clear();
+                    currentSelected.AddRange(entities);
+                    List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
+
+                    UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+                }
+                else
+                {
+                    currentSelected.Clear();
+                    currentSelected.AddRange(entities);
+                }
+            }
+        }
+
+        internal void Clear(bool undoable) 
+        {
+            if (undoable)
+            {
+                List<EntityReference> lastSelection = new List<EntityReference>(currentSelected);
+                currentSelected.Clear();
+                List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
+
+                UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+            }
+            else
+            {
+                currentSelected.Clear();
+            }
+        }
     }
 
 
@@ -50,6 +135,8 @@ namespace SolarEditor
 
         public bool ShowBoundingBoxes = false;
         public bool ShowEmpties = false;
+
+        public AirGame airGame = new AirGame();
 
         internal EditorState()
         {
@@ -127,12 +214,11 @@ namespace SolarEditor
                     }
                 }
 
+                gizmo.Operate(camera, selection.SelectedEntities.Select(x => x.GetEntity()).ToList());
+
                 if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered())
-                {
-                    if (selection.SelectedEntities.Count > 0 && gizmo.Operate(camera, selection.SelectedEntities[0].GetEntity()))
-                    {
-                    }
-                    else if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
+                {                    
+                    if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
                     {
                         Ray ray = camera.ShootRayFromMousePos();
                         Entity? selectedEntity = null;
@@ -152,7 +238,7 @@ namespace SolarEditor
 
                         if (selectedEntity != null)
                         {
-                            selection.Set(selectedEntity);
+                            //selection.Set(selectedEntity);
                         }
                     }
                 }
@@ -162,41 +248,48 @@ namespace SolarEditor
                     if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
                     {
                         Entity entity = GameSystem.CurrentScene.CreateEntity();
-                        selection.Set((Entity)entity);
+                        selection.Set(entity, false);
                         AddWindow(new EntityWindow());
-                    }
 
-                    if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
-                    {
-                        //if (selectedEntities.Count > 0)
-                        //{
-                        //    List<Entity> newEntities = new List<Entity>();
-                        //    for (int i = 0; i < selectedEntities.Count; i++)
-                        //    {
-                        //        Entity entity = GameSystem.CurrentScene.CreateEntity();
-                        //        entity.Position = selectedEntities[i].Position + Vector3.UnitX;
-                        //        entity.Orientation= selectedEntities[i].Orientation;
-                        //        entity.Scale = selectedEntities[i].Scale;                            
-                        //        entity.Name = selectedEntities[i].Name + " Clone";
-                        //        entity.Material.Flags = selectedEntities[i].Material.Flags;
-                        //        entity.Material.ModelId = selectedEntities[i].Material.ModelId;
-                        //        entity.Material.AlbedoTexture = selectedEntities[i].Material.AlbedoTexture;
-                        //        entity.Material.NormalTexture = selectedEntities[i].Material.NormalTexture;
-                        //        entity.Material.ShaderId = selectedEntities[i].Material.ShaderId;
-
-                        //        newEntities.Add(entity);
-                        //    }
-
-                        //    selectedEntities.Clear();
-                        //    selectedEntities.AddRange(newEntities); 
-                        //}
+                        UndoSystem.Add(new CreateEntityUndoAction(GameSystem.CurrentScene, selection, selection.GetValidEntities() ));
                     }
 
                     if (Input.IskeyJustDown(KeyCode.DEL))
                     {
-                        //selectedEntities.ForEach(x => GameSystem.CurrentScene.DeleteEntity(x.Id));
-                        //selectedEntities.Clear();
+                        if (selection.SelectedEntities.Count > 0)
+                        {
+                            UndoSystem.Add(new DeleteEntityUndoAction(GameSystem.CurrentScene, selection, selection.GetValidEntities()));
+
+                            foreach (EntityReference entityReference in selection.SelectedEntities)
+                            {
+                                GameSystem.CurrentScene.DestroyEntity(entityReference);
+                            }
+                            selection.Clear(false);
+                        }                       
                     }
+
+                    if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
+                    {
+                        if (selection.SelectedEntities.Count > 0)
+                        {
+                            List<Entity> newEntities = new List<Entity>();
+                            foreach (EntityReference entityReference in selection.SelectedEntities)
+                            {
+                                Entity? entity = entityReference.GetEntity();
+                                if (entity != null)
+                                {
+                                    Entity newEntity = GameSystem.CurrentScene.CreateEntity(entity.CreateEntityAsset());
+                                    newEntity.Position += Vector3.UnitX; 
+                                    newEntities.Add(newEntity);
+                                }
+                            }
+
+                            selection.Set(newEntities.Select(x=> x.Reference).ToList(), false);
+
+                            UndoSystem.Add(new CreateEntityUndoAction(GameSystem.CurrentScene, selection, newEntities));
+                        }
+                    }
+
 
                     if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
                     {
@@ -366,6 +459,11 @@ namespace SolarEditor
 
                 if (ImGui.BeginMenu("View"))
                 {
+                    if (ImGui.MenuItem("Console"))
+                    {
+                        AddWindow(new ConsoleWindow());
+                    }
+
                     if (ImGui.MenuItem("Shader Editor")) {
                         AddWindow(new ShaderEditorWindow(null));
                     }
