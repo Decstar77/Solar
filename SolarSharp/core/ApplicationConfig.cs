@@ -24,7 +24,7 @@ namespace SolarSharp
         public delegate bool OnInitialize();
         public OnInitialize OnInitializeCallback;
 
-        public delegate void OnUpdate();
+        public delegate GameScene OnUpdate();
         public OnUpdate OnUpdateCallback;
 
         //public delegate void OnRender(RenderPacket renderPacket);

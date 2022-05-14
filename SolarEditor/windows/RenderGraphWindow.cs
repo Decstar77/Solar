@@ -212,15 +212,16 @@ namespace SolarEditor
 
         private void Compile()
         {
-            if (GameSystem.CurrentScene.RenderGraph == RenderGraph)
-            {
-                RenderGraph.Shutdown();
-                RenderGraph.Create(RenderSystem.device);
-            }
-            else
-            {
-                Logger.Warn($"Did not compile render graph, {RenderGraph.Name}, as it is not currently the active graph in the open scene");
-            }
+            throw new NotImplementedException();
+            //if (GameSystem.CurrentScene.RenderGraph == RenderGraph)
+            //{
+            //    RenderGraph.Shutdown();
+            //    RenderGraph.Create(RenderSystem.device);
+            //}
+            //else
+            //{
+            //    Logger.Warn($"Did not compile render graph, {RenderGraph.Name}, as it is not currently the active graph in the open scene");
+            //}
         }
 
         private void Save()

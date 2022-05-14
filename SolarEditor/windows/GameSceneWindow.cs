@@ -24,13 +24,14 @@ namespace SolarEditor
 
         public override void Show(EditorState editorState)
         {
-            GameScene gameScene = GameSystem.CurrentScene;
+            GameScene gameScene = editorState.displayScene;
 
             if (ImGui.Begin("Current Scene", ref show))
             {
                 string name = gameScene.name;
-                ImGui.InputText("Name", ref name);
-                gameScene.name = name;
+                if (ImGui.InputText("Name", ref name)) {
+                    gameScene.name = name;
+                }
 
                 string[] renderGraphAssets = AssetSystem.RenderGraphs.Select(x => x.Name).ToArray();
                 int currentRenderGraphAsset = AssetSystem.RenderGraphs.FindIndex(x => x.Name == gameScene.RenderGraph?.Name);
@@ -49,7 +50,7 @@ namespace SolarEditor
 
                 if (ImGui.CollapsingHeader("Entities", 0))
                 {
-                    Entity[] entities = GameSystem.CurrentScene.GetAllEntities();
+                    Entity[] entities = gameScene.GetAllEntities();
 
                     for (int i = 0; i < entities.Length; i++)
                     {

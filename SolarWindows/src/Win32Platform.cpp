@@ -315,6 +315,7 @@ struct Input
 	int f12;
 	int escape;
 	int space;
+	int tab;
 	int controllerUp;
 	int controllerDown;
 	int controllerLeft;
@@ -601,6 +602,10 @@ void ProcessKeyboardInput(uint16 vkCode, bool32 isDown)
 	else if (vkCode == VK_SPACE)
 	{
 		input.space = isDown;
+	}
+	else if (vkCode == VK_TAB)
+	{
+		input.tab = isDown;
 	}
 }
 

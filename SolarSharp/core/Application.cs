@@ -66,10 +66,6 @@ namespace SolarSharp
                 Logger.Error("Could not initalize debug system");
             }
 
-
-            GameSystem.CurrentScene = new GameScene();
-            GameSystem.CurrentScene.name = "Untitled";
-
             if (!config.OnInitializeCallback.Invoke()) {
                 Logger.Error("Could not intialize project");
             }
@@ -78,9 +74,9 @@ namespace SolarSharp
             clock.Start();
             while (Window.Running(ref Input)) {
 
-                config.OnUpdateCallback.Invoke();
+                GameScene gameScene = config.OnUpdateCallback.Invoke();
 
-                RenderSystem.BackupRenderer();                
+                RenderSystem.BackupRenderer(gameScene);                
                 EventSystem.Fire(EventType.RENDER_END, null);
 
                 RenderSystem.SwapBuffers(true);

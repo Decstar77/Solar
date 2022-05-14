@@ -10,7 +10,7 @@ namespace SolarEditor
 {
     internal class ConsoleWindow : EditorWindow
     {
-        private static bool AutoScroll = false;
+        private static bool AutoScroll = true;
 
         public override void Start()
         {
@@ -19,7 +19,6 @@ namespace SolarEditor
         public override void Shutdown()
         {
         }
-
 
         public override void Show(EditorState editorState)
         {            

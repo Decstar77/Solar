@@ -14,21 +14,28 @@ namespace SolarSharp
 {
     public struct EntityReference
     { 
-        public static EntityReference Invalid { get { return new EntityReference(-1); } }
-        public int EntityId { get; set; }
+        public static EntityReference Invalid { get { return new EntityReference(-1, -1, null); } }
+        public int EntityIndex { get; set; }
+        public int EntityGeneration { get; set; }
+        [JsonIgnore] public GameScene Scene { get; set; }
 
-        public EntityReference(int id)
+        public EntityReference(int id, int gen, GameScene scene)
         {
-            EntityId = id;
+            EntityIndex = id;
+            EntityGeneration = gen;
+            Scene = scene;
         }
 
         public Entity? GetEntity()
         {
-            Entity[] entities = GameSystem.CurrentScene.GetAllEntities();
-            foreach (Entity entity in entities)
+            if (Scene != null)
             {
-                if (entity.Id == EntityId)
-                    return entity;
+                Entity[] entities = Scene.GetAllEntities();
+                foreach (Entity entity in entities)
+                {
+                    if (entity.Index == EntityIndex)
+                        return entity;
+                }
             }
 
             return null;
@@ -36,18 +43,18 @@ namespace SolarSharp
 
         public static bool operator ==(EntityReference left, EntityReference right)
         {
-            return left.EntityId == right.EntityId;
+            return left.EntityIndex == right.EntityIndex && left.EntityGeneration == right.EntityGeneration && left.Scene == right.Scene;
         }
 
         public static bool operator !=(EntityReference left, EntityReference right)
         {
-            return left.EntityId != right.EntityId;
+            return !(left == right);
         }
 
         public override bool Equals(object obj)
         {
             if (obj is EntityReference entityReference)
-                return entityReference.EntityId == EntityId;
+                return entityReference == this;
             return false;
         }
     }
@@ -61,9 +68,9 @@ namespace SolarSharp
 
     public class Entity
     {
-        public int Id { get; set; } = -1;
+        public int Index { get; set; } = -1;
+        public int Generation { get; set; } = -1;
 
-        [JsonInclude]
         public string Name = "Untitled";
 
         protected Vector3 position = Vector3.Zero;
@@ -75,20 +82,28 @@ namespace SolarSharp
         protected Vector3 scale = new Vector3(1, 1, 1);
         public Vector3 Scale { get { return scale; } set { scale = value; } }
         
-        public EntityReference Reference { get { return new EntityReference(Id); } }
+        public EntityReference Reference { get { return new EntityReference(Index, Generation, Scene); } }
         public RenderingState RenderingState { get; set; } = new RenderingState();
 
-        [JsonIgnore]
         public AlignedBox WorldSpaceBoundingBox { get { return GetWorldBoundingBox(); } }
-
-        [JsonIgnore]
         public AlignedBox LocalSpaceBoundingBox { get { return GetLocalBoundingBox(); } }
+        public GameScene Scene { get; set; } = null;
 
-        public EntityReference Parent { get; set; }
+        public EntityReference Parent { get; set; } = EntityReference.Invalid;
         public List<EntityReference> Children { get; set; }
 
-        public Entity()
+        public Entity(int index, int generation, GameScene scene)
         {
+            Index = index;
+            Generation = generation;
+            Scene = scene;
+        }
+
+        public Entity(FreeList.Element element, GameScene scene)
+        {
+            Index = element.idx;
+            Generation = element.gen;
+            Scene = scene;
         }
 
         //public Entity Clone()
@@ -186,40 +201,46 @@ namespace SolarSharp
         }
     }
 
-
-    public class FreeList<T> where T : class
+    public class FreeList
     {
-        public int Count { get; set; }  
-                
-        private T[] data;
+        public struct Element
+        {
+            public int idx;
+            public int gen;
+        }
+
+        public int Count { get; set; }        
+        private int[] generations;
         private Stack<int> freeList;
 
         public FreeList(int size)
         {
             freeList = new Stack<int>(size);
-            data = new T[size];
+            generations = new int[size];
             Count = 0;
-            
-            for (int i = size - 1; i >= 0; i--) {
-                freeList.Push(i);
-            }
-            
+            CreateFreeListIndices();
         }
 
-        public int GetNextFreeIndex() => freeList.Peek();
-        public T[] GetValues() => data;
-
-        public void Add(T t)
+        public Element GetNext()
         {
-            data[freeList.Pop()] = t;
             Count++;
+            int index = freeList.Pop();
+            int generation = ++generations[index];
+            return new Element { idx = index, gen = generation };
         }
 
         public void Remove(int index)
         {
-            freeList.Push(index);
             Count--;
-            data[index] = null;
+            freeList.Push(index);
+        }
+
+        private void CreateFreeListIndices()
+        {
+            for (int i = generations.Length - 1; i >= 0; i--)
+            {
+                freeList.Push(i);
+            }
         }
     }
 
@@ -233,10 +254,34 @@ namespace SolarSharp
         public Camera Camera { get { return camera; } set { camera = value; } }
         private Camera camera = new Camera();
         
-        private FreeList<Entity> entities = new FreeList<Entity>(1000);
+        private FreeList freeList = new FreeList(1000);
+        private Entity[] entities = new Entity[1000];
+
+        public int EntityCount { get { return freeList.Count; } }
 
         public GameScene()
         {
+        }
+
+        public GameScene(string name)
+        {
+            this.name = name;
+        }
+
+        public Entity CreateEntity()
+        {            
+            Entity entity = new Entity(freeList.GetNext(), this);
+            Debug.Assert(entities[entity.Index] == null);
+            entities[entity.Index] = entity;
+            return entity;
+        }
+
+        public Entity CreateEntity(EntityAsset entityAsset)
+        {
+            Entity entity = CreateEntity();
+            entity.SetFromEntityAsset(entityAsset);
+
+            return entity;
         }
 
         public GameScene(SceneAsset sceneAsset)
@@ -244,55 +289,38 @@ namespace SolarSharp
             if (sceneAsset != null)
             {
                 name = sceneAsset.name;
-                sceneAsset.entities?.ForEach(e => { e.Id = entities.GetNextFreeIndex(); PlaceEntity(e); });
-            }            
-        }
-
-        public Entity CreateEntity()
-        {
-            Entity entity = new Entity();
-            entity.Id = entities.GetNextFreeIndex();
-            entities.Add(entity);
-            return entity;
-        }
-
-        public Entity CreateEntity(EntityAsset entityAsset)
-        {
-            Entity entity = new Entity();
-            entity.Id = entities.GetNextFreeIndex();
-            entity.SetFromEntityAsset(entityAsset);
-            entities.Add(entity);
-
-            return entity;
-        }
-
-        public void PlaceEntity(Entity entity)
-        {
-            Debug.Assert(entity.Id == entities.GetNextFreeIndex());
-            entities.Add(entity);
+                sceneAsset.entities?.ForEach(e => CreateEntity(e));
+            }
+            else
+            {
+                name = "Unknown_scene";
+            }
         }
 
         public void DestroyEntity(EntityReference entityReference)
         {
-            entities.Remove(entityReference.EntityId);
+            if (entityReference != EntityReference.Invalid)
+            {
+                freeList.Remove(entityReference.EntityIndex);
+                entities[entityReference.EntityIndex] = null;
+            }            
         }
 
-        public void DestroyEntity(int id) 
+        public void DestroyAllEntities()
         {
-            entities.Remove(id);
+            
         }
 
         public SceneAsset CreateSceneAsset()
         {
             SceneAsset sceneAsset = new SceneAsset();
             sceneAsset.name = name;
-            sceneAsset.entities = entities.GetValues().Where(x => x != null).ToList();
+            sceneAsset.entities = entities.Where(x => x != null).Select(x => x.CreateEntityAsset()).ToList();
 
             return sceneAsset;
         }
-        
-        public Entity[] GetAllEntities() => entities.GetValues().Where(x => x != null).ToArray();
-                
+
+        public Entity[] GetAllEntities() => entities.Where(x => x != null).ToArray();
 
         public RenderGraph RenderGraph { get { return renderGraph; } set { renderGraph?.Shutdown(); renderGraph = value; } }
         private RenderGraph renderGraph = null;

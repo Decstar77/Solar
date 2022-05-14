@@ -113,7 +113,7 @@ namespace SolarSharp.Rendering
         }
 
         private static bool temp = false;
-        public static void BackupRenderer()
+        public static void BackupRenderer(GameScene scene)
         {
             if ( !temp && AssetSystem.GetModelAsset("windmill.fbx") != null)
             {
@@ -163,7 +163,7 @@ namespace SolarSharp.Rendering
                 texturesToAdd.Clear();
             }
 
-            Camera camera = GameSystem.CurrentScene.Camera;
+            Camera camera = scene.Camera;
 
             Matrix4 proj = camera.GetProjectionMatrix();
             Matrix4 view = camera.GetViewMatrix();
@@ -191,8 +191,6 @@ namespace SolarSharp.Rendering
                     context.SetInputLayout(shader.inputLayout);   
                     context.SetVertexShader(shader.vertexShader); 
                     context.SetPixelShader(shader.pixelShader);   
-
-                    GameScene scene = GameSystem.CurrentScene;
 
                     Entity[] entities = scene.GetAllEntities();
                     foreach (Entity entity in entities)

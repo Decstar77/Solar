@@ -25,7 +25,7 @@ namespace SolarEditor
                         if (ImGui.CollapsingHeader("Identifiers"))
                         {
                             ImGui.InputText("Name", ref Entity.Name);                        
-                            ImGui.Text("Id " + Entity.Id.ToString());
+                            ImGui.Text("Id " + Entity.Index.ToString());
                         }
 
                         if (ImGui.CollapsingHeader("Transform"))

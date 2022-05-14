@@ -17,7 +17,6 @@ namespace SolarEditor
         public abstract void Show(EditorState editorState);
         public abstract void Start();
         public abstract void Shutdown();
-
         public bool ShouldClose() => !show;
         public void Close() => show = false;
     }

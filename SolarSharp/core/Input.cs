@@ -60,6 +60,7 @@ namespace SolarSharp
 		[MarshalAs(UnmanagedType.Bool)] public bool f12;
 		[MarshalAs(UnmanagedType.Bool)] public bool escape;
 		[MarshalAs(UnmanagedType.Bool)] public bool space;
+		[MarshalAs(UnmanagedType.Bool)] public bool tab;
 		[MarshalAs(UnmanagedType.Bool)] public bool controllerUp;
 		[MarshalAs(UnmanagedType.Bool)] public bool controllerDown;
 		[MarshalAs(UnmanagedType.Bool)] public bool controllerLeft;
@@ -100,7 +101,9 @@ namespace SolarSharp
 		F9,
 		TLDA,
 		DEL,
-    }
+		ESCAPE,
+		TAB,
+	}
 
     public enum MouseButton
     {
@@ -207,6 +210,10 @@ namespace SolarSharp
 					return IskeyJustDown(Application.Input.tlda, Application.OldInput.tlda);
 				case KeyCode.DEL:
 					return IskeyJustDown(Application.Input.del, Application.OldInput.del);
+				case KeyCode.ESCAPE:
+					return IskeyJustDown(Application.Input.escape, Application.OldInput.escape);
+				case KeyCode.TAB:
+					return IskeyJustDown(Application.Input.tab, Application.OldInput.tab);
 			}
 			return false;
         }
@@ -259,6 +266,10 @@ namespace SolarSharp
 					return (Application.Input.tlda);
 				case KeyCode.DEL:
 					return (Application.Input.del);
+				case KeyCode.ESCAPE:
+					return (Application.Input.escape);
+				case KeyCode.TAB:
+					return (Application.Input.tab);
 			}
 			return false;
 		}

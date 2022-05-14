@@ -21,9 +21,9 @@ namespace SolarEditor
             return true;
         }
 
-        public static void OnUpdate()
+        public static GameScene OnUpdate()
         {
-            editorState?.Update();
+            return editorState?.Update();
         }
 
         public static void OnShutdown()

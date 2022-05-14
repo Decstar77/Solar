@@ -22,7 +22,7 @@ namespace SolarEditor
 		internal bool Operate()
 		{
 			float mouseSensitivity = 0.1f;
-			float flySpeed = 10.0f;
+			float flySpeed = 20.0f;
 			if (Input.IsMouseDown(MouseButton.MOUSE2))
 			{
 				Input.DisableMouse();

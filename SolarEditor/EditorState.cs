@@ -138,6 +138,10 @@ namespace SolarEditor
 
         public AirGame airGame = new AirGame();
 
+        public GameScene workingScene = new GameScene("NewScene");
+        public GameScene paletteScene = new GameScene("Palette");
+        public GameScene displayScene;
+
         internal EditorState()
         {
             EventSystem.AddListener(EventType.RENDER_END, (EventType type, object context) => { UIDraw(); return false; }, this);
@@ -178,17 +182,10 @@ namespace SolarEditor
                 });
             });
 
-            //Entity entity = gameScene.CreateEntity();
-            //entity.Name = "Bike";
-            //entity.Material = new MaterialAsset();
-            //entity.Material.ModelId = Guid.Parse("10209316-f57b-41f7-88cf-8ea81614bdb2");
-            //entity.Material.AlbedoTexture = Guid.Parse("5b767a8f-5e2e-428d-81d2-8b350bf556fc");
-            //entity.Position = new Vector3(0, 0, -3);
-            //entity.Orientation = Quaternion.RotateLocalZ(Quaternion.Identity, Util.DegToRad(45.0f));
+            workingScene = new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "NewScene.json"));
+            workingScene.Camera = camera;
 
-            //GameSystem.CurrentScene = gameScene;
-            GameSystem.CurrentScene = new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "NewScene.json"));
-            GameSystem.CurrentScene.Camera = camera;
+            displayScene = workingScene;
 
             Logger.Info("Editor startup complete");
         }        
@@ -196,8 +193,7 @@ namespace SolarEditor
         private bool newModelDialog = false;
         private ModelAsset? newModelAsset = null;
 
-
-        internal void Update()
+        internal GameScene Update()
         {
             ImGui.BeginFrame();
 
@@ -210,7 +206,7 @@ namespace SolarEditor
                 {
                     if (!EventSystem.Fire(EventType.ON_SAVE, null))
                     {
-                        AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, GameSystem.CurrentScene.CreateSceneAsset());
+                        AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, displayScene.CreateSceneAsset());
                     }
                 }
 
@@ -223,7 +219,7 @@ namespace SolarEditor
                         Ray ray = camera.ShootRayFromMousePos();
                         Entity? selectedEntity = null;
                         float minDist = float.MaxValue;
-                        foreach (var entity in GameSystem.CurrentScene.GetAllEntities())
+                        foreach (var entity in displayScene.GetAllEntities())
                         {
                             RaycastInfo info;
                             if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info))
@@ -247,22 +243,22 @@ namespace SolarEditor
                 {
                     if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
                     {
-                        Entity entity = GameSystem.CurrentScene.CreateEntity();
+                        Entity entity = displayScene.CreateEntity();
                         selection.Set(entity, false);
                         AddWindow(new EntityWindow());
 
-                        UndoSystem.Add(new CreateEntityUndoAction(GameSystem.CurrentScene, selection, selection.GetValidEntities() ));
+                        UndoSystem.Add(new CreateEntityUndoAction(displayScene, selection, selection.GetValidEntities() ));
                     }
 
                     if (Input.IskeyJustDown(KeyCode.DEL))
                     {
                         if (selection.SelectedEntities.Count > 0)
                         {
-                            UndoSystem.Add(new DeleteEntityUndoAction(GameSystem.CurrentScene, selection, selection.GetValidEntities()));
+                            UndoSystem.Add(new DeleteEntityUndoAction(displayScene, selection, selection.GetValidEntities()));
 
                             foreach (EntityReference entityReference in selection.SelectedEntities)
                             {
-                                GameSystem.CurrentScene.DestroyEntity(entityReference);
+                                displayScene.DestroyEntity(entityReference);
                             }
                             selection.Clear(false);
                         }                       
@@ -278,7 +274,7 @@ namespace SolarEditor
                                 Entity? entity = entityReference.GetEntity();
                                 if (entity != null)
                                 {
-                                    Entity newEntity = GameSystem.CurrentScene.CreateEntity(entity.CreateEntityAsset());
+                                    Entity newEntity = displayScene.CreateEntity(entity.CreateEntityAsset());
                                     newEntity.Position += Vector3.UnitX; 
                                     newEntities.Add(newEntity);
                                 }
@@ -286,7 +282,7 @@ namespace SolarEditor
 
                             selection.Set(newEntities.Select(x=> x.Reference).ToList(), false);
 
-                            UndoSystem.Add(new CreateEntityUndoAction(GameSystem.CurrentScene, selection, newEntities));
+                            UndoSystem.Add(new CreateEntityUndoAction(displayScene, selection, newEntities));
                         }
                     }
 
@@ -299,9 +295,66 @@ namespace SolarEditor
                     {
                         UndoSystem.Undo();
                     }
+
+                    if (Input.IskeyJustDown(KeyCode.F1))
+                    {
+                        if (!HasWindow(typeof(ConsoleWindow)))
+                        {
+                            AddWindow(new ConsoleWindow());
+                        }
+                        else
+                        {
+                            GetWindow<ConsoleWindow>()?.Close();
+                        }
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.F2))
+                    {
+                        AddWindow(new ShaderEditorWindow(null));
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.F3))
+                    {
+                        AddWindow(new RenderGraphWindow());
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.F4))
+                    {
+                        AddWindow(new AssetSystemWindow());
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.F6))
+                    {
+                        AddWindow(new GameSceneWindow());
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.F7))
+                    {
+                        AddWindow(new EntityWindow());
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.F8))
+                    {
+                        AddWindow(new DebugWindow());
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.ESCAPE))
+                    {
+                        CloseAllWindows();
+                    }
+                    else if (Input.IskeyJustDown(KeyCode.TAB))
+                    {
+                        if (displayScene == paletteScene)
+                        { 
+                            displayScene = workingScene;
+                            UndoSystem.Enabled = true;
+                        }
+                        else
+                        {
+                            displayScene = paletteScene;
+                            if (paletteScene.EntityCount == 0) {
+
+                            }
+                            UndoSystem.Enabled = false;
+                        }
+                        
+                    }
                 }
 
-                GameSystem.CurrentScene.GetAllEntities().ToList().ForEach(entity =>
+                displayScene.GetAllEntities().ToList().ForEach(entity =>
                 {
                     if (ShowBoundingBoxes)
                     {
@@ -314,11 +367,16 @@ namespace SolarEditor
                         //    DebugDraw.Point(entity.Position);
                         //}
                     }
-
                 });
+
+               
             }
 
-           
+            return displayScene;
+        }
+
+        internal void CreatePaletteScene()
+        {
         }
 
         internal void Shutdown()
@@ -375,14 +433,38 @@ namespace SolarEditor
             ImGui.EndFrame();
         }  
 
-        internal T AddWindow <T> (T window) where T : EditorWindow
+        internal T AddWindow<T>(T window) where T : EditorWindow
         {
             foreach (EditorWindow w in windows)
                 if (w.GetType() == window.GetType())
                     return (T)w;
-
+            
             newWindows.Add(window);
             return window;
+        }
+
+        internal T? GetWindow<T>() where T : EditorWindow
+        {
+            Type windowType = typeof(T);
+
+            foreach (EditorWindow w in windows)
+                if (w.GetType() == windowType)
+                    return (T)w;
+            return null;
+        }
+
+        internal bool HasWindow(Type window)
+        {
+            foreach (EditorWindow w in windows)
+                if (w.GetType() == window)
+                    return true;
+            return false;
+        }
+
+        internal void CloseAllWindows()
+        {
+            foreach (EditorWindow w in windows)
+                w.Close();
         }
 
         internal void ShowWindows()
@@ -459,32 +541,31 @@ namespace SolarEditor
 
                 if (ImGui.BeginMenu("View"))
                 {
-                    if (ImGui.MenuItem("Console"))
-                    {
+                    if (ImGui.MenuItem("Console", "F1")) {
                         AddWindow(new ConsoleWindow());
                     }
 
-                    if (ImGui.MenuItem("Shader Editor")) {
+                    if (ImGui.MenuItem("Shader Editor", "F2")) {
                         AddWindow(new ShaderEditorWindow(null));
                     }
 
-                    if (ImGui.MenuItem("Render graph")) {
+                    if (ImGui.MenuItem("Render graph", "F3")) {
                         AddWindow(new RenderGraphWindow());
                     }
 
-                    if (ImGui.MenuItem("Assets")) {
+                    if (ImGui.MenuItem("Assets", "F4")) {
                         AddWindow(new AssetSystemWindow());
                     }
 
-                    if (ImGui.MenuItem("Scene ")) {
+                    if (ImGui.MenuItem("Scene", "F6")) {
                         AddWindow(new GameSceneWindow());
                     }
 
-                    if (ImGui.MenuItem("Entity inspector ")) {
+                    if (ImGui.MenuItem("Entity inspector", "F7")) {
                         AddWindow(new EntityWindow());
                     }
 
-                    if (ImGui.MenuItem("Debug")) {
+                    if (ImGui.MenuItem("Debug", "F8")) {
                         AddWindow(new DebugWindow());
                     }
 

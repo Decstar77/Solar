@@ -216,11 +216,9 @@ namespace SolarSharp.Rendering
 			Array.Copy(bytes, buf, bytes.Length);
 
 			bool result = InputText(label, buf, buf.Length, flags);
-			string temp = Encoding.ASCII.GetString(buf);
-			input = "";
-			for (int i = 0; i < temp.Length && temp[i] != '\0'; i++) { input += temp[i]; }
+			input = Util.AsciiBytesToString(buf, 0);
 
-			return true;
+			return result;
 		}
 		public static void SameLine(float offsetFromStartX = 0.0f, float spacingW = 1.0f) => ImGuiAPI.ImGuiSameLine(offsetFromStartX, spacingW);
 		public static bool Button(string label, float sizeX = 0, float sizeY = 0) => ImGuiAPI.ImGuiButton(label, sizeX, sizeY);

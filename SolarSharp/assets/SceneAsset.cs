@@ -23,6 +23,6 @@ namespace SolarSharp.Assets
     public class SceneAsset : EngineAsset
     {
         [JsonInclude] public string name;
-        [JsonInclude] public List<Entity> entities;
+        [JsonInclude] public List<EntityAsset> entities;
     }
 }
