@@ -78,7 +78,7 @@ namespace SolarEditor
         {
             entityAssets = new List<EntityAsset>(entities.Select(x => x.CreateEntityAsset()));
             this.scene = scene;
-            this.selection= selection;
+            this.selection = selection;
         }
 
         internal override bool Redo()

@@ -20,7 +20,7 @@ namespace SolarSharp.core
 
 			shader = new GraphicsShader().Create(device, "DebugLineShader", debugShaderCode, Assets.VertexLayout.P);
 
-			uint vertexCount = 4096;
+			uint vertexCount = 262144; // @NOTE: 1 MB
 			mesh = new DynamicMesh(device, sizeof(float) * vertexCount, Assets.VertexLayout.P);
 			meshVertices = new float[vertexCount];
 
@@ -68,13 +68,20 @@ namespace SolarSharp.core
 			meshVertices[debugMeshVertexCount++] = p2.z;
 		}
 
-
         public static void Basis(Vector3 position, Basis basis)
         {
             Line(position, position + basis.forward * 10);
             Line(position, position + basis.up * 10);
             Line(position, position + basis.right * 10);
         }
+
+        public static void Triangle(Triangle triangle)
+        {
+            Line(triangle.a, triangle.b);
+            Line(triangle.b, triangle.c);
+            Line(triangle.c, triangle.a);
+        }
+
 
         public static void AlignedBox(AlignedBox box)
         {

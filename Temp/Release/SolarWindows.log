@@ -1,10 +1,1 @@
-﻿  ImGuiAPI.cpp
-     Creating library F:\codes\Solar\x64\Release\SolarWindows.lib and object F:\codes\Solar\x64\Release\SolarWindows.exp
-  Generating code
-F:\codes\Solar\SolarWindows\src\ImGuiAPI.cpp(334): error C4716: 'ImGuiGetFrameHeightWithSpacing': must return a value
-F:\codes\Solar\SolarWindows\src\ImGuiAPI.cpp(324): error C4716: 'ImGuiGetStyleItemSpacingX': must return a value
-F:\codes\Solar\SolarWindows\src\ImGuiAPI.cpp(329): error C4716: 'ImGuiGetStyleItemSpacingY': must return a value
-  10 of 4155 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    9 functions were new in current compilation
-    103 functions had inline decision re-evaluated but remain unchanged
-LINK : fatal error LNK1257: code generation failed
+﻿  SolarWindows.vcxproj -> F:\codes\Solar\x64\Release\SolarWindows.dll

@@ -17,6 +17,7 @@ namespace SolarEditor
 			pitch = 0;
 			yaw = -90.0f;
 			Position = new Vector3(0, 0, 5);
+			far = 250.0f;
 		}
 
 		internal bool Operate()

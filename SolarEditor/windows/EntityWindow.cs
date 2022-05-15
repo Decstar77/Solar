@@ -17,9 +17,9 @@ namespace SolarEditor
         {
             if (ImGui.Begin("Entity inspector", ref show))
             {                
-                if (editorState.selection.SelectedEntities.Count > 0)
+                if (editorState.currentContext.selection.SelectedEntities.Count > 0)
                 {
-                    Entity = editorState.selection.SelectedEntities[0].GetEntity();
+                    Entity = editorState.currentContext.selection.SelectedEntities[0].GetEntity();
                     if (Entity != null)
                     { 
                         if (ImGui.CollapsingHeader("Identifiers"))

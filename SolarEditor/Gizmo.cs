@@ -17,7 +17,7 @@ namespace SolarEditor
         private ImGizmoOperation operation = ImGizmoOperation.TRANSLATE;
         private ImGizmoMode mode = ImGizmoMode.LOCAL;
 
-        public bool Operate(Camera camera, List<Entity> entities)
+        public bool Operate(Camera camera, List<Entity> entities, UndoSystem undoSystem)
         {
             ImGizmo.Enable(true);
             ImGizmo.SetRect(0, 0, Window.SurfaceWidth, Window.SurfaceHeight);
@@ -46,7 +46,7 @@ namespace SolarEditor
 
             if (entities.Count > 0)
             {
-                Matrix4 modelMatrix = entities[0].ComputeModelMatrix();
+                Matrix4 modelMatrix = entities[0].ComputeTransformMatrix();
                 Matrix4 inputMatrix = modelMatrix.Transpose;
 
                 bool action = !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered();
@@ -77,7 +77,7 @@ namespace SolarEditor
                     if (Input.IsMouseButtonJustUp(MouseButton.MOUSE1) && isUsing)
                     {
                         isUsing = false;
-                        UndoSystem.Add(new TransformAction(entities[0].Reference, oldM, modelMatrix));
+                        undoSystem.Add(new TransformAction(entities[0].Reference, oldM, modelMatrix));
                     }
                 }
             }

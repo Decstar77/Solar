@@ -11,6 +11,22 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.Rendering
 {
+    unsafe struct Foo
+    {
+        fixed int x[4];
+    };
+
+    struct Bar
+    {
+        int[] x = new int[4];
+        public Bar()
+        {
+
+        }
+    }
+
+
+
     public static class RenderSystem
     {
         public static DXDevice device;
@@ -67,7 +83,6 @@ namespace SolarSharp.Rendering
                 texturesToAdd.Add(textureAsset);
             }
         }
-
 
         public static bool Initialize()
         {
@@ -163,6 +178,7 @@ namespace SolarSharp.Rendering
                 texturesToAdd.Clear();
             }
 
+
             Camera camera = scene.Camera;
 
             Matrix4 proj = camera.GetProjectionMatrix();
@@ -205,11 +221,12 @@ namespace SolarSharp.Rendering
                                     StaticMesh mesh;
                                     if (meshes.TryGetValue(meshAsset.Guid, out mesh))
                                     {
-                                        Matrix4 mvp = proj * view * entity.ComputeModelMatrix();
+                                        Matrix4 m = entity.ComputeTransformMatrix();
+                                        Matrix4 mvp = proj * view * m;
 
                                         MaterialAsset materialAsset = AssetSystem.GetMaterialAsset(meshAsset.materialName);
 
-                                        constBuffer0.Reset().Prepare(mvp).Upload(context);
+                                        constBuffer0.Reset().Prepare(mvp).Prepare(m).Prepare(m.Inverse).Upload(context);
                                         materialConstBuffer.Reset().Prepare(materialAsset.AlbedoColour).Upload(context);
 
                                         context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);

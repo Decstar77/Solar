@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace SolarSharp.Assets
             {
                 case VertexLayout.P: return 3;
                 case VertexLayout.PNT: return (3 + 3 + 2);
+                default: Debug.Assert(false); return 0;
             }
 
             return 0;
@@ -54,6 +56,7 @@ namespace SolarSharp.Assets
                     return -1;
                 case VertexLayout.COUNT:
                     return -1;
+                default: Debug.Assert(false); return 0;
             }
             return -1;
         }
@@ -64,6 +67,14 @@ namespace SolarSharp.Assets
 
     }
 
+    public struct MeshVertex
+    {
+        public Vector3 position;
+        public Vector3 normal;
+        public Vector2 uv;
+        public Vector3 color;
+    }
+
     public class MeshAsset : EngineAsset
     {
         public string name;
@@ -71,7 +82,57 @@ namespace SolarSharp.Assets
         public List<uint> indices;
         public VertexLayout layout;
         public AlignedBox alignedBox;
-        public string materialName;
+        public string materialName;  
+        
+        public List<Triangle> BuildTriangles()
+        {
+            List<Triangle> triangles = new List<Triangle>();
+            // @NOTE: Assumes the mesh is triangluated
+            for (int i = 0 ; i < indices.Count; i += 3)
+            {
+                int index1 = (int)indices[i];
+                int index2 = (int)indices[i + 1];
+                int index3 = (int)indices[i + 2];
+
+                Triangle triangle = new Triangle();
+                triangle.a =  GetMeshVertex(index1).position;
+                triangle.b = GetMeshVertex(index2).position;
+                triangle.c = GetMeshVertex(index3).position;
+
+                triangles.Add(triangle);
+            }
+
+            return triangles;
+        }
+
+        public MeshVertex GetMeshVertex(int index)
+        {
+            MeshVertex vertex = new MeshVertex();
+
+            index *= (int)layout.GetStride();
+            switch (layout)
+            {
+                case VertexLayout.PNT: {    
+                        vertex.position.x = vertices[index];
+                        vertex.position.y = vertices[index + 1];
+                        vertex.position.z = vertices[index + 2];
+
+                        vertex.normal.x = vertices[index + 3];
+                        vertex.normal.y = vertices[index + 4];
+                        vertex.normal.z = vertices[index + 5];
+
+                        vertex.uv.x = vertices[index + 6];
+                        vertex.uv.y = vertices[index + 7];
+                    }
+                    break;
+
+                default: 
+                    Debug.Assert(false);
+                    break;
+            }
+
+            return vertex;
+        }
     }
 
     public class ModelAsset : EngineAsset

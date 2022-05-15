@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace SolarEditor
 {
-    internal static class UndoSystem
+    internal class UndoSystem
     {
-        public static Stack<UndoAction> undoActions = new Stack<UndoAction>();
-        private static Stack<UndoAction> redoActions = new Stack<UndoAction>();
+        public Stack<UndoAction> undoActions = new Stack<UndoAction>();
+        private Stack<UndoAction> redoActions = new Stack<UndoAction>();
 
-        public static bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = true;
 
-        public static void Add(UndoAction undoAction)
+        public void Add(UndoAction undoAction)
         {
             if (Enabled)
             {
@@ -24,7 +24,7 @@ namespace SolarEditor
             }
         }
 
-        public static void Undo()
+        public void Undo()
         {
             if (Enabled && undoActions.Count > 0)
             {
@@ -35,7 +35,7 @@ namespace SolarEditor
             }
         }
 
-        public static void Redo()
+        public void Redo()
         {
             if (Enabled && redoActions.Count > 0)
             {

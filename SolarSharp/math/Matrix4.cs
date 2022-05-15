@@ -83,6 +83,11 @@ namespace SolarSharp
         public Vector4 col3 { get { return new Vector4(m13, m23, m33, m43); } set { m13 = value.x; m23 = value.y; m33 = value.z; m43 = value.w; } }
         public Vector4 col4 { get { return new Vector4(m14, m24, m34, m44); } set { m14 = value.x; m24 = value.y; m34 = value.z; m44 = value.w; } }
 
+        public Vector4 row1 { get { return new Vector4(m11, m12, m13, m14); } set { m11 = value.x; m12 = value.y; m13 = value.z; m14 = value.w; } }
+        public Vector4 row2 { get { return new Vector4(m21, m22, m23, m24); } set { m21 = value.x; m22 = value.y; m23 = value.z; m24 = value.w; } }
+        public Vector4 row3 { get { return new Vector4(m31, m32, m33, m34); } set { m31 = value.x; m32 = value.y; m33 = value.z; m34 = value.w; } }
+        public Vector4 row4 { get { return new Vector4(m41, m42, m43, m44); } set { m41 = value.x; m42 = value.y; m43 = value.z; m44 = value.w; } }
+
         public static Matrix4 Identity
         {
             get
@@ -433,12 +438,12 @@ namespace SolarSharp
             return m;
         }
 
-        public static Vector4 operator *(Matrix4 value1, Vector4 value2)
-        {
-            float x = Vector4.Dot(value1.col1, value2);
-            float y = Vector4.Dot(value1.col2, value2);
-            float z = Vector4.Dot(value1.col3, value2);
-            float w = Vector4.Dot(value1.col4, value2);
+        public static Vector4 operator *(Matrix4 m, Vector4 v)
+        {                        
+            float x = Vector4.Dot(m.row1, v);
+            float y = Vector4.Dot(m.row2, v);
+            float z = Vector4.Dot(m.row3, v);
+            float w = Vector4.Dot(m.row4, v);
 
             return new Vector4(x, y, z, w);
         }

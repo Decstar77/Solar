@@ -39,6 +39,23 @@ namespace SolarSharp
         }
     }
 
+    public struct Triangle
+    {
+        public Vector3 a;
+        public Vector3 b;
+        public Vector3 c;
+
+        public static Triangle Transform(Triangle triangle, Matrix4 transformMatrix)
+        {
+            Triangle t = new Triangle();
+            t.a = Matrix4.Transform(transformMatrix, triangle.a);
+            t.b = Matrix4.Transform(transformMatrix, triangle.b);
+            t.c = Matrix4.Transform(transformMatrix, triangle.c);
+
+            return t;
+        }
+    }
+
     public struct AlignedBox
     {
         public Vector3 min;

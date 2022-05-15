@@ -126,9 +126,12 @@ EDITOR_INTERFACE(void*) CreateSwapchain()
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.Flags = 0;
 
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullscreenDescriptor = {};
+		swapChainFullscreenDescriptor.Windowed = true;
+
 		HWND window = winState.window;
 		DXCHECK(dxgiFactory->CreateSwapChainForHwnd(renderState.device, window,
-			&swapChainDesc, NULL, NULL, &renderState.swapChain.swapChain));
+			&swapChainDesc, &swapChainFullscreenDescriptor, NULL, &renderState.swapChain.swapChain));
 
 		//DXRELEASE(dxgiFactory);
 		//if (SUCCEEDED(hr))

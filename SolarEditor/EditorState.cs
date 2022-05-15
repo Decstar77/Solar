@@ -13,18 +13,34 @@ using PlaneGame;
 
 /*
 @TODO:
-* Entity Creation
-* Entity Deletion
-* Console Scroll to bottom
-* Undo redo can be a bit sticky
- */
+* Base Rendering:
+*   - Pack material index into vertex data
+*   - All material data does into a const buffer
+*   - Remove asset system lookup
+* Base Lighting:
+*   - PBR
+*   - IBL
+*   - SHADOWS
+*   - SSAO
+* Mouse picking
+* Clip board
+* Selection indication - draw bb
+* Gizmo for multple entities
+* 
+*/
 
 namespace SolarEditor
 {
     internal class Selection
     {
         public IReadOnlyList<EntityReference> SelectedEntities { get { return currentSelected; } }
-        private List<EntityReference> currentSelected = new List<EntityReference>();        
+        private List<EntityReference> currentSelected = new List<EntityReference>();
+        private UndoSystem undoSystem;
+
+        public Selection(UndoSystem undoSystem)
+        {
+            this.undoSystem = undoSystem;
+        }
 
         public List<Entity> GetValidEntities()
         {
@@ -49,7 +65,7 @@ namespace SolarEditor
                 currentSelected.Add(selectedEntity.Reference);
                 List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
 
-                UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+                undoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
             }
             else
             {                
@@ -68,7 +84,7 @@ namespace SolarEditor
                     currentSelected.Add(selectedEntity.Reference);
                     List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
 
-                    UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+                    undoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
                 }
                 else
                 {
@@ -96,7 +112,7 @@ namespace SolarEditor
                     currentSelected.AddRange(entities);
                     List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
 
-                    UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+                    undoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
                 }
                 else
                 {
@@ -114,7 +130,7 @@ namespace SolarEditor
                 currentSelected.Clear();
                 List<EntityReference> newSelection = new List<EntityReference>(currentSelected);
 
-                UndoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
+                undoSystem.Add(new SelectionUndoAction(this, lastSelection, newSelection));
             }
             else
             {
@@ -124,23 +140,42 @@ namespace SolarEditor
     }
 
 
+    internal class EditorContext
+    {
+        public UndoSystem undoSystem;
+        public Selection selection; 
+        public FlyCamera camera;
+        public GameScene scene;
+
+        public EditorContext()
+        {
+            undoSystem = new UndoSystem();
+            selection = new Selection(undoSystem);
+            camera = new FlyCamera();
+        }
+
+        public void SetScene(GameScene scene)
+        {
+            this.scene = scene;
+            scene.Camera = this.camera;
+        }
+    }
+
+
     internal class EditorState
     {
         private List<EditorWindow> windows = new List<EditorWindow>();
         private List<EditorWindow> newWindows = new List<EditorWindow>();
-        private FlyCamera camera = new FlyCamera();
         private Gizmo gizmo = new Gizmo();
-
-        public Selection selection = new Selection();
-
         public bool ShowBoundingBoxes = false;
         public bool ShowEmpties = false;
 
         public AirGame airGame = new AirGame();
 
-        public GameScene workingScene = new GameScene("NewScene");
-        public GameScene paletteScene = new GameScene("Palette");
-        public GameScene displayScene;
+        public EditorContext currentContext = new EditorContext();
+
+        public EditorContext workingContext = new EditorContext();
+        public EditorContext paletteContext = new EditorContext();
 
         internal EditorState()
         {
@@ -182,22 +217,19 @@ namespace SolarEditor
                 });
             });
 
-            workingScene = new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "NewScene.json"));
-            workingScene.Camera = camera;
+            workingContext.SetScene(new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "NewScene.json")));
+            currentContext = workingContext;
 
-            displayScene = workingScene;
+            paletteContext.SetScene(new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "Palette.json")));
 
             Logger.Info("Editor startup complete");
         }        
-
-        private bool newModelDialog = false;
-        private ModelAsset? newModelAsset = null;
 
         internal GameScene Update()
         {
             ImGui.BeginFrame();
 
-            if (!camera.Operate())
+            if (!currentContext.camera.Operate())
             {
                 DrawGlobalMenu();
                 ShowWindows();
@@ -206,35 +238,59 @@ namespace SolarEditor
                 {
                     if (!EventSystem.Fire(EventType.ON_SAVE, null))
                     {
-                        AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, displayScene.CreateSceneAsset());
+                        AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, currentContext.scene.CreateSceneAsset());
                     }
                 }
 
-                gizmo.Operate(camera, selection.SelectedEntities.Select(x => x.GetEntity()).ToList());
+                bool usingGizmo = gizmo.Operate(currentContext.camera, 
+                    currentContext.selection.SelectedEntities.Select(x => x.GetEntity()).ToList(), 
+                    currentContext.undoSystem);
 
-                if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered())
+                if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered() && !usingGizmo)
                 {                    
                     if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
                     {
-                        Ray ray = camera.ShootRayFromMousePos();
+                        Ray ray = currentContext.camera.ShootRayFromMousePos();
                         Entity? selectedEntity = null;
                         float minDist = float.MaxValue;
-                        foreach (var entity in displayScene.GetAllEntities())
+                        foreach (var entity in currentContext.scene.GetAllEntities())
                         {
                             RaycastInfo info;
                             if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info))
-                            {
-                                if (info.t < minDist)
+                            {                             
+                                if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
                                 {
-                                    minDist = info.t;
-                                    selectedEntity = entity;
+                                    ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
+                                    if (modelAsset != null)
+                                    {
+                                        foreach (MeshAsset meshAsset in modelAsset.meshes)
+                                        {
+                                            List<Triangle> triangles = meshAsset.BuildTriangles();
+                                            foreach (Triangle triangle in triangles)
+                                            {
+                                                DebugDraw.Triangle(triangle);
+                                            }
+                                        }
+                                    }
                                 }
+
+                                
+
+                                //if (info.t < minDist)
+                                //{
+                                //    minDist = info.t;
+                                //    selectedEntity = entity;
+                                //}
                             }
                         }
 
                         if (selectedEntity != null)
                         {
-                            //selection.Set(selectedEntity);
+                            currentContext.selection.Set(selectedEntity, true);
+                        }
+                        else
+                        {
+                            currentContext.selection.Clear(true);                            
                         }
                     }
                 }
@@ -243,57 +299,65 @@ namespace SolarEditor
                 {
                     if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
                     {
-                        Entity entity = displayScene.CreateEntity();
-                        selection.Set(entity, false);
+                        Entity entity = currentContext.scene.CreateEntity();
+                        currentContext.selection.Set(entity, false);
                         AddWindow(new EntityWindow());
 
-                        UndoSystem.Add(new CreateEntityUndoAction(displayScene, selection, selection.GetValidEntities() ));
+                        currentContext.undoSystem.Add(
+                            new CreateEntityUndoAction(currentContext.scene, 
+                            currentContext.selection, 
+                            currentContext.selection.GetValidEntities()));
                     }
 
                     if (Input.IskeyJustDown(KeyCode.DEL))
                     {
-                        if (selection.SelectedEntities.Count > 0)
+                        if (currentContext.selection.SelectedEntities.Count > 0)
                         {
-                            UndoSystem.Add(new DeleteEntityUndoAction(displayScene, selection, selection.GetValidEntities()));
+                            currentContext.undoSystem.Add(
+                                new DeleteEntityUndoAction(currentContext.scene, 
+                                currentContext.selection, 
+                                currentContext.selection.GetValidEntities()));
 
-                            foreach (EntityReference entityReference in selection.SelectedEntities)
+                            foreach (EntityReference entityReference in currentContext.selection.SelectedEntities)
                             {
-                                displayScene.DestroyEntity(entityReference);
+                                currentContext.scene.DestroyEntity(entityReference);
                             }
-                            selection.Clear(false);
+                            currentContext.selection.Clear(false);
                         }                       
                     }
 
                     if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
                     {
-                        if (selection.SelectedEntities.Count > 0)
+                        if (currentContext.selection.SelectedEntities.Count > 0)
                         {
                             List<Entity> newEntities = new List<Entity>();
-                            foreach (EntityReference entityReference in selection.SelectedEntities)
+                            foreach (EntityReference entityReference in currentContext.selection.SelectedEntities)
                             {
                                 Entity? entity = entityReference.GetEntity();
                                 if (entity != null)
                                 {
-                                    Entity newEntity = displayScene.CreateEntity(entity.CreateEntityAsset());
+                                    Entity newEntity = currentContext.scene.CreateEntity(entity.CreateEntityAsset());
                                     newEntity.Position += Vector3.UnitX; 
                                     newEntities.Add(newEntity);
                                 }
                             }
 
-                            selection.Set(newEntities.Select(x=> x.Reference).ToList(), false);
-
-                            UndoSystem.Add(new CreateEntityUndoAction(displayScene, selection, newEntities));
+                            currentContext.selection.Set(newEntities.Select(x=> x.Reference).ToList(), false);
+                            currentContext.undoSystem.Add(
+                                new CreateEntityUndoAction(currentContext.scene, 
+                                currentContext.selection, 
+                                newEntities));
                         }
                     }
 
 
                     if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
                     {
-                        UndoSystem.Redo();
+                        currentContext.undoSystem.Redo();
                     }
                     else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
                     {
-                        UndoSystem.Undo();
+                        currentContext.undoSystem.Undo();
                     }
 
                     if (Input.IskeyJustDown(KeyCode.F1))
@@ -337,34 +401,51 @@ namespace SolarEditor
                     }
                     else if (Input.IskeyJustDown(KeyCode.TAB))
                     {
-                        if (displayScene == paletteScene)
-                        { 
-                            displayScene = workingScene;
-                            UndoSystem.Enabled = true;
+                        if (currentContext == workingContext)
+                        {
+                            if (paletteContext.scene.EntityCount == 0) {
+                                CreatePaletteScene();
+                            }
+                            currentContext = paletteContext;
                         }
                         else
                         {
-                            displayScene = paletteScene;
-                            if (paletteScene.EntityCount == 0) {
-
-                            }
-                            UndoSystem.Enabled = false;
+                            currentContext = workingContext;
                         }
-                        
                     }
                 }
 
-                displayScene.GetAllEntities().ToList().ForEach(entity =>
+                currentContext.scene.GetAllEntities().ToList().ForEach(entity =>
                 {
-                    if (ShowBoundingBoxes)
+                    //if (ShowBoundingBoxes)
                     {
-                        DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
+                        if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
+                        {
+                            Matrix4 transformMatrix = entity.ComputeTransformMatrix();
+
+                            ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
+                            if (modelAsset != null)
+                            {
+                                foreach (MeshAsset meshAsset in modelAsset.meshes)
+                                {
+                                    List<Triangle> triangles = meshAsset.BuildTriangles();
+                                    foreach (Triangle triangle in triangles)
+                                    {
+                                        var t = Triangle.Transform(triangle, transformMatrix);
+                                        DebugDraw.Triangle(t);
+                                    }
+                                }
+                            }
+                        }
+
+
+                        //DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
                     }
 
                     if (ShowEmpties)
                     {
                         //if (entity.Material.ModelId == Guid.Empty) {
-                        //    DebugDraw.Point(entity.Position);
+                        //    DebugDraw.Point(entity.Position);s
                         //}
                     }
                 });
@@ -372,11 +453,30 @@ namespace SolarEditor
                
             }
 
-            return displayScene;
+            return currentContext.scene;
         }
 
         internal void CreatePaletteScene()
         {
+            paletteContext.scene.DestroyAllEntities();
+            float x = -30;
+            float z = -30;
+
+            AssetSystem.GetSortedModelAssets().ForEach(asset => {
+                AlignedBox ab = asset.alignedBox;
+                //float width = ab.Extent.x * 2;
+                x += 5;
+
+                Entity entity = paletteContext.scene.CreateEntity();
+                entity.RenderingState.ModelId = asset.Guid;
+                entity.Position += new Vector3(x, 0, z);
+                entity.Name = asset.name;
+                if (x > 30)
+                {
+                    z += 5;
+                    x = -30;
+                }
+            });
         }
 
         internal void Shutdown()
@@ -386,50 +486,6 @@ namespace SolarEditor
 
         internal void UIDraw()
         {
-           
-                     
-
-            //if (open)
-            //{
-            //    open = false;
-            //    ImGui.OpenPopup("Create Shader");
-            //}
-
-            if (newModelDialog)
-            {
-                newModelDialog = false;
-                ImGui.OpenPopup("Create Model Asset");
-            }
-
-            
-            if (ImGui.BeginPopupModal("Create Model Asset"))
-            {
-                string path = Application.Config.AssetPath + newModelAsset.name;
-
-                ImGui.InputText("Path", ref path);
-                if (ImGui.Button("Create", 200, 0))
-                { 
-                    File.Copy(newModelAsset.path,  path);
-
-                    //MeshAsset mesh = newModelAsset.meshes[0];
-                    //StaticMesh newMesh = new StaticMesh(RenderSystem.device, mesh);
-                    //RenderSystem.cube = newMesh;
-
-                    newModelAsset = null;
-
-                    ImGui.CloseCurrentPopup();
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("Cancel", 200, 0))
-                {
-                    newModelAsset = null;
-                    ImGui.CloseCurrentPopup();
-                }
-
-                ImGui.EndPopup();
-            }
- 
-    
             ImGui.EndFrame();
         }  
 

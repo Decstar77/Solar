@@ -26,10 +26,11 @@ namespace SolarEditor
                 {
                     if (ImGui.BeginTabItem("Models"))
                     {
-                        ImGui.Columns(4, "modelColumns", true);
+                        ImGui.Columns(5, "modelColumns", true);
                         ImGui.Separator();
 
                         ImGui.Text("Name"); ImGui.NextColumn();
+                        ImGui.Text("Mesh Count"); ImGui.NextColumn();
                         ImGui.Text("Actions"); ImGui.NextColumn();
                         ImGui.Text("GUID"); ImGui.NextColumn();
                         ImGui.Text("Path"); ImGui.NextColumn();
@@ -40,6 +41,8 @@ namespace SolarEditor
                         AssetSystem.GetSortedModelAssets().ForEach(x => {
                             ImGui.Separator();
                             ImGui.Text(x.name); ImGui.NextColumn();
+
+                            ImGui.Text(x.meshes.Count.ToString()); ImGui.NextColumn();
 
                             ImGui.PushId(idCounter++);
 

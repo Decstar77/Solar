@@ -37,11 +37,11 @@ namespace SolarSharp
             float height = Window.SurfaceHeight;
 
             Vector2 pixelPoint = Input.MousePositionPixelCoords;
-            Matrix4 proj = GetProjectionMatrix();
-            Matrix4 view = GetViewMatrix();
+            Matrix4 proj = GetProjectionMatrix().Inverse;
+            Matrix4 view = GetViewMatrix().Inverse;
 
             Vector4 normCoords = GetNormalisedDeviceCoordinates(width, height, pixelPoint.x, pixelPoint.y);
-            Vector4 viewCoords = proj.Inverse * normCoords;
+            Vector4 viewCoords = proj * normCoords;
             Vector4 worldCoods = view * new Vector4(viewCoords.x, viewCoords.y, -1, 1); // @NOTE: This -1 ensure we a have something pointing in to the screen
 
             Ray ray = new Ray();

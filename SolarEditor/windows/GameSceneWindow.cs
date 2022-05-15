@@ -24,7 +24,7 @@ namespace SolarEditor
 
         public override void Show(EditorState editorState)
         {
-            GameScene gameScene = editorState.displayScene;
+            GameScene gameScene = editorState.currentContext.scene;
 
             if (ImGui.Begin("Current Scene", ref show))
             {
@@ -60,7 +60,7 @@ namespace SolarEditor
                         if (ImGui.Selectable(entity.Name))
                         {
                             editorState.AddWindow(new EntityWindow());
-                            editorState.selection.Set(entity, true);
+                            editorState.currentContext.selection.Set(entity, true);
                         }
                         ImGui.PopId();
 

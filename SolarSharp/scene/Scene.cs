@@ -86,7 +86,7 @@ namespace SolarSharp
         public RenderingState RenderingState { get; set; } = new RenderingState();
 
         public AlignedBox WorldSpaceBoundingBox { get { return GetWorldBoundingBox(); } }
-        public AlignedBox LocalSpaceBoundingBox { get { return GetLocalBoundingBox(); } }
+        //public AlignedBox LocalSpaceBoundingBox { get { return GetLocalBoundingBox(); } }
         public GameScene Scene { get; set; } = null;
 
         public EntityReference Parent { get; set; } = EntityReference.Invalid;
@@ -155,7 +155,7 @@ namespace SolarSharp
         
         public void SetTransform(Matrix4 m) => Matrix4.Decompose(m, out position, out orientation, out scale);
 
-        public Matrix4 ComputeModelMatrix()
+        public Matrix4 ComputeTransformMatrix()
         {
             Matrix4 translation = Matrix4.TranslateRH(Matrix4.Identity, position);
             Matrix4 rotation = Quaternion.ToMatrix4(orientation);
@@ -185,17 +185,13 @@ namespace SolarSharp
 
         protected AlignedBox GetWorldBoundingBox()
         {
-            //if (Material?.ModelId != null)
-            //{
-            //    if (Material.ModelId != Guid.Empty)
-            //    {
-            //        ModelAsset modelAsset = AssetSystem.GetModelAsset(Material.ModelId);
-            //        if (modelAsset != null)
-            //        {
-            //            return AlignedBox.Transform(modelAsset.alignedBox, position, Orientation);
-            //        }
-            //    }
-            //}
+            if (RenderingState != null && RenderingState.ModelId != Guid.Empty)
+            {
+                ModelAsset modelAsset = AssetSystem.GetModelAsset(RenderingState.ModelId);
+                if (modelAsset != null) {
+                    return AlignedBox.Transform(modelAsset.alignedBox, position, Orientation);
+                }
+            }
 
             return new AlignedBox();
         }
@@ -217,8 +213,7 @@ namespace SolarSharp
         {
             freeList = new Stack<int>(size);
             generations = new int[size];
-            Count = 0;
-            CreateFreeListIndices();
+            Clear();
         }
 
         public Element GetNext()
@@ -233,6 +228,14 @@ namespace SolarSharp
         {
             Count--;
             freeList.Push(index);
+        }
+
+        public void Clear()
+        {
+            freeList.Clear();
+            CreateFreeListIndices();
+            Count = 0;
+            Array.Fill(generations, 0);
         }
 
         private void CreateFreeListIndices()
@@ -253,9 +256,11 @@ namespace SolarSharp
 
         public Camera Camera { get { return camera; } set { camera = value; } }
         private Camera camera = new Camera();
+
+        public static readonly int MaxEntityCount = 100000;
         
-        private FreeList freeList = new FreeList(1000);
-        private Entity[] entities = new Entity[1000];
+        private FreeList freeList = new FreeList(MaxEntityCount);
+        private Entity[] entities = new Entity[MaxEntityCount];
 
         public int EntityCount { get { return freeList.Count; } }
 
@@ -306,9 +311,10 @@ namespace SolarSharp
             }            
         }
 
-        public void DestroyAllEntities()
+        public void DestroyAllEntities() 
         {
-            
+            freeList.Clear();
+            Array.Fill(entities, null);
         }
 
         public SceneAsset CreateSceneAsset()

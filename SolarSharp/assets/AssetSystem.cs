@@ -23,37 +23,47 @@ namespace SolarSharp.Assets
         private static List<RenderGraph> renderGraphs = new List<RenderGraph>();
         
         private static Dictionary<Guid, SceneAsset> scenes = new Dictionary<Guid, SceneAsset>();        
-        private static List<ModelAsset> modelAssets = new List<ModelAsset>();
+        private static Dictionary<Guid, ModelAsset> modelAssets = new Dictionary<Guid, ModelAsset>();
         private static List<TextureAsset> textureAssets = new List<TextureAsset>();
         private static List<MaterialAsset> materialAssets = new List<MaterialAsset>();
         
         public static ModelAsset? GetModelAsset(string name)
         {
-            ModelAsset? model = null;
-
             lock (modelAssets)
             {
-                model = modelAssets.Find(x => x.name == name);
+                foreach (var asset in modelAssets)
+                {
+                    if (asset.Value.name == name)
+                    {
+                        return asset.Value;
+                    }
+                }
             }
 
-            return model;
+            return null;
         }
 
         public static ModelAsset? GetModelAsset(Guid id)
         {
             lock (modelAssets)
             {
-                return modelAssets.Find(x => x.Guid == id);
+                ModelAsset asset;
+                if (modelAssets.TryGetValue(id, out asset))
+                {
+                    return asset;
+                }
             }
+
+            return null;
         }
 
         public static List<ModelAsset> GetSortedModelAssets() {
-            lock(modelAssets)
+            lock (modelAssets)
             {
-                modelAssets.Sort((x, y) => (x.name.CompareTo(y.name)));
-                List<ModelAsset> models = new List<ModelAsset>(modelAssets);
-                return models;
-            }             
+                var list = modelAssets.Values.ToList();
+                list.Sort((x, y) => (x.name.CompareTo(y.name)));
+                return list;
+            }
         }
             
         public static void AddModelAsset(ModelAsset model)
@@ -61,7 +71,7 @@ namespace SolarSharp.Assets
             lock (modelAssets)
             {                
                 Logger.Trace($"Placing {model.name}");
-                modelAssets.Add(model);
+                modelAssets.Add(model.Guid, model);
             }
         }
 
@@ -69,12 +79,10 @@ namespace SolarSharp.Assets
         {
             lock (modelAssets)
             {
-                int index = modelAssets.FindIndex(x => x.Guid == id);
-                if (index >= 0)
+                if (modelAssets.Remove(id))
                 {
-                    Logger.Trace($"Removing {modelAssets[index].name}");
-                    modelAssets.RemoveAt(index);
-                }                
+                    Logger.Trace($"Removed model {id}");
+                }                   
             }
         }
 
