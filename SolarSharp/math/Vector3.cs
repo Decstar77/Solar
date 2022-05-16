@@ -91,6 +91,18 @@ namespace SolarSharp
                 vector1.x * vector2.y - vector1.y * vector2.x);
         }
 
+        public static Vector3 Project(Vector3 a, Vector3 b)
+        {
+            float nume = Dot(a, b);
+            float demon = b.MagSqrd;
+
+            float s = nume / demon;
+
+            Vector3 result = s * b;
+
+            return result;
+        }
+
         public static Vector3 Transform(Vector3 position, Matrix4 matrix)
         {
             return new Vector3(

@@ -21,8 +21,10 @@ EDITOR_INTERFACE(bool) ImGizmoIsUsing()
 	return ImGuizmo::IsUsing();
 }
 
-EDITOR_INTERFACE(bool) ImGizmoManipulate(Mat4f proj, Mat4f view, Mat4f* world, int operation, int mode)
+EDITOR_INTERFACE(bool) ImGizmoManipulate(Mat4f proj, Mat4f view, Mat4f* world, int operation, int mode, Mat4f *deltaMatrix, float* snap)
 {
-	return ImGuizmo::Manipulate(view.ptr, proj.ptr, (ImGuizmo::OPERATION)operation, (ImGuizmo::MODE)mode, world->ptr);	
+	if (snap[0] == 0.0f)
+		return ImGuizmo::Manipulate(view.ptr, proj.ptr, (ImGuizmo::OPERATION)operation, (ImGuizmo::MODE)mode, world->ptr, deltaMatrix->ptr);
+	return ImGuizmo::Manipulate(view.ptr, proj.ptr, (ImGuizmo::OPERATION)operation, (ImGuizmo::MODE)mode, world->ptr, deltaMatrix->ptr, snap);	
 }
 

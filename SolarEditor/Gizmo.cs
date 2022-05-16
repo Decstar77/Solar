@@ -48,10 +48,17 @@ namespace SolarEditor
             {
                 Matrix4 modelMatrix = entities[0].ComputeTransformMatrix();
                 Matrix4 inputMatrix = modelMatrix.Transpose;
+                Matrix4 deltaMatrix = Matrix4.Identity;
+
+                float[] snap = new float[] { 0.0f, 0.0f, 0.0f };
+                if (Input.IsKeyDown(KeyCode.CTRL_L)) {
+                    snap = new float[] { 1.0f, 1.0f, 1.0f };
+                }
 
                 bool action = !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered();
-
-                if (ImGizmo.Manipulate(camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose, ref inputMatrix, operation, mode))
+                if (ImGizmo.Manipulate(
+                    camera.GetProjectionMatrix().Transpose, camera.GetViewMatrix().Transpose, 
+                    ref inputMatrix, ref deltaMatrix, operation, mode, snap))                    
                 {
                     if (action)
                     {
@@ -60,9 +67,16 @@ namespace SolarEditor
                         Vector3 scl;
                         Matrix4.Decompose(inputMatrix.Transpose, out pos, out rot, out scl);
 
-                        entities[0].Position = pos;
+                        Vector3 delta = pos - entities[0].Position;
+
                         entities[0].Orientation = rot;
                         entities[0].Scale = scl;
+
+                        foreach (var entity in entities)
+                        {
+                            entity.Position += delta;
+                        }
+
                     }
                 }
 

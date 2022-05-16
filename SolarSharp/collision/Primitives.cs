@@ -37,13 +37,24 @@ namespace SolarSharp
             this.origin = origin;
             this.normal = normal;
         }
+
+        public Plane(Triangle triangle)
+        {
+            normal = Vector3.Normalize(Vector3.Cross(triangle.b - triangle.a, triangle.c - triangle.a));
+            origin = triangle.a;
+        }
     }
 
     public struct Triangle
     {
-        public Vector3 a;
-        public Vector3 b;
-        public Vector3 c;
+        public Vector3 a = Vector3.Zero;
+        public Vector3 b = Vector3.Zero;
+        public Vector3 c = Vector3.Zero;
+
+        public Triangle()
+        {
+
+        }
 
         public static Triangle Transform(Triangle triangle, Matrix4 transformMatrix)
         {
@@ -53,6 +64,31 @@ namespace SolarSharp
             t.c = Matrix4.Transform(transformMatrix, triangle.c);
 
             return t;
+        }
+
+        public static Vector3 GetBarycentric(Triangle triangle, Vector3 point)
+        {
+            Vector3 ap = point - triangle.a;
+            Vector3 bp = point - triangle.b;
+            Vector3 cp = point - triangle.c;
+
+            Vector3 ab = triangle.b - triangle.a;
+            Vector3 ac = triangle.c - triangle.a;
+            Vector3 bc = triangle.c - triangle.b;
+            Vector3 cb = triangle.b - triangle.c;
+            Vector3 ca = triangle.a - triangle.c;
+
+            Vector3 v;
+            v = ab - Vector3.Project(ab, cb);
+            float a = 1.0f - (Vector3.Dot(v, ap) / Vector3.Dot(v, ab));
+
+            v = bc - Vector3.Project(bc, ac);
+            float b = 1.0f - (Vector3.Dot(v, bp) / Vector3.Dot(v, bc));
+
+            v = ca - Vector3.Project(ca, ab);
+            float c = 1.0f - (Vector3.Dot(v, cp) / Vector3.Dot(v, ca));
+
+            return new Vector3(a, b, c);
         }
     }
 

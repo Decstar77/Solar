@@ -30,7 +30,8 @@ namespace SolarSharp.Rendering
 			=> ImGizmoAPI.ImGizmoSetRect(x, y, width, height);
 
 		public static bool GizmoIsUsing() => ImGizmoAPI.ImGizmoIsUsing();
-		public static bool Manipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, ImGizmoOperation operation, ImGizmoMode mode) 
-			=> ImGizmoAPI.ImGizmoManipulate(proj,view, ref world, (int)operation, (int)mode);
+		public static bool Manipulate(Matrix4 proj, Matrix4 view, ref Matrix4 world, ref Matrix4 deltaMatrix,
+			ImGizmoOperation operation, ImGizmoMode mode, float[] snap)
+			=> ImGizmoAPI.ImGizmoManipulate(proj,view, ref world, (int)operation, (int)mode, ref deltaMatrix, snap);
     }
 }

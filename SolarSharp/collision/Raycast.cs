@@ -81,6 +81,25 @@ namespace SolarSharp
             return false;
         }
 
+        public static bool Triangle(Ray ray, Triangle triangle, out RaycastInfo info)
+        {
+            Plane plane = new Plane(triangle);
+            if (Plane(ray, plane, out info))
+            {
+                Vector3 point = ray.Travel(info.t);
+                Vector3 bar = SolarSharp.Triangle.GetBarycentric(triangle, point);
+
+                if (bar.x >= 0.0f && bar.x <= 1.0f &&
+                    bar.y >= 0.0f && bar.y <= 1.0f &&
+                    bar.z >= 0.0f && bar.z <= 1.0f) 
+                {                    
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static bool BoundingBox(Ray ray, BoundingBox box, out RaycastInfo info)
         {
             info = new RaycastInfo();

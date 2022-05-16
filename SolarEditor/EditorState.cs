@@ -102,7 +102,7 @@ namespace SolarEditor
                 return;
             }
 
-            entities = entities.Except(SelectedEntities).ToList();
+
             if (entities.Count > 0)
             {
                 if (undoable)
@@ -139,6 +139,11 @@ namespace SolarEditor
         }
     }
 
+    internal class ClipBoard
+    { 
+        public List<EntityAsset> copiedEntities = new List<EntityAsset>();
+    }
+
 
     internal class EditorContext
     {
@@ -159,23 +164,31 @@ namespace SolarEditor
             this.scene = scene;
             scene.Camera = this.camera;
         }
+
+        public void AddEntities(params Entity[] newEntities)
+        {
+            selection.Set(newEntities.Select(x => x.Reference).ToList(), false);
+            undoSystem.Add(new CreateEntityUndoAction(scene, selection, newEntities.ToList()));
+        }
     }
 
 
     internal class EditorState
     {
+        private Gizmo gizmo = new Gizmo();
+        private ClipBoard clipboard = new ClipBoard();
         private List<EditorWindow> windows = new List<EditorWindow>();
         private List<EditorWindow> newWindows = new List<EditorWindow>();
-        private Gizmo gizmo = new Gizmo();
+        
+
         public bool ShowBoundingBoxes = false;
         public bool ShowEmpties = false;
 
         public AirGame airGame = new AirGame();
 
         public EditorContext currentContext = new EditorContext();
-
         public EditorContext workingContext = new EditorContext();
-        public EditorContext paletteContext = new EditorContext();
+        public EditorContext paletteContext = new EditorContext();        
 
         internal EditorState()
         {
@@ -223,7 +236,7 @@ namespace SolarEditor
             paletteContext.SetScene(new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "Palette.json")));
 
             Logger.Info("Editor startup complete");
-        }        
+        }
 
         internal GameScene Update()
         {
@@ -251,42 +264,54 @@ namespace SolarEditor
                     if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
                     {
                         Ray ray = currentContext.camera.ShootRayFromMousePos();
+        
                         Entity? selectedEntity = null;
                         float minDist = float.MaxValue;
                         foreach (var entity in currentContext.scene.GetAllEntities())
                         {
                             RaycastInfo info;
+
                             if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info))
-                            {                             
+                            {
+                                if (info.t > minDist)
+                                    continue;
+
                                 if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
                                 {
                                     ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
                                     if (modelAsset != null)
                                     {
+                                        Matrix4 transformMatrix = entity.ComputeTransformMatrix();
                                         foreach (MeshAsset meshAsset in modelAsset.meshes)
                                         {
                                             List<Triangle> triangles = meshAsset.BuildTriangles();
                                             foreach (Triangle triangle in triangles)
                                             {
-                                                DebugDraw.Triangle(triangle);
+                                                if (Raycast.Triangle(ray, Triangle.Transform(triangle, transformMatrix), out info))
+                                                {
+                                                    if (info.t < minDist)
+                                                    {
+                                                        minDist = info.t;
+                                                        selectedEntity = entity;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                }
-
-                                
-
-                                //if (info.t < minDist)
-                                //{
-                                //    minDist = info.t;
-                                //    selectedEntity = entity;
-                                //}
+                                }  
                             }
                         }
 
                         if (selectedEntity != null)
                         {
-                            currentContext.selection.Set(selectedEntity, true);
+                            if (Input.IsKeyDown(KeyCode.SHIFT_L))
+                            {
+                                currentContext.selection.Add(selectedEntity, true);
+                            }
+                            else
+                            {
+                                currentContext.selection.Set(selectedEntity, true);
+                            }
                         }
                         else
                         {
@@ -342,11 +367,7 @@ namespace SolarEditor
                                 }
                             }
 
-                            currentContext.selection.Set(newEntities.Select(x=> x.Reference).ToList(), false);
-                            currentContext.undoSystem.Add(
-                                new CreateEntityUndoAction(currentContext.scene, 
-                                currentContext.selection, 
-                                newEntities));
+                            currentContext.AddEntities(newEntities.ToArray());
                         }
                     }
 
@@ -358,6 +379,33 @@ namespace SolarEditor
                     else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
                     {
                         currentContext.undoSystem.Undo();
+                    }
+
+                    if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.C)) 
+                    {
+                        if (currentContext.selection.SelectedEntities.Count > 0)
+                        {
+                            Logger.Trace($"Copied {currentContext.selection.SelectedEntities.Count } entties");
+                            clipboard.copiedEntities = currentContext.selection.GetValidEntities().Select(x => x.CreateEntityAsset()).ToList();
+                        }
+                    }
+
+                    if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.V))
+                    {
+                        //Logger.Trace($"Copied {currentContext.selection.SelectedEntities.Count } entties");
+                        if (clipboard.copiedEntities.Count > 0)
+                        {
+                            List<Entity> newEntities = new List<Entity>(); 
+
+                            foreach (var entity in clipboard.copiedEntities)
+                            {
+                                Entity e = currentContext.scene.CreateEntity(entity);
+                                e.Position += Vector3.UnitX;
+                                newEntities.Add(e);
+                            }
+
+                            currentContext.AddEntities(newEntities.ToArray());
+                        }
                     }
 
                     if (Input.IskeyJustDown(KeyCode.F1))
@@ -417,27 +465,8 @@ namespace SolarEditor
 
                 currentContext.scene.GetAllEntities().ToList().ForEach(entity =>
                 {
-                    //if (ShowBoundingBoxes)
+                    if (ShowBoundingBoxes)
                     {
-                        if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
-                        {
-                            Matrix4 transformMatrix = entity.ComputeTransformMatrix();
-
-                            ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
-                            if (modelAsset != null)
-                            {
-                                foreach (MeshAsset meshAsset in modelAsset.meshes)
-                                {
-                                    List<Triangle> triangles = meshAsset.BuildTriangles();
-                                    foreach (Triangle triangle in triangles)
-                                    {
-                                        var t = Triangle.Transform(triangle, transformMatrix);
-                                        DebugDraw.Triangle(t);
-                                    }
-                                }
-                            }
-                        }
-
 
                         //DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
                     }
@@ -449,9 +478,17 @@ namespace SolarEditor
                         //}
                     }
                 });
-
                
+                foreach (EntityReference reff in currentContext.selection.SelectedEntities)
+                {
+                    Entity? entity = reff.GetEntity();
+                    if (entity != null)
+                        DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
+                }
+
             }
+
+        
 
             return currentContext.scene;
         }

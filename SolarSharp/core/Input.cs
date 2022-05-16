@@ -85,11 +85,13 @@ namespace SolarSharp
 		A,
 		S,
 		D,
+		C,
 		Q,
 		E,
 		R,
 		T,
 		Z,
+		V,
 		F1,
 		F2,
 		F3,
@@ -180,6 +182,8 @@ namespace SolarSharp
 					return IskeyJustDown(Application.Input.d, Application.OldInput.d);
 				case KeyCode.Q:
 					return IskeyJustDown(Application.Input.q, Application.OldInput.q);
+				case KeyCode.C:
+					return IskeyJustDown(Application.Input.c, Application.OldInput.c);
 				case KeyCode.E:
 					return IskeyJustDown(Application.Input.e, Application.OldInput.e);
 				case KeyCode.R:
@@ -214,6 +218,8 @@ namespace SolarSharp
 					return IskeyJustDown(Application.Input.escape, Application.OldInput.escape);
 				case KeyCode.TAB:
 					return IskeyJustDown(Application.Input.tab, Application.OldInput.tab);
+				case KeyCode.V:
+					return IskeyJustDown(Application.Input.v, Application.OldInput.v);
 			}
 			return false;
         }
@@ -270,6 +276,10 @@ namespace SolarSharp
 					return (Application.Input.escape);
 				case KeyCode.TAB:
 					return (Application.Input.tab);
+				case KeyCode.C:
+					return (Application.Input.c);
+				case KeyCode.V:
+					return (Application.Input.v);
 			}
 			return false;
 		}
