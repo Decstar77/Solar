@@ -40,6 +40,7 @@
     <Compile Include="core\Game.cs" />
     <Compile Include="core\Input.cs" />
     <Compile Include="EngineAPI\ImGizmoAPI.cs" />
+    <Compile Include="math\PerlinNoise.cs" />
     <Compile Include="rendering\DynamicMesh.cs" />
     <Compile Include="rendering\imgui\ImGizmo.cs" />
     <Compile Include="rendering\StaticTexture.cs" />

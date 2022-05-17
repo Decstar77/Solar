@@ -242,6 +242,7 @@ namespace SolarEditor
         {
             ImGui.BeginFrame();
 
+
             if (!currentContext.camera.Operate())
             {
                 DrawGlobalMenu();

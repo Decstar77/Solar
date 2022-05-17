@@ -34,5 +34,10 @@ namespace SolarSharp
         {
             return new Vector2(left.x * right, left.y * right);
         }
+
+        public static Vector2 operator *(Vector2 left, float right)
+        {
+            return new Vector2(left.x * right, left.y * right);
+        }
     }
 }
