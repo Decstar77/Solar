@@ -10,155 +10,315 @@ using System.Threading.Tasks;
 
 namespace SolarEditor
 {
-    public class LRule
-    { 
-        public char Letter { get; set; }
-        private string[] possibleResults;
+    internal enum LevelPlacementType
+    {
+        NONE,
+        OCCUPIED,
+        CONCRETE,
+        GRASS,
+        BUILDING01,
+        ROAD,
+    }
+    internal class LevelCell
+    {
+        public LevelPlacementType type;
+        public int xIndex;
+        public int yIndex;
+        public int zIndex;
+
+        public Vector3 direction = Vector3.Zero;
+        public LevelCell link;
+
+        public LevelCell(int x, int y, int z, LevelPlacementType type)
+        {
+            xIndex = x;
+            yIndex = y;
+            zIndex = z;
+            this.type = type;
+        }
+
+        public void Set(LevelPlacementType type, LevelCell link)
+        {
+            this.type = type;
+            this.link = link;
+        }
+
+    }
+
+    internal struct LevelCreateInfo
+    {
+        public int DesiredHouseCount;
+
+        public Guid TileContreteModel;
+        public Guid TileGrassModel;
+        public Guid RoadForwardModel;
+        public Guid RoadFlat;
+        public Guid Building01Model;
+    }
+
+    internal class LevelGenerator
+    {
+        private int cellXCount;
+        private int cellYCount;
+        private int cellZCount;
+
+        private const int TileWidth = 4;
+        private const int TileDepth = 4;
+        private const int TileHeight = 2;
+
+        private Vector3 TileDims = new Vector3(TileWidth, TileHeight, TileDepth);
+        private Vector3 centerOffset;
+
+        private int cX;
+        private int cY;
+        private int cZ;
+
+        private LevelCell[,,] levelCells;
+
         private Random random;
 
-        public LRule(char letter, params string[] possibleResults)
+        public LevelGenerator(int width, int height)
         {
-            Letter = letter;
-            this.possibleResults = possibleResults;
+            this.cellXCount = width;
+            this.cellYCount = 2;
+            this.cellZCount = height;
+
             random = new Random();
-        }
 
-        public string GetResult()
-        {
-            return possibleResults[random.Next(possibleResults.Length)];            
-        }
-    }
+            levelCells = new LevelCell[cellXCount, cellYCount, cellZCount];
 
-    public struct LParams
-    {
-        public Vector3 position;
-        public Vector3 direction;
-        public int length;
-    }
+            cX = cellXCount / 2;
+            cY = cellYCount / 2;
+            cZ = cellZCount / 2;
+            centerOffset = new Vector3(cX, 0, cZ) * TileDims;
 
-    public enum LevelLetterEncoding
-    {
-        UNKOWN = '1',
-        SAVE = '[',
-        LOAD = ']',
-        FORWARD = 'F',
-        TURN_RIGHT = '+',
-        TURN_LEFT = '-',
-    }
-
-    public class LevelGenerator
-    {
-        public LRule[] rules;        
-        public int iterationLimit = 1;
-
-        public LevelGenerator(int interationLimit, params LRule[] rules)
-        {
-            this.iterationLimit = interationLimit; ;
-            this.rules = rules;
-        }
-
-        public string GenerateSequence(string word )
-        { 
-            return GrowRecursive(word);
-        }
-
-        public static void DebugDraw_(string word, int length)
-        {
-            Stack<LParams> lParams = new Stack<LParams>();
-
-            Vector3 direction = Vector3.UnitZ;
-            Vector3 currentPos = Vector3.Zero;
-
-            foreach (var c in word)
-            {                
-                LevelLetterEncoding encoding = (LevelLetterEncoding)c;
-                switch (encoding)
-                {
-                    case LevelLetterEncoding.UNKOWN:
-                        Debug.Assert(false);
-                        break;
-                    case LevelLetterEncoding.SAVE:
-                        lParams.Push(new LParams
-                        {
-                            direction = direction,
-                            position = currentPos,
-                            length = length
-                        });
-                        break;
-                    case LevelLetterEncoding.LOAD: {
-                            LParams param = lParams.Pop();
-                            direction = param.direction;
-                            currentPos = param.position;
-                            length = param.length;
-                        }
-                        break;
-
-                    case LevelLetterEncoding.FORWARD: {
-                            Vector3 temp = currentPos;
-                            currentPos += direction * length;
-                            length -= 4;
-                            DebugDraw.Line(temp + Vector3.UnitY * 2, currentPos + Vector3.UnitY * 2);
-                        }                       
-                        break;
-                    case LevelLetterEncoding.TURN_RIGHT:
-                        direction = Quaternion.RotatePoint(direction, Quaternion.RotateLocalY(Quaternion.Identity, Util.DegToRad(90)));
-                        break;
-                    case LevelLetterEncoding.TURN_LEFT:
-                        direction = Quaternion.RotatePoint(direction, Quaternion.RotateLocalY(Quaternion.Identity, Util.DegToRad(-90)));
-                        break;
-                }
-
-            }
-
-        }
-
-        private string GrowRecursive(string word, int iterationIndex = 0)
-        {
-            if (iterationIndex >= iterationLimit)
+            for (int x = 0; x < cellXCount; x++)
             {
-                return word;
+                for (int y = 0; y < cellYCount; y++)
+                {
+                    for (int z = 0; z < cellZCount; z++)
+                    {
+                        levelCells[x, y, z] = new LevelCell(x, y, z, LevelPlacementType.NONE);
+                    }
+                }
             }
+        }
 
-            StringBuilder newWord = new StringBuilder();
-            foreach (var c in word) {
-                newWord.Append(c);
-                foreach (var r in rules) {
-                    if (r.Letter == c) {
-                        newWord.Append(GrowRecursive(r.GetResult(), iterationIndex + 1));
-                    }                     
+        public void _DebugDraw()
+        {
+            ForEachCell(c =>
+            {
+                if (c.type != LevelPlacementType.NONE)
+                {
+                    Vector3 min = GetTileWorldPosition(c.xIndex, c.yIndex, c.zIndex);
+                    Vector3 max = GetTileWorldPosition(c.xIndex, c.yIndex, c.zIndex) + TileDims;
+                    DebugDraw.AlignedBox(new AlignedBox(min, max));
+                }
+            });
+        }
+
+        public void Generate(GameScene scene, LevelCreateInfo createInfo)
+        {            
+            for (int x = 0; x < cellXCount; x++)
+            {
+                for (int z = 0; z < cellZCount; z++)
+                {
+                    levelCells[x, 0, z].Set(LevelPlacementType.GRASS, null);
                 }
             }
 
-            return newWord.ToString();
+            while (true) {
+                Vector3 indices = GetRandomIndex();
+                indices.y = 1;
+                if (PLaceBuilding01(indices))
+                {
+                    createInfo.DesiredHouseCount--;
+                }
+                if (createInfo.DesiredHouseCount == 0)
+                    break;
+            }
+            
+
+            for (int x = 0; x < cellXCount; x++)
+            {
+                for (int y = 0; y < cellYCount; y++)
+                {
+                    for (int z = 0; z < cellZCount; z++)
+                    {
+                        if (levelCells[x, y, z] != null)
+                        {
+                            switch (levelCells[x, y, z].type)
+                            {
+                                case LevelPlacementType.NONE:
+                                    break;
+                                case LevelPlacementType.CONCRETE:
+                                    {
+                                        Entity entity = scene.CreateEntity();
+                                        entity.Position = GetTileWorldPosition(x, y, z);
+                                        entity.RenderingState.ModelId = createInfo.TileContreteModel;
+                                    }
+                                    break;
+                                case LevelPlacementType.GRASS:
+                                    {
+                                        Entity entity = scene.CreateEntity();
+                                        entity.Position = GetTileWorldPosition(x, y, z);
+                                        entity.RenderingState.ModelId = createInfo.TileGrassModel;
+                                    }
+                                    break;
+                                case LevelPlacementType.BUILDING01:
+                                    {
+                                        Entity entity = scene.CreateEntity();
+                                        entity.Position = GetTileWorldPosition(x, y, z);
+                                        entity.RenderingState.ModelId = createInfo.Building01Model;
+                                    }
+                                    break;
+                                case LevelPlacementType.ROAD:
+                                    {
+                                        Entity entity = scene.CreateEntity();
+                                        entity.Position = GetTileWorldPosition(x, y, z);
+                                        entity.RenderingState.ModelId = createInfo.RoadFlat;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool PLaceBuilding01(Vector3 indices)
+        {
+            return PLaceBuilding01((int)indices.x, (int)indices.y, (int)indices.z);
+        }
+
+        private bool PLaceBuilding01(int x, int y, int z)
+        {           
+            Vector3 dir = GetRandomDirection();
+
+            dir.x = dir.x > 0 ? dir.x + 1 : dir.x;
+            dir.z = dir.z > 0 ? dir.z + 1 : dir.z;
+
+            if (CanPlace2x2(x, y, z) && CanPlaceCell(x + (int)dir.x, y, z + (int)dir.z))
+            {
+                Place2x2(x, y, z, LevelPlacementType.BUILDING01);
+
+                levelCells[x, y, z].direction = dir;
+                levelCells[x + (int)dir.x, y, z + (int)dir.z].Set(LevelPlacementType.ROAD, null);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void Place2x2(int x, int y, int z, LevelPlacementType type)
+        {
+            levelCells[x, y, z].Set(type, null);
+            levelCells[x + 1, y, z + 1].Set(LevelPlacementType.OCCUPIED, levelCells[x, y, z]);
+            levelCells[x + 1, y, z].Set(LevelPlacementType.OCCUPIED, levelCells[x, y, z]);
+            levelCells[x, y, z + 1].Set(LevelPlacementType.OCCUPIED, levelCells[x, y, z]);
+        }
+
+        private bool CanPlace2x2(int x, int y, int z)
+        {
+            if (CanPlaceCell(x + 1, y, z) &&
+                CanPlaceCell(x, y, z + 1) && 
+                CanPlaceCell(x + 1, y, z + 1) && 
+                CanPlaceCell(x, y, z))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool CanPlaceCell(int x, int y, int z)
+        {
+            if (x >= cellXCount)
+                return false;
+            if (x < 0)
+                return false;
+            if (z >= cellZCount)
+                return false;
+            if (z < 0)
+                return false;
+
+            if (levelCells[x, y, z].type != LevelPlacementType.NONE)
+                return false;
+
+            return true;
+        }
+
+        private Vector3 GetTileWorldPosition(int x, int y, int z)
+        {
+            return new Vector3(x, y, z) * TileDims - centerOffset;
+        }
+
+        private Vector3 GetRandomDirection()
+        {
+            int dir =  random.Next(4);
+            switch(dir)
+            {
+                case 0: return new Vector3(-1, 0, 0);
+                case 1: return new Vector3(1, 0, 0);
+                case 2: return new Vector3(0, 0, 1);
+                case 3: return new Vector3(0, 0, -1);
+            }
+
+            return Vector3.UnitX;
+        }
+
+        private Vector3 GetRandomIndex()
+        {
+            return new Vector3(random.Next(cellXCount), random.Next(cellYCount), random.Next(cellZCount));
+        }
+
+        private void ForEachCell(Action<LevelCell> predicate)
+        {
+            for (int x = 0; x < cellXCount; x++)
+            {
+                for (int y = 0; y < cellYCount; y++)
+                {
+                    for (int z = 0; z < cellZCount; z++)
+                    {
+                        predicate.Invoke(levelCells[x, y, z]);
+                    }
+                }
+            }
         }
     }
-
-
 
     internal class LevelGeneratorWindow : EditorWindow
     {
-        string result = "";
-        int iterations = 2;
-        int length = 8;
+        public int TileHorizontalCount = 9 * 3;
+        public int TileVerticalCount = 9 * 3;
+        LevelGenerator levelGenerator;
+
         public override void Show(EditorState editorState)
         {
             if (ImGui.Begin("Level generator", ref show))
             {
-                ImGui.InputInt("Iterations", ref iterations);
-                ImGui.InputInt("Length", ref length);
+                ImGui.InputInt("Tile Horizontal Count", ref TileHorizontalCount);
+                ImGui.InputInt("Tile Vertical Count", ref TileVerticalCount);
                 if (ImGui.Button("Generate"))
                 {
-                    LRule rule = new LRule('F', "[+F][-F]", "[+F]F[-F]", "[-F]F[+F]");
-                    LevelGenerator levelGenerator = new LevelGenerator(iterations, rule);
-                    result = levelGenerator.GenerateSequence("[F]--F");
+                    
+                    LevelCreateInfo createInfo = new LevelCreateInfo();
+                    createInfo.DesiredHouseCount = TileHorizontalCount / 3;
+                    Guid.TryParse("c430f407-cf03-4a28-9876-98d7bcab5962", out createInfo.TileContreteModel);
+                    Guid.TryParse("dfd0d315-0e1a-441b-8492-a1079d037810", out createInfo.TileGrassModel);
+                    Guid.TryParse("a1fc79b4-8e82-4a2f-b551-ab077f26c823", out createInfo.Building01Model);                    
+                    Guid.TryParse("a0d1c221-ae20-4a63-b772-87c00e278ad8", out createInfo.RoadFlat);
+                    Guid.TryParse("f94aa063-7bb2-427e-826a-55af086e6dff", out createInfo.RoadForwardModel);
+
+                    levelGenerator = new LevelGenerator(TileHorizontalCount, TileVerticalCount);
+                    editorState.currentContext.scene.DestroyAllEntities();
+                    levelGenerator.Generate(editorState.currentContext.scene, createInfo);
                 }
 
-                
-                if (!string.IsNullOrEmpty(result))
+                if (levelGenerator != null)
                 {
-                    ImGui.Text(result);
-                    LevelGenerator.DebugDraw_(result, length);
-                }
+                    //levelGenerator._DebugDraw();
+                }                
             }
 
             ImGui.End();
