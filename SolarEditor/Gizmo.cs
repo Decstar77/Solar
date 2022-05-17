@@ -52,7 +52,14 @@ namespace SolarEditor
 
                 float[] snap = new float[] { 0.0f, 0.0f, 0.0f };
                 if (Input.IsKeyDown(KeyCode.CTRL_L)) {
-                    snap = new float[] { 1.0f, 1.0f, 1.0f };
+                    if (operation == ImGizmoOperation.TRANSLATE || operation == ImGizmoOperation.SCALE)
+                    {
+                        snap = new float[] { 1.0f, 1.0f, 1.0f };
+                    }
+                    else
+                    {
+                        snap = new float[] { 15.0f, 15.0f, 15.0f };
+                    }
                 }
 
                 bool action = !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered();
@@ -76,7 +83,6 @@ namespace SolarEditor
                         {
                             entity.Position += delta;
                         }
-
                     }
                 }
 

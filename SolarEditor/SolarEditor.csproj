@@ -32,6 +32,7 @@
     <Compile Include="windows\AssetWindow.cs" />
     <Compile Include="windows\DebugWindow.cs" />
     <Compile Include="windows\EntityWindow.cs" />
+    <Compile Include="windows\LevelGeneratorWindow.cs" />
     <Compile Include="windows\ModelViewerWindow.cs" />
     <Compile Include="windows\ShaderEditorWindow.cs" />
     <Compile Include="windows\ConsoleWindow.cs" />

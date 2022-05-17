@@ -443,6 +443,10 @@ namespace SolarEditor
                     {
                         AddWindow(new DebugWindow());
                     }
+                    else if (Input.IskeyJustDown(KeyCode.F9))
+                    {
+                        AddWindow(new LevelGeneratorWindow());
+                    }
                     else if (Input.IskeyJustDown(KeyCode.ESCAPE))
                     {
                         CloseAllWindows();
@@ -660,6 +664,10 @@ namespace SolarEditor
 
                     if (ImGui.MenuItem("Debug", "F8")) {
                         AddWindow(new DebugWindow());
+                    }
+
+                    if (ImGui.MenuItem("Level Generator", "F9")) {
+                        AddWindow(new LevelGeneratorWindow());
                     }
 
                     ImGui.EndMenu();
