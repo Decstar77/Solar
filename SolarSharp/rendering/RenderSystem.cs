@@ -228,7 +228,11 @@ namespace SolarSharp.Rendering
                                         Matrix4 m = entity.ComputeTransformMatrix();
                                         Matrix4 mvp = proj * view * m;
 
-                                        MaterialAsset materialAsset = AssetSystem.GetMaterialAsset(meshAsset.materialName);
+                                        string matName = !string.IsNullOrEmpty(entity.RenderingState.MaterialReference) ? 
+                                            entity.RenderingState.MaterialReference :
+                                            meshAsset.materialName;
+
+                                        MaterialAsset materialAsset = AssetSystem.GetMaterialAsset(matName);
 
                                         constBuffer0.Reset().Prepare(mvp).Prepare(m).Prepare(m.Inverse).Upload(context);
                                         materialConstBuffer.Reset().Prepare(materialAsset.AlbedoColour).Upload(context);

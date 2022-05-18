@@ -1,4 +1,5 @@
 ﻿using SolarSharp;
+using SolarSharp.Assets;
 using SolarSharp.core;
 using SolarSharp.Rendering;
 using System;
@@ -10,51 +11,98 @@ using System.Threading.Tasks;
 
 namespace SolarEditor
 {
+    [Flags]
+    internal enum TileDirectionType
+    {
+        N = 0,
+        L = 1,
+        R = 2,
+        F = 4,
+        B = 8,
+        FULL = L | R | F | B,
+        RB = R | B,
+        RF = R | F,
+        LF = L | F,
+        LB = L | B,
+        RFB = R | F | B,
+        LRF = L | R | F,
+        LFB = L | F| B,
+        LRB = L | R| B,
+    }
+
+
+    internal enum LevelTileType
+    {
+        NONE,
+        CONCRETE,
+        GRASS,
+        GRAVEL,
+        SAND,
+        SNOW,
+        WATER,
+    }
+
+    internal class LevelTile
+    {
+        public LevelTileType type;
+        public int xIndex;
+        public int zIndex;
+        public int Elevation = 0;
+
+        public LevelTile(int x, int z, LevelTileType type)
+        {
+            xIndex = x;
+            zIndex = z;
+            this.type = type;
+        }
+    }
+
     internal enum LevelPlacementType
     {
         NONE,
         OCCUPIED,
-        
-        TILE_CONCRETE,
-        TILE_GRASS,
-        TILE_GRAVEL,
-        TILE_SAND,
-        TILE_SNOW,
-        TILE_WATER,
-
         BUILDING01,
-        ROAD,
+        ROAD
     }
 
-    internal class LevelCell
+
+    internal class LevelPlacement
     {
         public LevelPlacementType type;
         public int xIndex;
         public int zIndex;
 
         public Vector3 direction = Vector3.Zero;
-        public LevelCell? link;
 
-        public int Elevation = 0;
-
-        public LevelCell(int x, int z, LevelPlacementType type)
+        public LevelPlacement(int x, int z, LevelPlacementType type)
         {
             xIndex = x;
             zIndex = z;
             this.type = type;
         }
-
-        public void Set(LevelPlacementType type, LevelCell? link)
-        {
-            this.type = type;
-            this.link = link;
-        }
-
     }
+
 
     internal struct LevelCreateInfo
     {
         public int DesiredHouseCount;
+
+
+        public Guid TileNone;
+        public Guid TileFull;
+        public Guid TileL;
+        public Guid TileR;
+        public Guid TileF;
+        public Guid TileB;
+        public Guid TileRB;
+        public Guid TileRF;
+        public Guid TileLF;
+        public Guid TileLB;
+        public Guid TileRFB;
+        public Guid TileLRF;
+        public Guid TileLFB;
+        public Guid TileLRB;       
+
 
         public Guid TileContreteModel;
         public Guid TileGrassModel;
@@ -89,7 +137,8 @@ namespace SolarEditor
         private int cX;
         private int cZ;
 
-        private LevelCell[,] levelCells;
+        private LevelTile[,] levelTiles;
+        private LevelPlacement[,] levelPlacements;
 
         private Random random;
 
@@ -100,7 +149,8 @@ namespace SolarEditor
 
             random = new Random();
 
-            levelCells = new LevelCell[cellXCount,  cellZCount];
+            levelTiles = new LevelTile[cellXCount,  cellZCount];
+            levelPlacements = new LevelPlacement[cellXCount, cellZCount];
 
             cX = cellXCount / 2;
             cZ = cellZCount / 2;
@@ -110,19 +160,20 @@ namespace SolarEditor
             {
                 for (int z = 0; z < cellZCount; z++)
                 {
-                    levelCells[x, z] = new LevelCell(x, z, LevelPlacementType.NONE);
+                    levelTiles[x, z] = new LevelTile(x, z, LevelTileType.NONE);
+                    levelPlacements[x, z] = new LevelPlacement(x, z, LevelPlacementType.NONE);
                 }
             }
         }
 
         public void _DebugDraw()
         {
-            ForEachCell(c =>
+            ForEachPlacement(p =>
             {
-                if (c.type != LevelPlacementType.NONE)
+                if (p.type != LevelPlacementType.NONE)
                 {
-                    Vector3 min = GetTileWorldPosition(c.xIndex, c.zIndex);
-                    Vector3 max = GetTileWorldPosition(c.xIndex, c.zIndex) + TileDims;
+                    Vector3 min = GetPlacementWorldPostion(p.xIndex, p.zIndex);
+                    Vector3 max = GetPlacementWorldPostion(p.xIndex, p.zIndex) + TileDims;
                     DebugDraw.AlignedBox(new AlignedBox(min, max));
                 }
             });
@@ -130,17 +181,93 @@ namespace SolarEditor
 
         public void Generate(GameScene scene, LevelCreateInfo createInfo)
         {
-            ForEachCell((c) => {
+            ForEachTile((c) => {
                 float sX = c.xIndex / (float)cellXCount;
-                float sZ = c.zIndex / (float)cellZCount;
-                                
+                float sZ = c.zIndex / (float)cellZCount;                                
                 c.Elevation = (int)MathF.Round(PerlinNoise.Noise(sX, sZ) * 6);
                 //c.Elevation = 0;
+                
+                if (c.Elevation >= SnowElevation)
+                {
+                    c.type = LevelTileType.SNOW;
+                }
+                else if (c.Elevation >= GravelElevation)
+                {
+                    c.type = LevelTileType.GRAVEL;
+                }
+                else if (c.Elevation >= GrassElevation)
+                {
+                    c.type = LevelTileType.GRASS;
+                }
+                else if (c.Elevation >= SandElevation)
+                {
+                    c.type = LevelTileType.SAND;
+                }
+                else if (c.Elevation >= WaterElevation)
+                {
+                    c.type = LevelTileType.WATER;
+                }
+                else
+                {
+                    c.type = LevelTileType.WATER;
+                }
             });
 
+            ForEachTile((cell) => {
+                if (cell != null)
+                {
+                    Entity entity = scene.CreateEntity();
+                    entity.Position = GetTileWorldPosition(cell.xIndex, cell.zIndex);
+                    entity.Position += new Vector3(0, cell.Elevation * TileHeight, 0);
 
-            while (true) {
-                Vector2 indices = GetRandomIndex();                
+                    TileDirectionType direction = TileDirectionType.N;
+                    if (cell.xIndex + 1 < cellXCount && levelTiles[cell.xIndex + 1, cell.zIndex].Elevation < cell.Elevation) {
+                        direction |= TileDirectionType.R;
+                    }
+                    if (cell.xIndex - 1 >= 0 && levelTiles[cell.xIndex - 1, cell.zIndex].Elevation < cell.Elevation) {
+                        direction |= TileDirectionType.L;
+                    }
+                    if (cell.zIndex + 1 < cellZCount && levelTiles[cell.xIndex, cell.zIndex + 1].Elevation < cell.Elevation) {
+                        direction |= TileDirectionType.B;                
+                    }
+                    if (cell.zIndex - 1 >= 0 && levelTiles[cell.xIndex, cell.zIndex - 1].Elevation < cell.Elevation) {
+                        direction |= TileDirectionType.F;
+                    }
+
+                    switch (direction)
+                    {
+                        case TileDirectionType.N: entity.RenderingState.ModelId = createInfo.TileNone; break;
+                        case TileDirectionType.L: entity.RenderingState.ModelId = createInfo.TileL; break;
+                        case TileDirectionType.R: entity.RenderingState.ModelId = createInfo.TileR; break;
+                        case TileDirectionType.F: entity.RenderingState.ModelId = createInfo.TileF; break;
+                        case TileDirectionType.B: entity.RenderingState.ModelId = createInfo.TileB; break;
+                        case TileDirectionType.FULL: entity.RenderingState.ModelId = createInfo.TileFull; break;
+                        case TileDirectionType.RB: entity.RenderingState.ModelId = createInfo.TileRB; break;
+                        case TileDirectionType.RF: entity.RenderingState.ModelId = createInfo.TileRF; break;
+                        case TileDirectionType.LF: entity.RenderingState.ModelId = createInfo.TileLF; break;
+                        case TileDirectionType.LB: entity.RenderingState.ModelId = createInfo.TileLB; break;
+                        case TileDirectionType.RFB: entity.RenderingState.ModelId = createInfo.TileRFB; break;
+                        case TileDirectionType.LRF: entity.RenderingState.ModelId = createInfo.TileLRF; break;
+                        case TileDirectionType.LFB: entity.RenderingState.ModelId = createInfo.TileLFB; break;
+                        case TileDirectionType.LRB: entity.RenderingState.ModelId = createInfo.TileLRB; break;
+                    }
+
+                    switch (cell.type)
+                    {
+                        case LevelTileType.NONE:
+                        case LevelTileType.CONCRETE:    entity.RenderingState.MaterialReference = "Grey_Asphalt"; break;
+                        case LevelTileType.GRASS:       entity.RenderingState.MaterialReference = "Grass"; break;
+                        case LevelTileType.GRAVEL:      entity.RenderingState.MaterialReference = "Sand"; break;
+                        case LevelTileType.SAND:        entity.RenderingState.MaterialReference = "Sand"; break;
+                        case LevelTileType.WATER:       entity.RenderingState.MaterialReference = "Water";break;
+                        case LevelTileType.SNOW:        entity.RenderingState.MaterialReference = "Snow"; break;
+                    }
+                }
+            });
+
+            while (true)
+            {
+                Vector2 indices = GetRandomIndex();
                 if (PLaceBuilding01(indices))
                 {
                     createInfo.DesiredHouseCount--;
@@ -151,113 +278,42 @@ namespace SolarEditor
 
             ConnectRoads();
 
-            for (int x = 0; x < cellXCount; x++)
+            ForEachPlacement(placement =>
             {
-                for (int z = 0; z < cellZCount; z++)
+                switch (placement.type)
                 {
-                    LevelCell cell = levelCells[x, z];
-                    if (cell.type == LevelPlacementType.NONE)
-                    {
-                        if (cell.Elevation >= SnowElevation)
-                        {
-                            cell.Set(LevelPlacementType.TILE_SNOW, null);
+                    case LevelPlacementType.BUILDING01:
+                        { 
+                            Entity entity = scene.CreateEntity();
+                            entity.Position = GetPlacementWorldPostion(placement.xIndex, placement.zIndex);
+                            entity.RenderingState.ModelId = createInfo.Building01Model;
                         }
-                        else if (cell.Elevation >= GravelElevation)
+                        break;
+                    case LevelPlacementType.ROAD:
                         {
-                            cell.Set(LevelPlacementType.TILE_GRAVEL, null);
+                            Entity entity = scene.CreateEntity();
+                            entity.Position = GetPlacementWorldPostion(placement.xIndex, placement.zIndex);
+                            entity.RenderingState.ModelId = createInfo.RoadFlat;
                         }
-                        else if (cell.Elevation >= GrassElevation)
-                        {
-                            cell.Set(LevelPlacementType.TILE_GRASS, null);
-                        }
-                        else if (cell.Elevation >= SandElevation)
-                        {
-                            cell.Set(LevelPlacementType.TILE_SAND, null);
-                        }
-                        else if (cell.Elevation >= WaterElevation)
-                        {
-                            cell.Set(LevelPlacementType.TILE_WATER, null);
-                        }
-                        else
-                        {
-                            cell.Set(LevelPlacementType.TILE_WATER, null);
-                        }
-                    }                    
+                        break;
                 }
-            }
+            });
 
-            for (int x = 0; x < cellXCount; x++)
-            {
-                for (int z = 0; z < cellZCount; z++)
-                {
-                    LevelCell cell = levelCells[x, z];
-                    if (cell != null)
-                    {
-                        Entity entity = scene.CreateEntity();
-                        entity.Position = GetTileWorldPosition(x, z);
-                        entity.Position += new Vector3(0, cell.Elevation * TileHeight, 0);
-                        switch (cell.type)
-                        {
-                            case LevelPlacementType.NONE:
-                                break;
-                            case LevelPlacementType.TILE_CONCRETE: {                                    
-                                    entity.RenderingState.ModelId = createInfo.TileContreteModel;
-                                }
-                                break;
-                            case LevelPlacementType.TILE_GRASS: {
-                                    entity.RenderingState.ModelId = createInfo.TileGrassModel;
-                                }
-                                break;
-                            case LevelPlacementType.TILE_GRAVEL: {
-                                    entity.RenderingState.ModelId = createInfo.TileGravelModel;
-                                }
-                                break;
-                            case LevelPlacementType.TILE_SAND: {
-                                    entity.RenderingState.ModelId = createInfo.TileSandModel;
-                                }
-                                break;
-                            case LevelPlacementType.TILE_WATER: {
-                                    entity.RenderingState.ModelId = createInfo.TileWaterModel;
-                                }
-                                break;
-                            case LevelPlacementType.TILE_SNOW: {
-                                    entity.RenderingState.ModelId = createInfo.TileSnowModel;
-                                }
-                                break;
-                            case LevelPlacementType.BUILDING01: {
-                                    entity.Position += new Vector3(0, TileHeight, 0);                                    
-                                    entity.RenderingState.ModelId = createInfo.Building01Model;
-                                }
-                                break;
-                            case LevelPlacementType.ROAD: {
-                                    entity.Position += new Vector3(0, TileHeight, 0);
-                                    entity.RenderingState.ModelId = createInfo.RoadFlat;
-
-                                    Entity tile = scene.CreateEntity();
-                                    tile.Position = entity.Position - new Vector3(0, TileHeight, 0);
-                                    tile.RenderingState.ModelId = createInfo.TileContreteModel;
-
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
         }
 
         private void ConnectRoads()
         {
-            List<LevelCell> roads = new List<LevelCell>();
-            ForEachCell(x =>
+            List<LevelPlacement> roads = new List<LevelPlacement>();
+            ForEachPlacement(x =>
             {
                 if (x.type == LevelPlacementType.ROAD)
                 {
                     roads.Add(x);
                 }
             });
-
+            
             if (roads.Count > 0) {
-                LevelCell cell = roads[0];
+                LevelPlacement cell = roads[0];
                 for (int i = 1; i < roads.Count; i++)
                 {
                     ConnectRoad(cell, roads[i]);
@@ -265,19 +321,19 @@ namespace SolarEditor
             }
         }
 
-        private void ConnectRoad(LevelCell startPoint, LevelCell endPoint)
+        private void ConnectRoad(LevelPlacement startPoint, LevelPlacement endPoint)
         {
             bool[,] visited = new bool[cellXCount, cellZCount];
-            LevelCell[,] links = new LevelCell[cellXCount, cellZCount];
-            Queue<LevelCell> cells = new Queue<LevelCell>();
+            LevelPlacement [,] links = new LevelPlacement[cellXCount, cellZCount];
+            Queue<LevelPlacement> cells = new Queue<LevelPlacement>();
 
             visited[startPoint.xIndex, startPoint.zIndex] = true;
-            cells.Enqueue(startPoint);            
+            cells.Enqueue(startPoint);
 
-            LevelCell? goal = null;
+            LevelPlacement? goal = null;
             while (cells.Count > 0)
             {
-                LevelCell cell = cells.Dequeue();
+                LevelPlacement cell = cells.Dequeue();
 
                 if (cell == endPoint) {
                     goal = cell;
@@ -286,7 +342,7 @@ namespace SolarEditor
 
                 if (cell.xIndex + 1 < cellXCount && !visited[cell.xIndex + 1, cell.zIndex]) {
                     if (CanPlaceRoad(cell)) {
-                        cells.Enqueue(levelCells[cell.xIndex + 1, cell.zIndex]);
+                        cells.Enqueue(levelPlacements[cell.xIndex + 1, cell.zIndex]);
                         links[cell.xIndex + 1, cell.zIndex] = cell;
                         visited[cell.xIndex + 1, cell.zIndex] = true;
                     }
@@ -294,7 +350,7 @@ namespace SolarEditor
                 
                 if (cell.xIndex - 1 >= 0 && !visited[cell.xIndex - 1, cell.zIndex]) {
                     if (CanPlaceRoad(cell)) {
-                        cells.Enqueue(levelCells[cell.xIndex - 1, cell.zIndex]);
+                        cells.Enqueue(levelPlacements[cell.xIndex - 1, cell.zIndex]);
                         links[cell.xIndex - 1, cell.zIndex] = cell;
                         visited[cell.xIndex - 1, cell.zIndex] = true;
                     }
@@ -302,7 +358,7 @@ namespace SolarEditor
 
                 if (cell.zIndex + 1 < cellZCount && !visited[cell.xIndex, cell.zIndex + 1]) {
                     if (CanPlaceRoad(cell)) {
-                        cells.Enqueue(levelCells[cell.xIndex, cell.zIndex + 1]);
+                        cells.Enqueue(levelPlacements[cell.xIndex, cell.zIndex + 1]);
                         links[cell.xIndex, cell.zIndex + 1] = cell;
                         visited[cell.xIndex, cell.zIndex + 1] = true;
                     }
@@ -310,17 +366,17 @@ namespace SolarEditor
 
                 if (cell.zIndex - 1 >= 0 && !visited[cell.xIndex, cell.zIndex - 1]) {
                     if (CanPlaceRoad(cell)) { 
-                        cells.Enqueue(levelCells[cell.xIndex, cell.zIndex - 1]);
+                        cells.Enqueue(levelPlacements[cell.xIndex, cell.zIndex - 1]);
                         links[cell.xIndex, cell.zIndex - 1] = cell;
                         visited[cell.xIndex, cell.zIndex - 1] = true;
                     }
                 }
             }
 
-            List<LevelCell> path = new List<LevelCell>();
+            List<LevelPlacement> path = new List<LevelPlacement>();
             if (goal != null)
             {
-                LevelCell cur = links[goal.xIndex, goal.zIndex];
+                LevelPlacement cur = links[goal.xIndex, goal.zIndex];
                 while (cur != null)
                 {
                     path.Add(cur);
@@ -329,17 +385,17 @@ namespace SolarEditor
             }
          
 
-            foreach(LevelCell cur in path)
+            foreach(LevelPlacement cur in path)
             {
                 cur.type = LevelPlacementType.ROAD;
             }
         }
 
-        private bool CanPlaceRoad(LevelCell cell)
+        private bool CanPlaceRoad(LevelPlacement cell)
         {
-            if (cell.type == LevelPlacementType.NONE || cell.type == LevelPlacementType.ROAD)
+            if (cell.type == LevelPlacementType.NONE|| cell.type == LevelPlacementType.ROAD)
             {
-                if (cell.Elevation > WaterElevation)
+                if (levelTiles[cell.xIndex, cell.zIndex].type != LevelTileType.WATER)
                 {
                     return true;
                 }
@@ -359,12 +415,12 @@ namespace SolarEditor
             dir.x = dir.x > 0 ? dir.x + 1 : dir.x;
             dir.z = dir.z > 0 ? dir.z + 1 : dir.z;
 
-            if (CanPlaceBuilding2x2(x, z) && CanPlaceBuilding(x + (int)dir.x, z + (int)dir.z))
+            if (CanPlaceBuilding2x2(x, z) && CanPlaceBuilding(x + (int)dir.x, z + (int)dir.z, levelTiles[x, z].Elevation))
             {
                 Place2x2(x, z, LevelPlacementType.BUILDING01);
 
-                levelCells[x, z].direction = dir;
-                levelCells[x + (int)dir.x, z + (int)dir.z].Set(LevelPlacementType.ROAD, null);
+                levelPlacements[x, z].direction = dir;
+                levelPlacements[x + (int)dir.x, z + (int)dir.z].type = LevelPlacementType.ROAD;
                 return true;
             }
 
@@ -373,18 +429,19 @@ namespace SolarEditor
 
         private void Place2x2(int x, int z, LevelPlacementType type)
         {
-            levelCells[x, z].Set(type, null);
-            levelCells[x + 1, z + 1].Set(LevelPlacementType.OCCUPIED, levelCells[x, z]);
-            levelCells[x + 1, z].Set(LevelPlacementType.OCCUPIED, levelCells[x, z]);
-            levelCells[x, z + 1].Set(LevelPlacementType.OCCUPIED, levelCells[x, z]);
+            levelPlacements[x, z].type = type;
+            levelPlacements[x + 1, z + 1].type = LevelPlacementType.OCCUPIED;
+            levelPlacements[x + 1, z].type = LevelPlacementType.OCCUPIED;
+            levelPlacements[x, z + 1].type = LevelPlacementType.OCCUPIED;
         }
 
         private bool CanPlaceBuilding2x2(int x, int z)
         {
-            if (CanPlaceBuilding(x + 1, z) &&
-                CanPlaceBuilding(x, z + 1) && 
-                CanPlaceBuilding(x + 1, z + 1) && 
-                CanPlaceBuilding(x, z))
+            int el = levelTiles[x, z].Elevation;
+            if (CanPlaceBuilding(x + 1, z, el) &&
+                CanPlaceBuilding(x, z + 1, el) && 
+                CanPlaceBuilding(x + 1, z + 1, el) && 
+                CanPlaceBuilding(x, z, el))
             {
                 return true;
             }
@@ -403,18 +460,31 @@ namespace SolarEditor
             if (z < 0)
                 return false;
 
-            if (levelCells[x, z].type != LevelPlacementType.NONE)
+            if (levelPlacements[x, z].type != LevelPlacementType.NONE)
                 return false;
 
-            if (levelCells[x, z].Elevation <= WaterElevation)
+            if (levelTiles[x, z].Elevation <= WaterElevation)
                 return false;
 
             return true;
         }
 
+        private bool CanPlaceBuilding(int x, int z, int elevation)
+        {
+            if (CanPlaceBuilding(x, z) && levelTiles[x, z].Elevation == elevation)
+                return true;
+
+            return false;
+        }
+
         private Vector3 GetTileWorldPosition(int x, int z)
         {
             return new Vector3(x, 0, z) * TileDims - centerOffset;
+        }
+
+        private Vector3 GetPlacementWorldPostion(int x, int z)
+        {
+            return new Vector3(x * TileDims.x, levelTiles[x, z].Elevation * TileDims.y + 2, z * TileDims.z) - centerOffset;
         }
 
         private Vector3 GetRandomDirection()
@@ -436,13 +506,24 @@ namespace SolarEditor
             return new Vector2(random.Next(cellXCount), random.Next(cellZCount));
         }
 
-        private void ForEachCell(Action<LevelCell> predicate)
+        private void ForEachPlacement(Action<LevelPlacement> predicate)
         {
             for (int x = 0; x < cellXCount; x++)
             {
                 for (int z = 0; z < cellZCount; z++)
                 {
-                    predicate.Invoke(levelCells[x, z]);
+                    predicate.Invoke(levelPlacements[x, z]);
+                }
+            }
+        }
+
+        private void ForEachTile(Action<LevelTile> predicate)
+        {
+            for (int x = 0; x < cellXCount; x++)
+            {
+                for (int z = 0; z < cellZCount; z++)
+                {
+                    predicate.Invoke(levelTiles[x, z]);
                 }
             }
         }
@@ -465,6 +546,21 @@ namespace SolarEditor
                     
                     LevelCreateInfo createInfo = new LevelCreateInfo();
                     createInfo.DesiredHouseCount = (int)((float)TileHorizontalCount * 0.7f);
+
+                    createInfo.TileNone = AssetSystem.GetModelAsset("Tile_W.obj").Guid;
+                    createInfo.TileL = AssetSystem.GetModelAsset("Tile_L.obj").Guid;
+                    createInfo.TileR = AssetSystem.GetModelAsset("Tile_R.obj").Guid;
+                    createInfo.TileF = AssetSystem.GetModelAsset("Tile_F.obj").Guid;
+                    createInfo.TileB = AssetSystem.GetModelAsset("Tile_B.obj").Guid;
+                    createInfo.TileFull = AssetSystem.GetModelAsset("Tile_Full.obj").Guid;
+                    createInfo.TileRB = AssetSystem.GetModelAsset("Tile_RB.obj").Guid;
+                    createInfo.TileRF = AssetSystem.GetModelAsset("Tile_RF.obj").Guid;
+                    createInfo.TileLF = AssetSystem.GetModelAsset("Tile_LF.obj").Guid;
+                    createInfo.TileLB = AssetSystem.GetModelAsset("Tile_LB.obj").Guid;
+                    createInfo.TileRFB = AssetSystem.GetModelAsset("Tile_RFB.obj").Guid;
+                    createInfo.TileLRF = AssetSystem.GetModelAsset("Tile_LRF.obj").Guid;
+                    createInfo.TileLFB = AssetSystem.GetModelAsset("Tile_LFB.obj").Guid;
+                    createInfo.TileLRB = AssetSystem.GetModelAsset("Tile_LRB.obj").Guid; 
 
                     Guid.TryParse("c430f407-cf03-4a28-9876-98d7bcab5962", out createInfo.TileContreteModel);
                     Guid.TryParse("dfd0d315-0e1a-441b-8492-a1079d037810", out createInfo.TileGrassModel);

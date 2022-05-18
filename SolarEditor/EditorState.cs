@@ -22,11 +22,11 @@ using PlaneGame;
 *   -Trains {done}
 *   -City centers
 *   -Correct road
-*   -House rotation
-*   -Bridges?
 *   -Trees
 *   -Filler, eg plants
 *   -Cars
+*   -House rotation
+*   -Bridges?
 *   -People
 *   -Collapsing function.
 * Player:
