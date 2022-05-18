@@ -46,8 +46,6 @@ namespace SolarEditor
                     gameScene.RenderGraph = AssetSystem.RenderGraphs[currentRenderGraphAsset];
                 }
 
-                ImGui.Text(nameof(editorState.airGame.PlaneModel) + " " + editorState.airGame.PlaneModel);
-
                 if (ImGui.CollapsingHeader("Entities", 0))
                 {
                     Entity[] entities = gameScene.GetAllEntities();

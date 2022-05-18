@@ -18,6 +18,9 @@ namespace SolarEditor
             if (ImGui.Begin("Debug window", ref show))  {
                 ImGui.CheckBox("Show Bounding boxes", ref editorState.ShowBoundingBoxes );
                 ImGui.CheckBox("Show empties", ref editorState.ShowEmpties);
+
+                ImGui.Text("Draw calls: " + DebugVariables.DrawCalls);
+                ImGui.Text("Index count: " + DebugVariables.IndexCount);
             }
             ImGui.End();
         }

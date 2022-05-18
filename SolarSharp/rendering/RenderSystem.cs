@@ -102,7 +102,8 @@ namespace SolarSharp.Rendering
             });
 
             rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc { 
-                CullMode = RasterizerCullMode.BACK            
+                CullMode = RasterizerCullMode.BACK,
+                //FillMode = RasterizerFillMode.WIREFRAME
             });
             blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
 
@@ -199,7 +200,10 @@ namespace SolarSharp.Rendering
             context.SetPSSampler(samplerState2, 2);
 
             constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
-            int drawCallCount = 0;
+
+            DebugVariables.DrawCalls = 0;
+            DebugVariables.IndexCount = 0;
+
             if (shader != null && cube != null)
             {
                 if (shader.IsValid())
@@ -232,7 +236,8 @@ namespace SolarSharp.Rendering
                                         context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
                                         context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
                                         context.DrawIndexed(mesh.IndexCount, 0, 0);
-                                        drawCallCount++;
+                                        DebugVariables.DrawCalls++;
+                                        DebugVariables.IndexCount += (int)mesh.IndexCount;
                                     }
 
                                 }

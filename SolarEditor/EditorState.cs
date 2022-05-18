@@ -13,6 +13,41 @@ using PlaneGame;
 
 /*
 @TODO:
+* Level Gen:
+*   -Elevation {done}
+*   -Water {done}
+*   -Sand {done}
+*   -Gravel {done}
+*   -Oil container {done}
+*   -Trains {done}
+*   -City centers
+*   -Correct road
+*   -House rotation
+*   -Bridges?
+*   -Trees
+*   -Filler, eg plants
+*   -Cars
+*   -People
+*   -Collapsing function.
+* Player:
+*   - Model first plane {done}
+*   - Control steering, including speed boost {}
+*   - Implement mutliplayer networking
+*   - Shooting
+*   - Bombing
+*   - Power ups
+* Particles:
+*   - Clouds
+*   - ???
+*   - ???
+* Game:
+*   - Winning/Loosing
+*   - Score count
+*   - Death count
+* Sound:
+*   - Hook xAudio2.
+*   - Play basic music.
+*   - Add sounds effets, will expand this later.
 * Base Rendering:
 *   - Pack material index into vertex data
 *   - All material data does into a const buffer
@@ -22,11 +57,18 @@ using PlaneGame;
 *   - IBL
 *   - SHADOWS
 *   - SSAO
-* Mouse picking
-* Clip board
+*   - BLOOM
+* Menu System:
+*   - Text rendering
+*   - Buttons
+* Serialization:
+*   - Packed model assets
+*   - Packed material assets
+*   - Load model assets
+*   - load material assets
+*   
 * Selection indication - draw bb
 * Gizmo for multple entities
-* 
 */
 
 namespace SolarEditor
@@ -184,6 +226,7 @@ namespace SolarEditor
         public bool ShowBoundingBoxes = false;
         public bool ShowEmpties = false;
 
+        public bool inGame = false;
         public AirGame airGame = new AirGame();
 
         public EditorContext currentContext = new EditorContext();
@@ -240,264 +283,279 @@ namespace SolarEditor
 
         internal GameScene Update()
         {
-            ImGui.BeginFrame();
-
-
-            if (!currentContext.camera.Operate())
+            if (!inGame)
             {
-                DrawGlobalMenu();
-                ShowWindows();
+                ImGui.BeginFrame();
 
-                if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
+                if (!currentContext.camera.Operate())
                 {
-                    if (!EventSystem.Fire(EventType.ON_SAVE, null))
-                    {
-                        AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, currentContext.scene.CreateSceneAsset());
-                    }
-                }
+                    DrawGlobalMenu();
+                    ShowWindows();
 
-                bool usingGizmo = gizmo.Operate(currentContext.camera, 
-                    currentContext.selection.SelectedEntities.Select(x => x.GetEntity()).ToList(), 
-                    currentContext.undoSystem);
-
-                if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered() && !usingGizmo)
-                {                    
-                    if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
+                    if (Input.IskeyJustDown(KeyCode.S) && Input.IsKeyDown(KeyCode.CTRL_L))
                     {
-                        Ray ray = currentContext.camera.ShootRayFromMousePos();
-        
-                        Entity? selectedEntity = null;
-                        float minDist = float.MaxValue;
-                        foreach (var entity in currentContext.scene.GetAllEntities())
+                        if (!EventSystem.Fire(EventType.ON_SAVE, null))
                         {
-                            RaycastInfo info;
+                            AssetSystem.SaveGameSceneAsset(Application.Config.AssetPath, currentContext.scene.CreateSceneAsset());
+                        }
+                    }
 
-                            if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info))
+                    bool usingGizmo = gizmo.Operate(currentContext.camera,
+                        currentContext.selection.SelectedEntities.Select(x => x.GetEntity()).ToList(),
+                        currentContext.undoSystem);
+
+                    if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsAnyItemHovered() && !usingGizmo)
+                    {
+                        if (Input.IsMouseButtonJustDown(MouseButton.MOUSE1))
+                        {
+                            Ray ray = currentContext.camera.ShootRayFromMousePos();
+
+                            Entity? selectedEntity = null;
+                            float minDist = float.MaxValue;
+                            foreach (var entity in currentContext.scene.GetAllEntities())
                             {
-                                if (info.t > minDist)
-                                    continue;
+                                RaycastInfo info;
 
-                                if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
+                                if (Raycast.AlignedBox(ray, entity.WorldSpaceBoundingBox, out info))
                                 {
-                                    ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
-                                    if (modelAsset != null)
+                                    if (info.t > minDist)
+                                        continue;
+
+                                    if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
                                     {
-                                        Matrix4 transformMatrix = entity.ComputeTransformMatrix();
-                                        foreach (MeshAsset meshAsset in modelAsset.meshes)
+                                        ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
+                                        if (modelAsset != null)
                                         {
-                                            List<Triangle> triangles = meshAsset.BuildTriangles();
-                                            foreach (Triangle triangle in triangles)
+                                            Matrix4 transformMatrix = entity.ComputeTransformMatrix();
+                                            foreach (MeshAsset meshAsset in modelAsset.meshes)
                                             {
-                                                if (Raycast.Triangle(ray, Triangle.Transform(triangle, transformMatrix), out info))
+                                                List<Triangle> triangles = meshAsset.BuildTriangles();
+                                                foreach (Triangle triangle in triangles)
                                                 {
-                                                    if (info.t < minDist)
+                                                    if (Raycast.Triangle(ray, Triangle.Transform(triangle, transformMatrix), out info))
                                                     {
-                                                        minDist = info.t;
-                                                        selectedEntity = entity;
+                                                        if (info.t < minDist)
+                                                        {
+                                                            minDist = info.t;
+                                                            selectedEntity = entity;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }  
-                            }
-                        }
-
-                        if (selectedEntity != null)
-                        {
-                            if (Input.IsKeyDown(KeyCode.SHIFT_L))
-                            {
-                                currentContext.selection.Add(selectedEntity, true);
-                            }
-                            else
-                            {
-                                currentContext.selection.Set(selectedEntity, true);
-                            }
-                        }
-                        else
-                        {
-                            currentContext.selection.Clear(true);                            
-                        }
-                    }
-                }
-
-                if (!ImGui.WantCaptureKeyboard())
-                {
-                    if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
-                    {
-                        Entity entity = currentContext.scene.CreateEntity();
-                        currentContext.selection.Set(entity, false);
-                        AddWindow(new EntityWindow());
-
-                        currentContext.undoSystem.Add(
-                            new CreateEntityUndoAction(currentContext.scene, 
-                            currentContext.selection, 
-                            currentContext.selection.GetValidEntities()));
-                    }
-
-                    if (Input.IskeyJustDown(KeyCode.DEL))
-                    {
-                        if (currentContext.selection.SelectedEntities.Count > 0)
-                        {
-                            currentContext.undoSystem.Add(
-                                new DeleteEntityUndoAction(currentContext.scene, 
-                                currentContext.selection, 
-                                currentContext.selection.GetValidEntities()));
-
-                            foreach (EntityReference entityReference in currentContext.selection.SelectedEntities)
-                            {
-                                currentContext.scene.DestroyEntity(entityReference);
-                            }
-                            currentContext.selection.Clear(false);
-                        }                       
-                    }
-
-                    if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
-                    {
-                        if (currentContext.selection.SelectedEntities.Count > 0)
-                        {
-                            List<Entity> newEntities = new List<Entity>();
-                            foreach (EntityReference entityReference in currentContext.selection.SelectedEntities)
-                            {
-                                Entity? entity = entityReference.GetEntity();
-                                if (entity != null)
-                                {
-                                    Entity newEntity = currentContext.scene.CreateEntity(entity.CreateEntityAsset());
-                                    newEntity.Position += Vector3.UnitX; 
-                                    newEntities.Add(newEntity);
                                 }
                             }
 
-                            currentContext.AddEntities(newEntities.ToArray());
-                        }
-                    }
-
-
-                    if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
-                    {
-                        currentContext.undoSystem.Redo();
-                    }
-                    else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
-                    {
-                        currentContext.undoSystem.Undo();
-                    }
-
-                    if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.C)) 
-                    {
-                        if (currentContext.selection.SelectedEntities.Count > 0)
-                        {
-                            Logger.Trace($"Copied {currentContext.selection.SelectedEntities.Count } entties");
-                            clipboard.copiedEntities = currentContext.selection.GetValidEntities().Select(x => x.CreateEntityAsset()).ToList();
-                        }
-                    }
-
-                    if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.V))
-                    {
-                        //Logger.Trace($"Copied {currentContext.selection.SelectedEntities.Count } entties");
-                        if (clipboard.copiedEntities.Count > 0)
-                        {
-                            List<Entity> newEntities = new List<Entity>(); 
-
-                            foreach (var entity in clipboard.copiedEntities)
+                            if (selectedEntity != null)
                             {
-                                Entity e = currentContext.scene.CreateEntity(entity);
-                                e.Position += Vector3.UnitX;
-                                newEntities.Add(e);
+                                if (Input.IsKeyDown(KeyCode.SHIFT_L))
+                                {
+                                    currentContext.selection.Add(selectedEntity, true);
+                                }
+                                else
+                                {
+                                    currentContext.selection.Set(selectedEntity, true);
+                                }
                             }
-
-                            currentContext.AddEntities(newEntities.ToArray());
-                        }
-                    }
-
-                    if (Input.IskeyJustDown(KeyCode.F1))
-                    {
-                        if (!HasWindow(typeof(ConsoleWindow)))
-                        {
-                            AddWindow(new ConsoleWindow());
-                        }
-                        else
-                        {
-                            GetWindow<ConsoleWindow>()?.Close();
-                        }
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F2))
-                    {
-                        AddWindow(new ShaderEditorWindow(null));
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F3))
-                    {
-                        AddWindow(new RenderGraphWindow());
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F4))
-                    {
-                        AddWindow(new AssetSystemWindow());
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F6))
-                    {
-                        AddWindow(new GameSceneWindow());
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F7))
-                    {
-                        AddWindow(new EntityWindow());
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F8))
-                    {
-                        AddWindow(new DebugWindow());
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.F9))
-                    {
-                        AddWindow(new LevelGeneratorWindow());
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.ESCAPE))
-                    {
-                        CloseAllWindows();
-                    }
-                    else if (Input.IskeyJustDown(KeyCode.TAB))
-                    {
-                        if (currentContext == workingContext)
-                        {
-                            if (paletteContext.scene.EntityCount == 0) {
-                                CreatePaletteScene();
+                            else
+                            {
+                                currentContext.selection.Clear(true);
                             }
-                            currentContext = paletteContext;
-                        }
-                        else
-                        {
-                            currentContext = workingContext;
                         }
                     }
-                }
 
-                currentContext.scene.GetAllEntities().ToList().ForEach(entity =>
-                {
-                    if (ShowBoundingBoxes)
+                    if (!ImGui.WantCaptureKeyboard())
                     {
+                        if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.A))
+                        {
+                            Entity entity = currentContext.scene.CreateEntity();
+                            currentContext.selection.Set(entity, false);
+                            AddWindow(new EntityWindow());
+
+                            currentContext.undoSystem.Add(
+                                new CreateEntityUndoAction(currentContext.scene,
+                                currentContext.selection,
+                                currentContext.selection.GetValidEntities()));
+                        }
+
+                        if (Input.IskeyJustDown(KeyCode.DEL))
+                        {
+                            if (currentContext.selection.SelectedEntities.Count > 0)
+                            {
+                                currentContext.undoSystem.Add(
+                                    new DeleteEntityUndoAction(currentContext.scene,
+                                    currentContext.selection,
+                                    currentContext.selection.GetValidEntities()));
+
+                                foreach (EntityReference entityReference in currentContext.selection.SelectedEntities)
+                                {
+                                    currentContext.scene.DestroyEntity(entityReference);
+                                }
+                                currentContext.selection.Clear(false);
+                            }
+                        }
+
+                        if (Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.D))
+                        {
+                            if (currentContext.selection.SelectedEntities.Count > 0)
+                            {
+                                List<Entity> newEntities = new List<Entity>();
+                                foreach (EntityReference entityReference in currentContext.selection.SelectedEntities)
+                                {
+                                    Entity? entity = entityReference.GetEntity();
+                                    if (entity != null)
+                                    {
+                                        Entity newEntity = currentContext.scene.CreateEntity(entity.CreateEntityAsset());
+                                        newEntity.Position += Vector3.UnitX;
+                                        newEntities.Add(newEntity);
+                                    }
+                                }
+
+                                currentContext.AddEntities(newEntities.ToArray());
+                            }
+                        }
+
+
+                        if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IsKeyDown(KeyCode.SHIFT_L) && Input.IskeyJustDown(KeyCode.Z))
+                        {
+                            currentContext.undoSystem.Redo();
+                        }
+                        else if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.Z))
+                        {
+                            currentContext.undoSystem.Undo();
+                        }
+
+                        if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.C))
+                        {
+                            if (currentContext.selection.SelectedEntities.Count > 0)
+                            {
+                                Logger.Trace($"Copied {currentContext.selection.SelectedEntities.Count } entties");
+                                clipboard.copiedEntities = currentContext.selection.GetValidEntities().Select(x => x.CreateEntityAsset()).ToList();
+                            }
+                        }
+
+                        if (Input.IsKeyDown(KeyCode.CTRL_L) && Input.IskeyJustDown(KeyCode.V))
+                        {
+                            //Logger.Trace($"Copied {currentContext.selection.SelectedEntities.Count } entties");
+                            if (clipboard.copiedEntities.Count > 0)
+                            {
+                                List<Entity> newEntities = new List<Entity>();
+
+                                foreach (var entity in clipboard.copiedEntities)
+                                {
+                                    Entity e = currentContext.scene.CreateEntity(entity);
+                                    e.Position += Vector3.UnitX;
+                                    newEntities.Add(e);
+                                }
+
+                                currentContext.AddEntities(newEntities.ToArray());
+                            }
+                        }
+
+                        if (Input.IskeyJustDown(KeyCode.F1))
+                        {
+                            if (!HasWindow(typeof(ConsoleWindow)))
+                            {
+                                AddWindow(new ConsoleWindow());
+                            }
+                            else
+                            {
+                                GetWindow<ConsoleWindow>()?.Close();
+                            }
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F2))
+                        {
+                            AddWindow(new ShaderEditorWindow(null));
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F3))
+                        {
+                            AddWindow(new RenderGraphWindow());
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F4))
+                        {
+                            AddWindow(new AssetSystemWindow());
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F5))
+                        {
+                            inGame = true;
+                            airGame.Start(currentContext.scene);
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F6))
+                        {
+                            AddWindow(new GameSceneWindow());
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F7))
+                        {
+                            AddWindow(new EntityWindow());
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F8))
+                        {
+                            AddWindow(new DebugWindow());
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.F9))
+                        {
+                            AddWindow(new LevelGeneratorWindow());
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.ESCAPE))
+                        {
+                            CloseAllWindows();
+                        }
+                        else if (Input.IskeyJustDown(KeyCode.TAB))
+                        {
+                            if (currentContext == workingContext)
+                            {
+                                if (paletteContext.scene.EntityCount == 0)
+                                {
+                                    CreatePaletteScene();
+                                }
+                                currentContext = paletteContext;
+                            }
+                            else
+                            {
+                                currentContext = workingContext;
+                            }
+                        }
+                    }
+
+                    currentContext.scene.GetAllEntities().ToList().ForEach(entity =>
+                    {
+                        if (ShowBoundingBoxes)
+                        {
 
                         //DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
                     }
 
-                    if (ShowEmpties)
-                    {
+                        if (ShowEmpties)
+                        {
                         //if (entity.Material.ModelId == Guid.Empty) {
                         //    DebugDraw.Point(entity.Position);s
                         //}
                     }
-                });
-               
-                foreach (EntityReference reff in currentContext.selection.SelectedEntities)
-                {
-                    Entity? entity = reff.GetEntity();
-                    if (entity != null)
-                        DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
-                }
+                    });
 
+                    foreach (EntityReference reff in currentContext.selection.SelectedEntities)
+                    {
+                        Entity? entity = reff.GetEntity();
+                        if (entity != null)
+                            DebugDraw.AlignedBox(entity.WorldSpaceBoundingBox);
+                    }
+
+                }                
             }
-
-        
+            else
+            {
+                airGame.FrameUpdate(currentContext.scene);
+                if (Input.IskeyJustDown(KeyCode.F5))
+                {
+                    airGame.Shutdown(currentContext.scene);
+                    currentContext.scene.Camera = currentContext.camera;
+                    inGame = false;
+                }
+            }
 
             return currentContext.scene;
         }
-
         internal void CreatePaletteScene()
         {
             paletteContext.scene.DestroyAllEntities();
@@ -528,7 +586,10 @@ namespace SolarEditor
 
         internal void UIDraw()
         {
-            ImGui.EndFrame();
+            if (!inGame)
+            {
+                ImGui.EndFrame();
+            }
         }  
 
         internal T AddWindow<T>(T window) where T : EditorWindow

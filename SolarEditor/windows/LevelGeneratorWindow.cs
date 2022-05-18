@@ -14,11 +14,18 @@ namespace SolarEditor
     {
         NONE,
         OCCUPIED,
-        CONCRETE,
-        GRASS,
+        
+        TILE_CONCRETE,
+        TILE_GRASS,
+        TILE_GRAVEL,
+        TILE_SAND,
+        TILE_SNOW,
+        TILE_WATER,
+
         BUILDING01,
         ROAD,
     }
+
     internal class LevelCell
     {
         public LevelPlacementType type;
@@ -26,7 +33,7 @@ namespace SolarEditor
         public int zIndex;
 
         public Vector3 direction = Vector3.Zero;
-        public LevelCell link;
+        public LevelCell? link;
 
         public int Elevation = 0;
 
@@ -37,7 +44,7 @@ namespace SolarEditor
             this.type = type;
         }
 
-        public void Set(LevelPlacementType type, LevelCell link)
+        public void Set(LevelPlacementType type, LevelCell? link)
         {
             this.type = type;
             this.link = link;
@@ -51,6 +58,11 @@ namespace SolarEditor
 
         public Guid TileContreteModel;
         public Guid TileGrassModel;
+        public Guid TileGravelModel;
+        public Guid TileSnowModel;
+        public Guid TileWaterModel;
+        public Guid TileSandModel;
+
         public Guid RoadForwardModel;
         public Guid RoadFlat;
         public Guid Building01Model;
@@ -65,10 +77,16 @@ namespace SolarEditor
         private const int TileDepth = 4;
         private const int TileHeight = 2;
 
+        private const int SnowElevation = 3;
+        private const int GravelElevation = 2;
+        private const int GrassElevation = -1;
+        private const int SandElevation = -2;
+        private const int WaterElevation = -3;
+
         private Vector3 TileDims = new Vector3(TileWidth, TileHeight, TileDepth);
         private Vector3 centerOffset;
 
-        private int cX;        
+        private int cX;
         private int cZ;
 
         private LevelCell[,] levelCells;
@@ -116,8 +134,8 @@ namespace SolarEditor
                 float sX = c.xIndex / (float)cellXCount;
                 float sZ = c.zIndex / (float)cellZCount;
                                 
-                //c.Elevation = (int)MathF.Round(PerlinNoise.Noise(sX, sZ) * 6);
-                c.Elevation = 0;
+                c.Elevation = (int)MathF.Round(PerlinNoise.Noise(sX, sZ) * 6);
+                //c.Elevation = 0;
             });
 
 
@@ -137,9 +155,33 @@ namespace SolarEditor
             {
                 for (int z = 0; z < cellZCount; z++)
                 {
-                    if (levelCells[x, z].type == LevelPlacementType.NONE)
+                    LevelCell cell = levelCells[x, z];
+                    if (cell.type == LevelPlacementType.NONE)
                     {
-                        //levelCells[x, z].Set(LevelPlacementType.GRASS, null);
+                        if (cell.Elevation >= SnowElevation)
+                        {
+                            cell.Set(LevelPlacementType.TILE_SNOW, null);
+                        }
+                        else if (cell.Elevation >= GravelElevation)
+                        {
+                            cell.Set(LevelPlacementType.TILE_GRAVEL, null);
+                        }
+                        else if (cell.Elevation >= GrassElevation)
+                        {
+                            cell.Set(LevelPlacementType.TILE_GRASS, null);
+                        }
+                        else if (cell.Elevation >= SandElevation)
+                        {
+                            cell.Set(LevelPlacementType.TILE_SAND, null);
+                        }
+                        else if (cell.Elevation >= WaterElevation)
+                        {
+                            cell.Set(LevelPlacementType.TILE_WATER, null);
+                        }
+                        else
+                        {
+                            cell.Set(LevelPlacementType.TILE_WATER, null);
+                        }
                     }                    
                 }
             }
@@ -158,26 +200,43 @@ namespace SolarEditor
                         {
                             case LevelPlacementType.NONE:
                                 break;
-                            case LevelPlacementType.CONCRETE:
-                                {                                    
+                            case LevelPlacementType.TILE_CONCRETE: {                                    
                                     entity.RenderingState.ModelId = createInfo.TileContreteModel;
                                 }
                                 break;
-                            case LevelPlacementType.GRASS:
-                                {
+                            case LevelPlacementType.TILE_GRASS: {
                                     entity.RenderingState.ModelId = createInfo.TileGrassModel;
                                 }
                                 break;
-                            case LevelPlacementType.BUILDING01:
-                                {
+                            case LevelPlacementType.TILE_GRAVEL: {
+                                    entity.RenderingState.ModelId = createInfo.TileGravelModel;
+                                }
+                                break;
+                            case LevelPlacementType.TILE_SAND: {
+                                    entity.RenderingState.ModelId = createInfo.TileSandModel;
+                                }
+                                break;
+                            case LevelPlacementType.TILE_WATER: {
+                                    entity.RenderingState.ModelId = createInfo.TileWaterModel;
+                                }
+                                break;
+                            case LevelPlacementType.TILE_SNOW: {
+                                    entity.RenderingState.ModelId = createInfo.TileSnowModel;
+                                }
+                                break;
+                            case LevelPlacementType.BUILDING01: {
                                     entity.Position += new Vector3(0, TileHeight, 0);                                    
                                     entity.RenderingState.ModelId = createInfo.Building01Model;
                                 }
                                 break;
-                            case LevelPlacementType.ROAD:
-                                {
+                            case LevelPlacementType.ROAD: {
                                     entity.Position += new Vector3(0, TileHeight, 0);
                                     entity.RenderingState.ModelId = createInfo.RoadFlat;
+
+                                    Entity tile = scene.CreateEntity();
+                                    tile.Position = entity.Position - new Vector3(0, TileHeight, 0);
+                                    tile.RenderingState.ModelId = createInfo.TileContreteModel;
+
                                 }
                                 break;
                         }
@@ -226,7 +285,7 @@ namespace SolarEditor
                 }
 
                 if (cell.xIndex + 1 < cellXCount && !visited[cell.xIndex + 1, cell.zIndex]) {
-                    if (cell.type == LevelPlacementType.NONE || cell.type == LevelPlacementType.ROAD) {
+                    if (CanPlaceRoad(cell)) {
                         cells.Enqueue(levelCells[cell.xIndex + 1, cell.zIndex]);
                         links[cell.xIndex + 1, cell.zIndex] = cell;
                         visited[cell.xIndex + 1, cell.zIndex] = true;
@@ -234,7 +293,7 @@ namespace SolarEditor
                 }
                 
                 if (cell.xIndex - 1 >= 0 && !visited[cell.xIndex - 1, cell.zIndex]) {
-                    if (cell.type == LevelPlacementType.NONE || cell.type == LevelPlacementType.ROAD) {
+                    if (CanPlaceRoad(cell)) {
                         cells.Enqueue(levelCells[cell.xIndex - 1, cell.zIndex]);
                         links[cell.xIndex - 1, cell.zIndex] = cell;
                         visited[cell.xIndex - 1, cell.zIndex] = true;
@@ -242,7 +301,7 @@ namespace SolarEditor
                 }
 
                 if (cell.zIndex + 1 < cellZCount && !visited[cell.xIndex, cell.zIndex + 1]) {
-                    if (cell.type == LevelPlacementType.NONE || cell.type == LevelPlacementType.ROAD) {
+                    if (CanPlaceRoad(cell)) {
                         cells.Enqueue(levelCells[cell.xIndex, cell.zIndex + 1]);
                         links[cell.xIndex, cell.zIndex + 1] = cell;
                         visited[cell.xIndex, cell.zIndex + 1] = true;
@@ -250,7 +309,7 @@ namespace SolarEditor
                 }
 
                 if (cell.zIndex - 1 >= 0 && !visited[cell.xIndex, cell.zIndex - 1]) {
-                    if (cell.type == LevelPlacementType.NONE || cell.type == LevelPlacementType.ROAD) {
+                    if (CanPlaceRoad(cell)) { 
                         cells.Enqueue(levelCells[cell.xIndex, cell.zIndex - 1]);
                         links[cell.xIndex, cell.zIndex - 1] = cell;
                         visited[cell.xIndex, cell.zIndex - 1] = true;
@@ -274,7 +333,18 @@ namespace SolarEditor
             {
                 cur.type = LevelPlacementType.ROAD;
             }
+        }
 
+        private bool CanPlaceRoad(LevelCell cell)
+        {
+            if (cell.type == LevelPlacementType.NONE || cell.type == LevelPlacementType.ROAD)
+            {
+                if (cell.Elevation > WaterElevation)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool PLaceBuilding01(Vector2 indices)
@@ -289,7 +359,7 @@ namespace SolarEditor
             dir.x = dir.x > 0 ? dir.x + 1 : dir.x;
             dir.z = dir.z > 0 ? dir.z + 1 : dir.z;
 
-            if (CanPlace2x2(x, z) && CanPlaceCell(x + (int)dir.x, z + (int)dir.z))
+            if (CanPlaceBuilding2x2(x, z) && CanPlaceBuilding(x + (int)dir.x, z + (int)dir.z))
             {
                 Place2x2(x, z, LevelPlacementType.BUILDING01);
 
@@ -309,12 +379,12 @@ namespace SolarEditor
             levelCells[x, z + 1].Set(LevelPlacementType.OCCUPIED, levelCells[x, z]);
         }
 
-        private bool CanPlace2x2(int x, int z)
+        private bool CanPlaceBuilding2x2(int x, int z)
         {
-            if (CanPlaceCell(x + 1, z) &&
-                CanPlaceCell(x, z + 1) && 
-                CanPlaceCell(x + 1, z + 1) && 
-                CanPlaceCell(x, z))
+            if (CanPlaceBuilding(x + 1, z) &&
+                CanPlaceBuilding(x, z + 1) && 
+                CanPlaceBuilding(x + 1, z + 1) && 
+                CanPlaceBuilding(x, z))
             {
                 return true;
             }
@@ -322,7 +392,7 @@ namespace SolarEditor
             return false;
         }
 
-        private bool CanPlaceCell(int x, int z)
+        private bool CanPlaceBuilding(int x, int z)
         {
             if (x >= cellXCount)
                 return false;
@@ -334,6 +404,9 @@ namespace SolarEditor
                 return false;
 
             if (levelCells[x, z].type != LevelPlacementType.NONE)
+                return false;
+
+            if (levelCells[x, z].Elevation <= WaterElevation)
                 return false;
 
             return true;
@@ -391,10 +464,16 @@ namespace SolarEditor
                 {
                     
                     LevelCreateInfo createInfo = new LevelCreateInfo();
-                    createInfo.DesiredHouseCount = TileHorizontalCount / 3;
+                    createInfo.DesiredHouseCount = (int)((float)TileHorizontalCount * 0.7f);
+
                     Guid.TryParse("c430f407-cf03-4a28-9876-98d7bcab5962", out createInfo.TileContreteModel);
                     Guid.TryParse("dfd0d315-0e1a-441b-8492-a1079d037810", out createInfo.TileGrassModel);
-                    Guid.TryParse("a1fc79b4-8e82-4a2f-b551-ab077f26c823", out createInfo.Building01Model);                    
+                    Guid.TryParse("b84a53b7-54ac-47cf-89b1-5a113f58e1a8", out createInfo.TileGravelModel);
+                    Guid.TryParse("4edc2c7e-fa26-4cff-bd3f-b5273c84157e", out createInfo.TileSnowModel);                    
+                    Guid.TryParse("55ca9ce2-eb3a-42a5-b096-cc2e9aca761b", out createInfo.TileWaterModel);
+                    Guid.TryParse("72faa7d3-1b8d-4081-a350-0905f435f7dc", out createInfo.TileSandModel);                    
+
+                    Guid.TryParse("a1fc79b4-8e82-4a2f-b551-ab077f26c823", out createInfo.Building01Model);  
                     Guid.TryParse("a0d1c221-ae20-4a63-b772-87c00e278ad8", out createInfo.RoadFlat);
                     Guid.TryParse("f94aa063-7bb2-427e-826a-55af086e6dff", out createInfo.RoadForwardModel);
 

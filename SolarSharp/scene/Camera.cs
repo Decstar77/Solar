@@ -14,10 +14,10 @@ namespace SolarSharp
 		private Quaternion orientation = Quaternion.Identity;
 
 		protected float far = 100.0f;
-		public float Far { get { return far; } }
+		public float Far { get { return far; } set { far = value; } }
 
 		protected float near = 0.1f;
-		public float Near { get { return near; } }
+		public float Near { get { return near; } set { near = value; } }
 
 		protected float yfov = Util.DegToRad(45.0f);
 		public float YFovDegrees { get { return Util.RadToDeg(yfov); } set { yfov = Util.DegToRad(value); } }
@@ -49,6 +49,12 @@ namespace SolarSharp
             ray.direction = Vector3.Normalize(new Vector3(worldCoods.x, worldCoods.y, worldCoods.z));
 
             return ray;
+        }
+
+		public void LookAt(Vector3 worldPoint)
+        {
+			Matrix4 matrix = Matrix4.CreateLookAtRH(Position, worldPoint, Vector3.UnitY);
+			orientation = Matrix4.ToQuaternion(matrix);
         }
 
         public Matrix4 GetViewMatrix() { return Matrix4.TranslateRH(Quaternion.ToMatrix4(Orientation), Position).Inverse; }

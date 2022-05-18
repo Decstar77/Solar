@@ -8,9 +8,9 @@ namespace SolarSharp.Core
 {
     public interface Game
     {
-        public bool Start();
-        public void FrameUpdate();
-        public void TickUpdate();
-        public void Shutdown();
+        public bool Start(GameScene scene);
+        public void FrameUpdate(GameScene scene);
+        public void TickUpdate(GameScene scene);
+        public void Shutdown(GameScene scene);
     }
 }

@@ -35,7 +35,7 @@
     <Compile Include="core\Application.cs" />
     <Compile Include="core\ApplicationConfig.cs" />
     <Compile Include="core\Clock.cs" />
-    <Compile Include="core\DebugDraw.cs" />
+    <Compile Include="core\Debug.cs" />
     <Compile Include="core\EventSystem.cs" />
     <Compile Include="core\Game.cs" />
     <Compile Include="core\Input.cs" />

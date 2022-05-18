@@ -152,8 +152,16 @@ namespace SolarSharp
             Parent = asset.parent;
             Children = asset.children;
         }
-        
-        public void SetTransform(Matrix4 m) => Matrix4.Decompose(m, out position, out orientation, out scale);
+
+        public void SetTransform(Matrix4 m)
+        {
+            Matrix4.Decompose(m, out position, out orientation, out scale);
+        }
+
+        public Vector3 GetForward() 
+        {
+            return Quaternion.ToBasis(orientation).forward;
+        }
 
         public Matrix4 ComputeTransformMatrix()
         {

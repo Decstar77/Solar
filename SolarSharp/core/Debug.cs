@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace SolarSharp.core
 {
+    public static class DebugVariables
+    {
+        public static int DrawCalls { get; set; }
+        public static int IndexCount { get; set; }
+    }
+
     public static class DebugDraw
     {
 		private static GraphicsShader shader = null;

@@ -105,6 +105,7 @@ namespace SolarSharp
 		DEL,
 		ESCAPE,
 		TAB,
+		SPACE,
 	}
 
     public enum MouseButton
@@ -220,6 +221,8 @@ namespace SolarSharp
 					return IskeyJustDown(Application.Input.tab, Application.OldInput.tab);
 				case KeyCode.V:
 					return IskeyJustDown(Application.Input.v, Application.OldInput.v);
+				case KeyCode.SPACE:
+					return IskeyJustDown(Application.Input.space, Application.OldInput.space);
 			}
 			return false;
         }
@@ -280,6 +283,9 @@ namespace SolarSharp
 					return (Application.Input.c);
 				case KeyCode.V:
 					return (Application.Input.v);
+				case KeyCode.SPACE:
+					return (Application.Input.space);
+
 			}
 			return false;
 		}
