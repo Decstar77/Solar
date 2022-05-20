@@ -25,8 +25,11 @@ namespace SolarSharp.Assets
         private static Dictionary<Guid, SceneAsset> scenes = new Dictionary<Guid, SceneAsset>();        
         private static Dictionary<Guid, ModelAsset> modelAssets = new Dictionary<Guid, ModelAsset>();
         private static List<TextureAsset> textureAssets = new List<TextureAsset>();
-        private static List<MaterialAsset> materialAssets = new List<MaterialAsset>();
-        
+
+
+        private static Dictionary<Guid, MaterialAsset> materialAssets = new Dictionary<Guid, MaterialAsset>();
+        private static HashSet<string> materialNames = new HashSet<string>();
+
         public static ModelAsset? GetModelAsset(string name)
         {
             lock (modelAssets)
@@ -181,12 +184,12 @@ namespace SolarSharp.Assets
         public static void AddMaterialAsset(MaterialAsset materialAsset)
         {
             lock (materialAssets)
-            {
-                // @TODO: Speed this up with hash table things prehaps ?
-                if (materialAssets.Find(x => x.name == materialAsset.name) == null)
+            {                
+                if (!materialAssets.ContainsKey(materialAsset.Guid) && !materialNames.Contains(materialAsset.name))
                 {
                     Logger.Trace($"Placing {materialAsset.name}");
-                    materialAssets.Add(materialAsset);
+                    materialAssets.Add(materialAsset.Guid, materialAsset);
+                    materialNames.Add(materialAsset.name);
                 }
                 else
                 {
@@ -201,12 +204,11 @@ namespace SolarSharp.Assets
             {
                 foreach (MaterialAsset materialAsset in materials)
                 {
-
-                    // @TODO: Speed this up with hash table things prehaps ?
-                    if (materialAssets.Find(x => x.name == materialAsset.name) == null)
+                    if (!materialAssets.ContainsKey(materialAsset.Guid) && !materialNames.Contains(materialAsset.name))
                     {
                         Logger.Trace($"Placing {materialAsset.name}");
-                        materialAssets.Add(materialAsset);
+                        materialAssets.Add(materialAsset.Guid, materialAsset);
+                        materialNames.Add(materialAsset.name);
                     }
                     else
                     {
@@ -220,17 +222,41 @@ namespace SolarSharp.Assets
         {
             lock (materialAssets)
             {
-                materialAssets.Sort((x, y) => (x.name.CompareTo(y.name)));
-                List<MaterialAsset> materials = new List<MaterialAsset>(materialAssets);
-                return materials;
+                return materialAssets.Select(x => x.Value).ToList();
             }
+        }
+        public static MaterialAsset? GetMaterialAsset(Guid id)
+        {
+            lock (materialAssets)
+            {
+                if (materialAssets.TryGetValue(id, out var materialAsset))
+                {
+                    return materialAsset;
+                }
+            }
+
+            return null;
         }
 
         public static MaterialAsset? GetMaterialAsset(string name)
         {
             lock(materialAssets)
             {
-                return materialAssets.Find(x => x.name == name);
+                return materialAssets.ToList().Find(x => x.Value.name == name).Value;
+            }
+        }
+
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+
+        public static ShaderAsset? GetShaderAsset(string name)
+        {
+            lock (shaderAssets)
+            {
+                return shaderAssets.Find(x => x.name == name);
             }
         }
 
@@ -256,7 +282,6 @@ namespace SolarSharp.Assets
             Directory.GetFiles(path, "*.rg", SearchOption.AllDirectories).ToList().ForEach(x => LoadRenderGraphAsset(x));
             return true;
         }
-
 
         public static RenderGraphAsset LoadRenderGraphAsset(string path)
         {
@@ -296,7 +321,7 @@ namespace SolarSharp.Assets
                 {
                     ShaderAsset shaderAsset = new ShaderAsset();
                     shaderAsset.Path = path;
-                    shaderAsset.Name = Path.GetFileNameWithoutExtension(path);
+                    shaderAsset.name = Path.GetFileNameWithoutExtension(path);
                     
                     StreamReader file = new StreamReader(path);
                     shaderAsset.Src = file.ReadToEnd();

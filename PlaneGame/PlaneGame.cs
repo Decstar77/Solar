@@ -19,9 +19,9 @@ namespace PlaneGame
             planeEntity = scene.CreateEntity();
             planeEntity.Position = new Vector3(0, 35, 0);
 
-            Guid guid = Guid.NewGuid();
-            Guid.TryParse("2ce77668-e7d6-428d-b762-ee998d1e7709", out guid);
-            planeEntity.RenderingState.ModelId = guid;
+            //Guid guid = Guid.NewGuid();
+            //Guid.TryParse("2ce77668-e7d6-428d-b762-ee998d1e7709", out guid);
+            //planeEntity.RenderingState.ModelId = guid;
 
             camera.Position = planeEntity.Position + new Vector3(0, 55, -15) ;
             camera.LookAt(planeEntity.Position );

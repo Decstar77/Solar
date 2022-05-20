@@ -25,8 +25,6 @@ namespace SolarSharp.Rendering
         }
     }
 
-
-
     public static class RenderSystem
     {
         public static DXDevice device;
@@ -41,6 +39,8 @@ namespace SolarSharp.Rendering
         public static StaticMesh cube;
 
         public static GraphicsShader shader;
+
+        public static GraphicsShader packedMaterialShader;
 
         private static ConstBuffer constBuffer0;
         private static ConstBuffer constBuffer1;
@@ -84,6 +84,20 @@ namespace SolarSharp.Rendering
             }
         }
 
+        class InstancedDrawCall
+        {
+            public StaticMesh mesh;
+            public List<Matrix4> transforms = new List<Matrix4>();
+        }
+
+        class MaterialDrawCall
+        {
+            public Vector4 albedo;
+            public Dictionary<Guid, InstancedDrawCall> meshCalls = new Dictionary<Guid, InstancedDrawCall>();
+        }
+
+        private static Dictionary<Guid, MaterialDrawCall> drawCalls = new Dictionary<Guid, MaterialDrawCall>();
+
         public static bool Initialize()
         {
             DeviceContext deviceContext = new DeviceContext();
@@ -103,7 +117,7 @@ namespace SolarSharp.Rendering
 
             rasterizerState = deviceContext.Device.CreateRasterizerState(new RasterizerDesc { 
                 CullMode = RasterizerCullMode.BACK,
-                //FillMode = RasterizerFillMode.WIREFRAME
+                FillMode = RasterizerFillMode.WIREFRAME
             });
             blendState = deviceContext.Device.CreateBlendState(new BlendDesc());
 
@@ -112,11 +126,11 @@ namespace SolarSharp.Rendering
             samplerState2 = deviceContext.Device.CreateSamplerState(new SamplerDesc { Filter = Filter.MIN_MAG_MIP_LINEAR });
 
 
-            quad = new StaticMesh(device, MeshFactory.CreateQuad(-1, 1, 2, 2, 0));
-            cube = new StaticMesh(device, MeshFactory.CreateBox(1, 1, 1, 1));
+            quad = new StaticMesh(device, MeshFactory.CreateQuad(-1, 1, 2, 2, 0), VertexLayout.PNT);
+            cube = new StaticMesh(device, MeshFactory.CreateBox(1, 1, 1, 1), VertexLayout.PNT);
 
-            shader = new GraphicsShader().Create(device, Assets.AssetSystem.ShaderAssets[0]); 
-            
+            shader = new GraphicsShader().Create(device, AssetSystem.GetShaderAsset("FirstShader"), VertexLayout.PNT);
+
             constBuffer0 = new ConstBuffer(device, 16 * 3).SetVS(context, 0);
             constBuffer1 = new ConstBuffer(device, 16 * 3).SetVS(context, 1);
             materialConstBuffer = new ConstBuffer(device, 16).SetPS(context, 0);
@@ -128,17 +142,81 @@ namespace SolarSharp.Rendering
             return true;
         }
 
-        private static bool temp = false;
-        public static void BackupRenderer(GameScene scene)
+        public static void BackupRenderer(RenderPacket renderPacket)
         {
-            if ( !temp && AssetSystem.GetModelAsset("windmill.fbx") != null)
+            CreateAndDestroyMeshes();
+            CreateAndDestroyTextures();
+
+            context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); 
+            context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 1.0f, 0);
+            context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
+
+            context.SetViewPortState(Window.SurfaceWidth, Window.SurfaceHeight); 
+            context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST); 
+            context.SetDepthStencilState(depthStencilState);
+            context.SetRasterizerState(rasterizerState); 
+            //context.SetBlendState(blendState);
+
+            context.SetPSSampler(samplerState0, 0);
+            context.SetPSSampler(samplerState1, 1);
+            context.SetPSSampler(samplerState2, 2);
+
+            constBuffer1.Reset().
+                Prepare(renderPacket.projectionMatrix).
+                Prepare(renderPacket.viewMatrix).
+                Prepare(Matrix4.Identity).
+                Upload(context);
+
+            DebugVariables.DrawCalls = 0;
+            DebugVariables.IndexCount = 0;
+
+            if (shader != null && shader.IsValid())
             {
-                ModelAsset model = AssetSystem.GetModelAsset("windmill.fbx");
+                context.SetInputLayout(shader.inputLayout); 
+                context.SetVertexShader(shader.vertexShader);
+                context.SetPixelShader(shader.pixelShader);
 
-                cube = new StaticMesh(device, model.meshes[0]);
-                temp = true;
-            };
+                foreach (RenderPacketEntry entry in renderPacket.renderPacketEntries)
+                {
+                    if (meshes.TryGetValue(entry.meshId, out StaticMesh mesh))
+                    {
+                        MaterialAsset material = AssetSystem.GetMaterialAsset(entry.materialId);
 
+                        if (material != null)
+                        {
+                            Matrix4 mvp = renderPacket.projectionMatrix * renderPacket.viewMatrix * entry.transform;
+
+                            constBuffer0.Reset().
+                                Prepare(mvp).
+                                Prepare(entry.transform).
+                                Prepare(entry.transform.Inverse).
+                                Upload(context);
+
+                            materialConstBuffer.Reset().
+                                Prepare(material.AlbedoColour).
+                                Upload(context);
+
+                            context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
+                            context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
+                            context.DrawIndexed(mesh.IndexCount, 0, 0);
+
+                            DebugVariables.DrawCalls++;
+                            DebugVariables.IndexCount += (int)mesh.IndexCount;
+                        }
+                    }
+                }
+            }
+         
+            DebugDraw.Flush(context);
+        }
+
+        public static void SwapBuffers(bool vysnc)
+        {
+            swapchain.Present(vysnc);
+        }
+
+        private static void CreateAndDestroyMeshes()
+        {
             lock (meshesToRemove)
             {
                 foreach (Guid modelAsset in meshesToRemove)
@@ -164,11 +242,18 @@ namespace SolarSharp.Rendering
                     // @TODO: Probably not a failure case but I want to investigate later 
                     Debug.Assert(!meshes.ContainsKey(meshAsset.Guid));
 
-                    meshes.Add(meshAsset.Guid, new StaticMesh(device, meshAsset));
+                    StaticMesh mesh = new StaticMesh(device, meshAsset, VertexLayout.PNT);
+                    //drawCalls.Add(mesh.mater)
+
+
+                    meshes.Add(meshAsset.Guid, mesh);
                 }
                 meshesToAdd.Clear();
             }
+        }
 
+        private static void CreateAndDestroyTextures()
+        {
             lock (texturesToAdd)
             {
                 foreach (TextureAsset textureAsset in texturesToAdd)
@@ -178,105 +263,6 @@ namespace SolarSharp.Rendering
                 }
                 texturesToAdd.Clear();
             }
-
-
-            Camera camera = scene.Camera;
-
-            Matrix4 proj = camera.GetProjectionMatrix();
-            Matrix4 view = camera.GetViewMatrix();
-
-            context.ClearRenderTargetView(swapchain.renderTargetView, new Vector4(0.2f, 0.2f, 0.2f, 1.0f)); 
-            context.ClearDepthStencilView(swapchain.depthStencilView, ClearFlag.D3D11_CLEAR_DEPTH, 1.0f, 0);
-            context.SetRenderTargets(swapchain.depthStencilView, swapchain.renderTargetView);
-
-            context.SetViewPortState(Window.SurfaceWidth, Window.SurfaceHeight); // @DONE
-            context.SetPrimitiveTopology(PrimitiveTopology.TRIANGLELIST); // @DONE
-            context.SetDepthStencilState(depthStencilState); // @DONE
-            context.SetRasterizerState(rasterizerState); // @DONE
-            //context.SetBlendState(blendState);
-
-            context.SetPSSampler(samplerState0, 0);
-            context.SetPSSampler(samplerState1, 1);
-            context.SetPSSampler(samplerState2, 2);
-
-            constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
-
-            DebugVariables.DrawCalls = 0;
-            DebugVariables.IndexCount = 0;
-
-            if (shader != null && cube != null)
-            {
-                if (shader.IsValid())
-                {
-                    context.SetInputLayout(shader.inputLayout);   
-                    context.SetVertexShader(shader.vertexShader); 
-                    context.SetPixelShader(shader.pixelShader);   
-
-                    Entity[] entities = scene.GetAllEntities();
-                    foreach (Entity entity in entities)
-                    {
-                        if (entity.RenderingState.ModelId != Guid.Empty)
-                        {
-                            ModelAsset modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
-                            if (modelAsset != null)
-                            {
-                                foreach (MeshAsset meshAsset in modelAsset.meshes)
-                                {
-                                    StaticMesh mesh;
-                                    if (meshes.TryGetValue(meshAsset.Guid, out mesh))
-                                    {
-                                        Matrix4 m = entity.ComputeTransformMatrix();
-                                        Matrix4 mvp = proj * view * m;
-
-                                        string matName = !string.IsNullOrEmpty(entity.RenderingState.MaterialReference) ? 
-                                            entity.RenderingState.MaterialReference :
-                                            meshAsset.materialName;
-
-                                        MaterialAsset materialAsset = AssetSystem.GetMaterialAsset(matName);
-
-                                        constBuffer0.Reset().Prepare(mvp).Prepare(m).Prepare(m.Inverse).Upload(context);
-                                        materialConstBuffer.Reset().Prepare(materialAsset.AlbedoColour).Upload(context);
-
-                                        context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
-                                        context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
-                                        context.DrawIndexed(mesh.IndexCount, 0, 0);
-                                        DebugVariables.DrawCalls++;
-                                        DebugVariables.IndexCount += (int)mesh.IndexCount;
-                                    }
-
-                                }
-
-                            }
-                            //{
-                            //    StaticTexture texture;
-                            //    if (textures.TryGetValue(entity.Material.AlbedoTexture, out texture))
-                            //    {
-                            //        Matrix4 mvp = proj * view * entity.ComputeModelMatrix();
-
-                            //        constBuffer0.Reset().Prepare(mvp).Upload(context);
-                            //        constBuffer1.Reset().Prepare(proj).Prepare(view).Prepare(Matrix4.Identity).Upload(context);
-
-                            //        context.SetPSShaderResources(texture.srv, 0);
-
-                            //        context.SetVertexBuffers(mesh.VertexBuffer, mesh.StrideBytes);
-                            //        context.SetIndexBuffer(mesh.IndexBuffer, TextureFormat.R32_UINT, 0);
-                            //        context.DrawIndexed(mesh.IndexCount, 0, 0);
-                            //    }
-                            //}  
-                        }
-                    }
-
-                }
-            }
-
-            //Logger.Info("Draw calls: " + drawCallCount);
-            DebugDraw.Flush(context);
         }
-
-        public static void SwapBuffers(bool vysnc)
-        {
-            swapchain.Present(vysnc);
-        }
-
     }
 }

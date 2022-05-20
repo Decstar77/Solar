@@ -19,16 +19,16 @@ namespace SolarSharp.Rendering
 
         }
 
-        public GraphicsShader Create(DXDevice device, ShaderAsset shaderAsset)
+        public GraphicsShader Create(DXDevice device, ShaderAsset shaderAsset, VertexLayout layout)
         {
-            Name = shaderAsset.Name;
+            Name = shaderAsset.name;
 
             DXBlob vertexBlob = device.CompileShader(shaderAsset.Src, "VSmain", "vs_5_0");
             DXBlob pixelBlob = device.CompileShader(shaderAsset.Src, "PSmain", "ps_5_0");
 
             if (vertexBlob.Ptr != IntPtr.Zero && pixelBlob.Ptr != IntPtr.Zero)
             {
-                InputElementDesc[] inputElementDescs = GetInputElementDescs(VertexLayout.PNT);
+                InputElementDesc[] inputElementDescs = GetInputElementDescs(layout);
 
                 inputLayout = device.CreateInputLayout(vertexBlob, inputElementDescs);
 
@@ -133,8 +133,6 @@ namespace SolarSharp.Rendering
                 case VertexLayout.TEXT:
                     return null;
                 case VertexLayout.PC:
-                    return null;
-                case VertexLayout.COUNT:
                     return null;
             }
 

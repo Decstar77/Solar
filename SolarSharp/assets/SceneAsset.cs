@@ -16,7 +16,8 @@ namespace SolarSharp.Assets
         [JsonInclude] public EntityReference reference;
         [JsonInclude] public EntityReference parent;
         [JsonInclude] public List<EntityReference> children;
-        [JsonInclude] public RenderingState renderingState;
+        [JsonInclude] public Guid modelId;
+        [JsonInclude] public List<MeshState> meshStates;
         [JsonInclude] public Dictionary<string, object> properties;
     }
 

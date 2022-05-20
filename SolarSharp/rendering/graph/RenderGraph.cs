@@ -177,11 +177,11 @@ namespace SolarSharp.Rendering.Graph
 
         public GraphicsShader CreateOrGetGraphicsShader(ShaderAsset shaderAsset, DXDevice device) 
         {
-            GraphicsShader shader = graphicsShaders.Find(x => { return x.Name == shaderAsset.Name; });
+            GraphicsShader shader = graphicsShaders.Find(x => { return x.Name == shaderAsset.name; });
 
             if (shader == null) {
-                Logger.Trace("Creating new graphics shader " + shaderAsset.Name);
-                shader = new GraphicsShader().Create(device, shaderAsset);
+                Logger.Trace("Creating new graphics shader " + shaderAsset.name);
+                shader = new GraphicsShader().Create(device, shaderAsset, VertexLayout.PNT);
                 graphicsShaders.Add(shader);
             }
 
@@ -237,7 +237,7 @@ namespace SolarSharp.Rendering.Graph
             setGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 150)).outFlowPin.Connect(setRenderTargetsNode.inFlowPin);
             getGraphicsShaderNode.SetPositionScreenSpace(new Vector2(870, 450));
             getGraphicsShaderNode.ShaderPin.Connect(setGraphicsShaderNode.ShaderPin);
-            getGraphicsShaderNode.ShaderName = AssetSystem.ShaderAssets[0].Name;
+            getGraphicsShaderNode.ShaderName = AssetSystem.ShaderAssets[0].name;
 
             getSwapChainNode2.SetPositionScreenSpace(new Vector2(870, 0));
             getSwapChainNode2.ColourPin.Connect(setRenderTargetsNode.RenderTargetPin);

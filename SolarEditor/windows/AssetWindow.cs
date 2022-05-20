@@ -152,7 +152,7 @@ namespace SolarEditor
                         int idCounter = 0;
                         AssetSystem.ShaderAssets.ForEach(x => {
                             ImGui.Separator();
-                            ImGui.Text(x.Name); ImGui.NextColumn();
+                            ImGui.Text(x.name); ImGui.NextColumn();
                             ImGui.Text(x.Path); ImGui.NextColumn();
                             ImGui.PushId(idCounter++);
                             if (ImGui.Button("Edit"))

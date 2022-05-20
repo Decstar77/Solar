@@ -13,7 +13,7 @@ namespace SolarSharp.Assets
         TRANSPARENT = 0x2
     }
 
-    public class MaterialAsset
+    public class MaterialAsset : EngineAsset
     {
         public string name;
         public MaterialFlag Flags { get; set; }        

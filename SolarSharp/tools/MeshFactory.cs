@@ -115,9 +115,10 @@ namespace SolarSharp.Tools
 		private static MeshAsset ConvertMeshDataIntoMeshResource(MeshData meshData, VertexLayout layout)
         {
 			MeshAsset meshResource = new MeshAsset();
-			meshResource.vertices = new List<float>();
+			meshResource.positions = new List<Vector3>();
+			meshResource.normals = new List<Vector3>();
+			meshResource.uvs = new List<Vector2>();
 			meshResource.indices = new List<uint>();
-			meshResource.layout = layout;
 
 			switch (layout)
             {
@@ -127,22 +128,12 @@ namespace SolarSharp.Tools
                     break;
                 case VertexLayout.P_PAD:
                     break;
-                case VertexLayout.PNT:
-                    {
-						meshResource.indices = meshData.indices;						
-
-						for (int i = 0; i < meshData.vertices.Count; i++)
-						{
-							meshResource.vertices.Add(meshData.vertices[i].position.x);
-							meshResource.vertices.Add(meshData.vertices[i].position.y);
-							meshResource.vertices.Add(meshData.vertices[i].position.z);
-							
-							meshResource.vertices.Add(meshData.vertices[i].normal.x);
-							meshResource.vertices.Add(meshData.vertices[i].normal.y);
-							meshResource.vertices.Add(meshData.vertices[i].normal.z);
-
-							meshResource.vertices.Add(meshData.vertices[i].uv.x);
-							meshResource.vertices.Add(meshData.vertices[i].uv.y);
+                case VertexLayout.PNT: {
+						meshResource.indices.AddRange(meshData.indices);
+						for (int i = 0; i < meshData.vertices.Count; i++) {
+							meshResource.positions.Add(meshData.vertices[i].position);
+							meshResource.normals.Add(meshData.vertices[i].normal);
+							meshResource.uvs.Add(meshData.vertices[i].uv);
 						}
 					}
                     break;
@@ -153,8 +144,6 @@ namespace SolarSharp.Tools
                 case VertexLayout.TEXT:
                     break;
                 case VertexLayout.PC:
-                    break;
-                case VertexLayout.COUNT:
                     break;
             }
 

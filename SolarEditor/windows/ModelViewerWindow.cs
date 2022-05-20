@@ -32,7 +32,6 @@ namespace SolarEditor
                         {
                             ImGui.Separator();
                             ImGui.Text("MeshName: " + mesh.name);
-                            ImGui.Text("VertexLayout: " + mesh.layout.ToString());
                             ImGui.Text("MaterialName: " + mesh.materialName);
                             ImGui.Text("Guid: " + mesh.Guid);
                         }

@@ -45,7 +45,7 @@
     <Compile Include="rendering\imgui\ImGizmo.cs" />
     <Compile Include="rendering\StaticTexture.cs" />
     <Compile Include="tools\MeshFactory.cs" />
-    <Compile Include="core\RenderPacket.cs" />
+    <Compile Include="rendering\RenderPacket.cs" />
     <Compile Include="core\Util.cs" />
     <Compile Include="core\Window.cs" />
     <Compile Include="EngineAPI\ImGuiAPI.cs" />

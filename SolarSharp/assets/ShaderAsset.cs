@@ -14,7 +14,7 @@ namespace SolarSharp.Assets
         private static string FRAGMENT_BEGIN_TOKEN = "//FragmentShaderBegin//";
         private static string FRAGMENT_END_TOKEN = "//FragmentShaderEnd//";
 
-        public string Name { get; set; }
+        public string name { get; set; }
         public string Path { get; set; }
         public string Src { get; set; }
              

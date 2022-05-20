@@ -101,8 +101,8 @@ namespace SolarEditor
 
         private void Compile()
         {
-            Logger.Info($"Compiling {shaderAsset.Name}");
-            RenderSystem.shader.Release().Create(RenderSystem.device, shaderAsset);
+            Logger.Info($"Compiling {shaderAsset.name}");
+            RenderSystem.shader.Release().Create(RenderSystem.device, shaderAsset, VertexLayout.PNT);
         }
 
         private void Save()

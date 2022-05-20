@@ -78,7 +78,8 @@ namespace SolarSharp
                 cpuClock.Start();
 
                 GameScene gameScene = config.OnUpdateCallback.Invoke();
-                RenderSystem.BackupRenderer(gameScene);
+                RenderPacket renderPacket = gameScene.CreateRenderPacket();
+                RenderSystem.BackupRenderer(renderPacket);
                 
                 //Console.WriteLine(cpuClock.GetElapsedTime() * 1000);
 

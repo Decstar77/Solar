@@ -56,9 +56,11 @@ namespace SolarEditor
 
             foreach (Mesh m in scene.Meshes)
             {
-                MeshAsset mesh = new MeshAsset();
-                mesh.vertices = new List<float>(m.VertexCount);
-                mesh.indices = new List<uint>(3 * m.FaceCount);
+                MeshAsset mesh  = new MeshAsset();
+                mesh.positions  = new List<Vector3>(m.VertexCount);
+                mesh.normals    = new List<Vector3>(m.VertexCount);
+                mesh.uvs        = new List<Vector2>(m.VertexCount);
+                mesh.indices    = new List<uint>(3 * m.FaceCount);
 
                 Vector3 minPos = new Vector3(float.MaxValue);
                 Vector3 maxPos = new Vector3(-float.MaxValue);
@@ -76,16 +78,9 @@ namespace SolarEditor
                     minPos = Vector3.Min(minPos, new SolarSharp.Vector3(pos.X, pos.Y, pos.Z));
                     maxPos = Vector3.Max(maxPos, new SolarSharp.Vector3(pos.X, pos.Y, pos.Z));
 
-                    mesh.vertices.Add(pos.X);
-                    mesh.vertices.Add(pos.Y);
-                    mesh.vertices.Add(pos.Z);
-
-                    mesh.vertices.Add(norm.X);
-                    mesh.vertices.Add(norm.Y);
-                    mesh.vertices.Add(norm.Z);
-
-                    mesh.vertices.Add(uv.X);
-                    mesh.vertices.Add(uv.Y);  
+                    mesh.positions.Add(new Vector3(pos.X, pos.Y, pos.Z));
+                    mesh.normals.Add(new Vector3(norm.X, norm.Y, norm.Z));
+                    mesh.uvs.Add(new Vector2(uv.X, uv.Y));
                 }
 
                 mesh.alignedBox = new AlignedBox(minPos, maxPos);
@@ -107,7 +102,6 @@ namespace SolarEditor
                     mesh.indices.Add((uint)(f.Indices[2]));
                 }
                 
-                mesh.layout = VertexLayout.PNT;
                 mesh.name = m.Name;
                 mesh.materialName = scene.Materials[m.MaterialIndex].Name;
                 model.meshes.Add(mesh);

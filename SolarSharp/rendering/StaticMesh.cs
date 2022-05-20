@@ -16,7 +16,7 @@ namespace SolarSharp.Rendering
         public DXBuffer VertexBuffer { get; set; }
         public DXBuffer IndexBuffer { get; set; }
 
-        public StaticMesh(DXDevice device, MeshAsset mesh) : this(device, mesh.vertices.ToArray(), mesh.indices.ToArray(), mesh.layout)
+        public StaticMesh(DXDevice device, MeshAsset mesh, VertexLayout layout) : this(device, mesh.PackedVertices(layout).ToArray() , mesh.indices.ToArray(), layout)
         {
             
         }

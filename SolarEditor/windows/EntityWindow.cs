@@ -37,26 +37,12 @@ namespace SolarEditor
                             }
                         }
 
-                        if (ImGui.CollapsingHeader("Material"))
+                        if (ImGui.CollapsingHeader("Rendering"))
                         {
                             var models = AssetSystem.GetSortedModelAssets();
-                            string[] modelNames = models.Select(x => x.name).ToArray();
-                            int modelIndex = models.FindIndex(x => x.Guid == Entity.RenderingState.ModelId);
-
-                            if (ImGui.Combo("Model", ref modelIndex, modelNames))
-                            {
-                                Entity.RenderingState.ModelId = models[modelIndex].Guid;
-                            }
-
-                            //var textures = AssetSystem.GetSortedTextureAssets();
-                            //string[] textureNames = textures.Select(x => x.name).ToArray();
-                            //int textureIndex = textures.FindIndex(x => x.Guid == Entity.Material.AlbedoTexture);
-                            //if (ImGui.Combo("Albedo", ref textureIndex, textureNames)) {
-                            //    Entity.Material.AlbedoTexture = textures[textureIndex].Guid;
-                            //}
-
-
+                            models.Select(model => model.name);
                         }
+
                     }
 
                 }

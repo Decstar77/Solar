@@ -278,6 +278,11 @@ namespace SolarEditor
 
             paletteContext.SetScene(new GameScene(AssetSystem.LoadGameSceneAsset(Application.Config.AssetPath + "Palette.json")));
 
+            Entity entity = currentContext.scene.CreateEntity();
+            Guid g;
+            Guid.TryParse("a1fc79b4-8e82-4a2f-b551-ab077f26c823", out g);
+            entity.RenderingState.SetModel(g);
+
             Logger.Info("Editor startup complete");
         }
 
@@ -321,9 +326,9 @@ namespace SolarEditor
                                     if (info.t > minDist)
                                         continue;
 
-                                    if (entity.RenderingState != null && entity.RenderingState.ModelId != Guid.Empty)
+                                    if (entity.RenderingState != null && entity.RenderingState.GetModelId() != Guid.Empty)
                                     {
-                                        ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.ModelId);
+                                        ModelAsset? modelAsset = AssetSystem.GetModelAsset(entity.RenderingState.GetModelId());
                                         if (modelAsset != null)
                                         {
                                             Matrix4 transformMatrix = entity.ComputeTransformMatrix();
@@ -568,7 +573,7 @@ namespace SolarEditor
                 x += 5;
 
                 Entity entity = paletteContext.scene.CreateEntity();
-                entity.RenderingState.ModelId = asset.Guid;
+               // entity.RenderingState.ModelId = asset.Guid;
                 entity.Position += new Vector3(x, 0, z);
                 entity.Name = asset.name;
                 if (x > 30)

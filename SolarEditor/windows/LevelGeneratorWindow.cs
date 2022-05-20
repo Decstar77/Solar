@@ -236,31 +236,31 @@ namespace SolarEditor
 
                     switch (direction)
                     {
-                        case TileDirectionType.N: entity.RenderingState.ModelId = createInfo.TileNone; break;
-                        case TileDirectionType.L: entity.RenderingState.ModelId = createInfo.TileL; break;
-                        case TileDirectionType.R: entity.RenderingState.ModelId = createInfo.TileR; break;
-                        case TileDirectionType.F: entity.RenderingState.ModelId = createInfo.TileF; break;
-                        case TileDirectionType.B: entity.RenderingState.ModelId = createInfo.TileB; break;
-                        case TileDirectionType.FULL: entity.RenderingState.ModelId = createInfo.TileFull; break;
-                        case TileDirectionType.RB: entity.RenderingState.ModelId = createInfo.TileRB; break;
-                        case TileDirectionType.RF: entity.RenderingState.ModelId = createInfo.TileRF; break;
-                        case TileDirectionType.LF: entity.RenderingState.ModelId = createInfo.TileLF; break;
-                        case TileDirectionType.LB: entity.RenderingState.ModelId = createInfo.TileLB; break;
-                        case TileDirectionType.RFB: entity.RenderingState.ModelId = createInfo.TileRFB; break;
-                        case TileDirectionType.LRF: entity.RenderingState.ModelId = createInfo.TileLRF; break;
-                        case TileDirectionType.LFB: entity.RenderingState.ModelId = createInfo.TileLFB; break;
-                        case TileDirectionType.LRB: entity.RenderingState.ModelId = createInfo.TileLRB; break;
+                        case TileDirectionType.N:       entity.RenderingState.SetModel(createInfo.TileNone); break;
+                        case TileDirectionType.L:       entity.RenderingState.SetModel(createInfo.TileL); break;
+                        case TileDirectionType.R:       entity.RenderingState.SetModel(createInfo.TileR); break;
+                        case TileDirectionType.F:       entity.RenderingState.SetModel(createInfo.TileF); break;
+                        case TileDirectionType.B:       entity.RenderingState.SetModel(createInfo.TileB); break;
+                        case TileDirectionType.FULL:    entity.RenderingState.SetModel(createInfo.TileFull); break;
+                        case TileDirectionType.RB:      entity.RenderingState.SetModel(createInfo.TileRB); break;
+                        case TileDirectionType.RF:      entity.RenderingState.SetModel(createInfo.TileRF); break;
+                        case TileDirectionType.LF:      entity.RenderingState.SetModel(createInfo.TileLF); break;
+                        case TileDirectionType.LB:      entity.RenderingState.SetModel(createInfo.TileLB); break;
+                        case TileDirectionType.RFB:     entity.RenderingState.SetModel(createInfo.TileRFB); break;
+                        case TileDirectionType.LRF:     entity.RenderingState.SetModel(createInfo.TileLRF); break;
+                        case TileDirectionType.LFB:     entity.RenderingState.SetModel(createInfo.TileLFB); break;
+                        case TileDirectionType.LRB:     entity.RenderingState.SetModel(createInfo.TileLRB); break;
                     }
-
+                                                            
                     switch (cell.type)
                     {
                         case LevelTileType.NONE:
-                        case LevelTileType.CONCRETE:    entity.RenderingState.MaterialReference = "Grey_Asphalt"; break;
-                        case LevelTileType.GRASS:       entity.RenderingState.MaterialReference = "Grass"; break;
-                        case LevelTileType.GRAVEL:      entity.RenderingState.MaterialReference = "Sand"; break;
-                        case LevelTileType.SAND:        entity.RenderingState.MaterialReference = "Sand"; break;
-                        case LevelTileType.WATER:       entity.RenderingState.MaterialReference = "Water";break;
-                        case LevelTileType.SNOW:        entity.RenderingState.MaterialReference = "Snow"; break;
+                        case LevelTileType.CONCRETE: entity.RenderingState.SetMeshMaterial(0, AssetSystem.GetMaterialAsset("Grey_Asphalt").Guid); break;
+                        case LevelTileType.GRASS:    entity.RenderingState.SetMeshMaterial(0, AssetSystem.GetMaterialAsset("Grass").Guid); break;
+                        case LevelTileType.GRAVEL:   entity.RenderingState.SetMeshMaterial(0, AssetSystem.GetMaterialAsset("Sand").Guid); break;
+                        case LevelTileType.SAND:     entity.RenderingState.SetMeshMaterial(0, AssetSystem.GetMaterialAsset("Sand").Guid); break;
+                        case LevelTileType.WATER:    entity.RenderingState.SetMeshMaterial(0, AssetSystem.GetMaterialAsset("Water").Guid); break;
+                        case LevelTileType.SNOW:     entity.RenderingState.SetMeshMaterial(0, AssetSystem.GetMaterialAsset("Snow").Guid); break;
                     }
                 }
             });
@@ -286,14 +286,14 @@ namespace SolarEditor
                         { 
                             Entity entity = scene.CreateEntity();
                             entity.Position = GetPlacementWorldPostion(placement.xIndex, placement.zIndex);
-                            entity.RenderingState.ModelId = createInfo.Building01Model;
+                            entity.RenderingState.SetModel(createInfo.Building01Model);
                         }
                         break;
                     case LevelPlacementType.ROAD:
                         {
                             Entity entity = scene.CreateEntity();
                             entity.Position = GetPlacementWorldPostion(placement.xIndex, placement.zIndex);
-                            entity.RenderingState.ModelId = createInfo.RoadFlat;
+                            entity.RenderingState.SetModel(createInfo.RoadFlat);
                         }
                         break;
                 }
